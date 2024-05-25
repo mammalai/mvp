@@ -7,6 +7,9 @@ def generate_uuid():
 
 
 ROLES = {
+    'unverified': {
+        'description': 'Unverified User'
+    },
     'free': {
         'description': 'Free User'
     },
@@ -38,7 +41,7 @@ class Role(db.Model):
     @classmethod
     def get_all_roles_for_user(cls, username):
         roles_list = cls.query.filter_by(username=username).all()
-        return [r_db.role for r_db in roles_list]
+        return [r_db for r_db in roles_list]
     
     @classmethod
     def role_exists_for_user(cls, username, role):

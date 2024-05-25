@@ -8,15 +8,21 @@ from backend.models.token import TokenBlocklist
 from backend.extensions import db, jwt
 from datetime import timedelta
 
+import os
+from backend.config import TestConfig, DevConfig
+
+
 def create_app():
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////Users/salarsatti/projects/flask-rest/backend/database.db"
-    app.config['SECRET_KEY'] = "2934948fn394fnqp4ifqp394fSRHF8EFH9WEFn9"
-    app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1) # you probably want to change this to a short time
-    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
-
+    # if no environment variable, it will default to test
+    if os.environ.get("FLASK_ENV") == "TEST" or os.environ.get("FLASK_ENV") == None:
+        app.config.from_object(TestConfig)
+    elif os.environ.get("FLASK_ENV") == "DEV":
+        app.config.from_object(DevConfig)
+    else:
+        raise Exception("At least one config has not been set")
+   
     # initialize exts
     db.init_app(app)
     jwt.init_app(app)

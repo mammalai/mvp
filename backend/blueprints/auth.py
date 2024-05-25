@@ -12,8 +12,152 @@ import sys
 from backend.models.user import User
 from backend.models.token import TokenBlocklist 
 from backend.models.role import Role
+from backend.models.user import EmailVerification
+from backend.models.user import EmailPasswordReset
+
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
+import uuid
+import os
 
 auth_bp = Blueprint("auth", __name__)
+
+@auth_bp.post("/password_reset/new_password")
+def password_reset_new_password():
+    reset_token = request.args.get("verification_token")
+    data = request.get_json()
+    # use the token to get the email/user password reset
+    epr = EmailPasswordReset.get_epr_by_token(token=reset_token)
+
+    if epr is None:
+        return jsonify({"error": "Invalid token"}), 400
+    else:
+        # update the user's password from the data in the dictionary
+        u = User.get_user_by_email(email=epr.email)
+        u.set_password(password=data.get('new_password'))
+        u.save()
+        # delete the token so it can't be used again
+        epr.delete()
+        return jsonify({"message": "Password reset successful."}), 200
+    
+def send_password_reset_email(email, reset_token):
+    print(f"Sending password reset email to {email}")
+    
+    message = Mail(
+        from_email=f'info@{os.environ.get("DOMAIN_NAME")}',
+        to_emails=email,
+        subject=f'{os.environ.get("DOMAIN_NAME")} - Password reset',
+        html_content=
+            f"""
+                <strong>
+                    Your sent a password reset request to {email}.
+                </strong>
+                <br>
+                <br>
+                <a href="http://localhost:5000/auth/resetpassword?email={email}&{reset_token}">Click here to reset your password</a>
+                <p>{reset_token}</p>
+            """
+    )
+    try:
+        sg = SendGridAPIClient('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')
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e)
+
+@auth_bp.post("/password_reset/request_email")
+def password_reset_request_email():
+    data = request.get_json()
+    email = data.get("email")
+
+    user = User.get_user_by_email(email=email)
+    if user is None:
+        return jsonify({"message": "Password reset email sent"}), 201
+    else:
+        token = str(uuid.uuid4())
+        # remove any old password reset tokens
+        old_epr = EmailPasswordReset.get_epr_by_email(email=user.email)
+        if old_epr is not None:
+            old_epr.delete()
+        # create a new password reset token
+        new_reset = EmailPasswordReset(email=user.email, token=token)
+        new_reset.save()
+        send_password_reset_email(user.email, token)
+        return jsonify({"message": "Password reset email sent"}), 201
+
+
+@auth_bp.post("/emailverification")
+def email_verification():
+    verification_token = request.args.get("verification_token")
+    print(verification_token)
+
+    email_verification = EmailVerification.get_email_by_token(token=verification_token)
+    if email_verification is None:
+        return jsonify({"error": "Invalid token"}), 400
+    else:
+        # delete any roles that are labelled as unverified
+        user_roles = Role.get_all_roles_for_user(username=email_verification.email)
+        user_roles[0].delete()
+
+        # add the user as a free user
+        Role.add_role_for_user(username=email_verification.email, role='free')
+        email_verification.delete()
+        return jsonify({"message": f"User email verified for: {email_verification.email}"}), 201
+
+
+def send_email_verification_email(email, verification_token):
+    print(f"Sending email verification email to {email}")
+    message = Mail(
+        from_email=f'info@{os.environ.get("DOMAIN_NAME")}',
+        to_emails=email,
+        subject=f'{os.environ.get("DOMAIN_NAME")} - Email verification',
+        html_content=
+            f"""
+                <strong>
+                    Please verify yout email: {email}
+                </strong>
+                <br>
+                <br>
+                <a href="http://localhost:5000/auth/verify?email={email}&{verification_token}">Click here to verify your email</a>
+                <p>{verification_token}</p>
+            """
+    )
+    try:
+        sg = SendGridAPIClient('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')
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e)
+
+
+@auth_bp.post("/emailregistration")
+def email_registration():
+    data = request.get_json()
+    user = User.get_user_by_email(email=data.get("email"))
+
+    if user is not None:
+        return jsonify({"error": "User already exists"}), 409
+    # create the user
+    new_user = User(email=data.get("email"))
+    new_user.set_password(password=data.get("password"))
+    # add the user as a free user
+    role = Role(username=new_user.email, role='unverified')
+    
+    verification_token = str(uuid.uuid4())
+    new_verification = EmailVerification(email=new_user.email, token=verification_token)
+    
+    role.save()
+    new_user.save()
+    new_verification.save()
+
+    send_email_verification_email(new_user.email, verification_token)
+
+    return jsonify({"message": "User created"}), 201
 
 
 @auth_bp.post("/register")
@@ -23,14 +167,12 @@ def register_user():
 
     if user is not None:
         return jsonify({"error": "User already exists"}), 409
-    # get the initial user
+    # create the user
     new_user = User(username=data.get("username"), email=data.get("email"))
-    # set the password hash
     new_user.set_password(password=data.get("password"))
-    # commit the user to the database
     new_user.save()
     # add the user as a free user
-    Role.add_role_for_user(username=new_user.username, role='free')
+    Role.add_role_for_user(username=new_user.email, role='free')
 
     return jsonify({"message": "User created"}), 201
 
@@ -39,14 +181,15 @@ def register_user():
 def login_user():
     data = request.get_json()
 
-    user = User.get_user_by_username(username=data.get("username"))
+    user = User.get_user_by_email(email=data.get("email"))
 
     if user and (user.check_password(password=data.get("password"))):
              
-        roles_list = Role.get_all_roles_for_user(username=user.username)
+        roles_list = Role.get_all_roles_for_user(username=user.email)
+        roles_list_str = [r.role for r in roles_list]
         
-        access_token = create_access_token(identity=user.username, additional_claims={"roles": roles_list})
-        refresh_token = create_refresh_token(identity=user.username)
+        access_token = create_access_token(identity=user.email, additional_claims={"roles": roles_list_str})
+        refresh_token = create_refresh_token(identity=user.email)
 
         return (
             jsonify(
@@ -68,7 +211,6 @@ def whoami():
         {
             "message": "message",
             "user_details": {
-                "username": current_user.username,
                 "email": current_user.email,
             },
         }

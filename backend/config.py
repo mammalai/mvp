@@ -11,3 +11,12 @@ class TestConfig:
     JWT_SECRET_KEY = "super-secret"  # Change this!
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1) # you probably want to change this to a short time
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+
+
+class DevConfig:
+    SQLALCHEMY_DATABASE_URI = "sqlite:////Users/salarsatti/projects/flask-mvp/backend/database.db"
+    SECRET_KEY = "293"
+    JWT_SECRET="super-secret"
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    

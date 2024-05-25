@@ -16,17 +16,66 @@ def client():
 			yield testclient
 
 def test_create_user(client):
-		with client.application.app_context():
-			test_username = "ssatti"
-			# set the new user
-			new_user = User(username=test_username, email="s@gmai.com")
-			# set the password hash
-			new_user.set_password(password="1234")
-			# commit the user to the database
-			new_user.save()
+	with client.application.app_context():
+		"""
+		arrange
+		"""
+		test_username = "ssatti"
+		new_user = User(username=test_username, email="s@gmai.com")
+		new_user.set_password(password="1234")
+		"""
+		act
+		"""
+		new_user.save()
+		# Add assertions to verify that the user was created successfully
+		user = User.query.filter_by(username=test_username).first()
+		"""
+		assert
+		"""
+		assert user is not None
+		assert user.username == test_username
+		assert user.check_password("1234")
 
-			# Add assertions to verify that the user was created successfully
-			user = User.query.filter_by(username=test_username).first()
-			assert user is not None
-			assert user.username == test_username
-			assert user.check_password("1234")
+def test_delete_user(client):
+	with client.application.app_context():
+		"""
+		arrange
+		"""
+		test_username = "ssatti"
+		# set the new user, password, and save the user
+		new_user = User(username=test_username, email="s@gmail.com")
+		new_user.set_password(password="1234")
+		new_user.save()
+		"""
+		act
+		"""
+		user = User.query.filter_by(username=test_username).first()
+		new_user.delete()
+		"""
+		assert
+		"""
+		user = User.query.filter_by(username=test_username).first()
+		assert user is None
+
+def test_update_user_password(client):
+	with client.application.app_context():
+		"""
+		arrange
+		"""
+		test_username = "ssatti"
+		# set the new user
+		new_user = User(username=test_username, email="s@gmai.com")
+		new_user.set_password(password="old_password")
+		new_user.save()
+		"""
+		act
+		"""
+		user = User.query.filter_by(username=test_username).first()
+		user.set_password(password="new_password")
+		user.save()
+		"""
+		assert
+		"""
+		user = User.query.filter_by(username=test_username).all()
+		assert(len(user) == 1)
+		assert user[0].check_password("new_password")

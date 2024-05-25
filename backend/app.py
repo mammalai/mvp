@@ -9,7 +9,7 @@ from backend.extensions import db, jwt
 from datetime import timedelta
 
 import os
-from backend.config import TestConfig
+from backend.config import TestConfig, DevConfig
 
 
 def create_app():
@@ -18,16 +18,14 @@ def create_app():
     # if no environment variable, it will default to test
     if os.environ.get("FLASK_ENV") == "TEST" or os.environ.get("FLASK_ENV") == None:
         app.config.from_object(TestConfig)
+    elif os.environ.get("FLASK_ENV") == "DEV":
+        app.config.from_object(DevConfig)
     else:
         raise Exception("At least one config has not been set")
    
     # initialize exts
     db.init_app(app)
     jwt.init_app(app)
-
-    if os.environ.get("FLASK_ENV") == "TEST" or os.environ.get("FLASK_ENV") == None:
-        with app.app_context():
-            db.create_all()
 
     # register bluepints
     app.register_blueprint(auth_bp, url_prefix="/auth")

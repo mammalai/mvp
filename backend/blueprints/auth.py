@@ -124,15 +124,18 @@ def send_email_verification_email(email, verification_token):
                 <p>{verification_token}</p>
             """
     )
-    try:
-        sg = SendGridAPIClient('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')
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e)
-
+    sendgrid_api_key = os.environ.get("SENDGRID_API_KEY")
+    if sendgrid_api_key:
+        try:
+            sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+            response = sg.send(message)
+            print(response.status_code)
+            print(response.body)
+            print(response.headers)
+        except Exception as e:
+            print(e)
+    else:
+        print("No sendgrid API key found")
 
 @auth_bp.post("/emailregistration")
 def email_registration():

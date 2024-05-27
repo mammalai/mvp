@@ -54,7 +54,7 @@ class EmailVerification(db.Model):
         return f"<EmailVerification {self.email}: {self.token}>"
     
     @classmethod
-    def get_email_by_token(cls, token):
+    def get_email_verification_by_token(cls, token):
         return cls.query.filter_by(token=token).first()
 
     def save(self):

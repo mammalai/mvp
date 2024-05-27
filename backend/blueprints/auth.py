@@ -93,7 +93,7 @@ def password_reset_request_email():
 def email_verification():
     verification_token = request.args.get("token")
 
-    email_verification = EmailVerification.get_email_by_token(token=verification_token)
+    email_verification = EmailVerification.get_email_verification_by_token(token=verification_token)
     if email_verification is None:
         return jsonify({"error": "Invalid token"}), 400
     else:

@@ -23,9 +23,9 @@ import os
 
 auth_bp = Blueprint("auth", __name__)
 
-@auth_bp.post("/password_reset/new_password")
+@auth_bp.post("/password-reset/password")
 def password_reset_new_password():
-    reset_token = request.args.get("verification_token")
+    reset_token = request.args.get("token")
     data = request.get_json()
     # use the token to get the email/user password reset
     epr = EmailPasswordReset.get_epr_by_token(token=reset_token)
@@ -35,7 +35,7 @@ def password_reset_new_password():
     else:
         # update the user's password from the data in the dictionary
         u = User.get_user_by_email(email=epr.email)
-        u.set_password(password=data.get('new_password'))
+        u.set_password(password=data.get('password'))
         u.save()
         # delete the token so it can't be used again
         epr.delete()

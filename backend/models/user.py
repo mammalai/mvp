@@ -57,6 +57,10 @@ class EmailVerification(db.Model):
     def get_email_verification_by_token(cls, token):
         return cls.query.filter_by(token=token).first()
 
+    @classmethod
+    def get_email_verification_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
+
     def save(self):
         db.session.add(self)
         db.session.commit()

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -184,24 +184,25 @@ def login_user():
     user = User.get_user_by_email(email=data.get("email"))
 
     if user and (user.check_password(password=data.get("password"))):
-             
         roles_list = Role.get_all_roles_for_user(username=user.email)
         roles_list_str = [r.role for r in roles_list]
         
         access_token = create_access_token(identity=user.email, additional_claims={"roles": roles_list_str})
         refresh_token = create_refresh_token(identity=user.email)
 
-        return (
-            jsonify(
-                {
-                    "message": "Logged In ",
-                    "tokens": {"access": access_token, "refresh": refresh_token},
-                }
-            ),
-            200,
+        response = make_response(
+            jsonify({
+                "message": "Authentication successful",
+                "access_token": access_token
+            }), 200
         )
 
-    return jsonify({"error": "Invalid username or password"}), 400
+        # HTTP-only cookies cannot be accessed via JavaScript which prevents client-side scripts
+        # from reading the token.
+        response.set_cookie("refresh_token", refresh_token, httponly=True, samesite="Strict")
+        return response
+    else:
+        return jsonify({"error": "Invalid username or password"}), 400
 
 
 @auth_bp.get("/whoami")

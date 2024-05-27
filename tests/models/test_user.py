@@ -15,14 +15,18 @@ def client():
 			db.create_all()
 			yield testclient
 
-def test_create_user(client):
+@pytest.fixture
+def strong_password():
+    return "StrongPassword123"
+
+def test_create_user(client, strong_password):
 	with client.application.app_context():
 		"""
 		arrange
 		"""
 		test_username = "ssatti"
 		new_user = User(username=test_username, email="s@gmai.com")
-		new_user.set_password(password="1234")
+		new_user.set_password(password=strong_password)
 		"""
 		act
 		"""
@@ -34,9 +38,9 @@ def test_create_user(client):
 		"""
 		assert user is not None
 		assert user.username == test_username
-		assert user.check_password("1234")
+		assert user.check_password(strong_password)
 
-def test_delete_user(client):
+def test_delete_user(client, strong_password):
 	with client.application.app_context():
 		"""
 		arrange
@@ -44,7 +48,7 @@ def test_delete_user(client):
 		test_username = "ssatti"
 		# set the new user, password, and save the user
 		new_user = User(username=test_username, email="s@gmail.com")
-		new_user.set_password(password="1234")
+		new_user.set_password(password=strong_password)
 		new_user.save()
 		"""
 		act
@@ -57,7 +61,7 @@ def test_delete_user(client):
 		user = User.query.filter_by(username=test_username).first()
 		assert user is None
 
-def test_update_user_password(client):
+def test_update_user_password(client, strong_password):
 	with client.application.app_context():
 		"""
 		arrange
@@ -65,17 +69,17 @@ def test_update_user_password(client):
 		test_username = "ssatti"
 		# set the new user
 		new_user = User(username=test_username, email="s@gmai.com")
-		new_user.set_password(password="old_password")
+		new_user.set_password(password=f"old_{strong_password}")
 		new_user.save()
 		"""
 		act
 		"""
 		user = User.query.filter_by(username=test_username).first()
-		user.set_password(password="new_password")
+		user.set_password(password=f"new_{strong_password}")
 		user.save()
 		"""
 		assert
 		"""
 		user = User.query.filter_by(username=test_username).all()
 		assert(len(user) == 1)
-		assert user[0].check_password("new_password")
+		assert user[0].check_password(f"new_{strong_password}")

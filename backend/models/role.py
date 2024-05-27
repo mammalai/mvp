@@ -31,6 +31,8 @@ class Role(db.Model):
         return f'<Role {self.username}={self.role}>'
 
     def save(self):
+        if self.id == None:
+            self.id = str(generate_uuid())
         db.session.add(self)
         db.session.commit()
 

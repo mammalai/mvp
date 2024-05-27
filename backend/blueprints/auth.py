@@ -197,6 +197,8 @@ def login_user():
             }), 200
         )
 
+        # HTTP-only cookies cannot be accessed via JavaScript which prevents client-side scripts
+        # from reading the token.
         response.set_cookie("refresh_token", refresh_token, httponly=True, samesite="Strict")
         return response
     else:

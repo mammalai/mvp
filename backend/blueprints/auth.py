@@ -39,7 +39,7 @@ def password_reset_new_password():
         u.save()
         # delete the token so it can't be used again
         epr.delete()
-        return jsonify({"message": "Password reset successful."}), 200
+        return jsonify({"message": "Password reset successful"}), 200
     
 def send_password_reset_email(email, reset_token):
     print(f"Sending password reset email to {email}")

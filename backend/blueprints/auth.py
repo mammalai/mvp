@@ -91,8 +91,7 @@ def password_reset_request_email():
 
 @auth_bp.post("/emailverification")
 def email_verification():
-    verification_token = request.args.get("verification_token")
-    print(verification_token)
+    verification_token = request.args.get("token")
 
     email_verification = EmailVerification.get_email_by_token(token=verification_token)
     if email_verification is None:

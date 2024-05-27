@@ -59,16 +59,16 @@ def send_password_reset_email(email, reset_token):
                 <p>{reset_token}</p>
             """
     )
-    try:
-        sg = SendGridAPIClient('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')
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e)
+    # try:
+    #     sg = SendGridAPIClient('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')
+    #     response = sg.send(message)
+    #     print(response.status_code)
+    #     print(response.body)
+    #     print(response.headers)
+    # except Exception as e:
+    #     print(e)
 
-@auth_bp.post("/password_reset/request_email")
+@auth_bp.post("/password-reset/request")
 def password_reset_request_email():
     data = request.get_json()
     email = data.get("email")

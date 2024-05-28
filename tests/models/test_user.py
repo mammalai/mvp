@@ -61,6 +61,35 @@ def test_delete_user(client, strong_password):
 		user = User.query.filter_by(username=test_username).first()
 		assert user is None
 
+def test_update_with_weak_password(client, strong_password):
+	with client.application.app_context():
+		"""
+		arrange
+		"""
+		test_username = "weak_password"
+		# set the new user
+		new_user = User(username=test_username, email="s@gmai.com")
+		"""
+		assert
+		"""
+		with pytest.raises(ValueError) as excinfo:
+			new_user.set_password(password=f"short")
+		assert "Password must be at least 8 characters long" in str(excinfo.value)
+
+		with pytest.raises(ValueError) as excinfo:
+			new_user.set_password(password=f"no_upper_case")
+		assert "Password must contain at least one uppercase letter" in str(excinfo.value)
+
+		with pytest.raises(ValueError) as excinfo:
+			new_user.set_password(password=f"NO_LOWER_CASE")
+		assert "Password must contain at least one lowercase letter" in str(excinfo.value)
+
+		with pytest.raises(ValueError) as excinfo:
+			new_user.set_password(password=f"NO_numberS")
+		assert "Password must contain at least one number" in str(excinfo.value)
+
+		new_user.set_password(password=f"new_{strong_password}")
+
 def test_update_user_password(client, strong_password):
 	with client.application.app_context():
 		"""

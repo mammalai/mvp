@@ -4,7 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 import pytest
 from backend.app import create_app, db
-from backend.models.user import User
+from backend.models.user import User, EmailVerification
+from backend.models.role import Role
 
 @pytest.fixture
 def client():
@@ -18,6 +19,43 @@ def client():
 @pytest.fixture
 def strong_password():
     return "StrongPassword123"
+
+def test_register_with_verification(client, strong_password):
+    """
+    arrange
+    """
+    test_username = "register_test_user"
+    email = f"{test_username}@gmail.com"
+    """
+    act
+    """
+    response = client.post("/auth/emailregistration", json={
+        "email": email,
+        "password": strong_password
+    })
+    assert response.status_code == 201
+    """
+    assert
+    """
+    user = User.query.filter_by(email=email).first()
+    assert user is not None
+    assert user.email == email
+    assert user.check_password(strong_password)
+    roles_list = Role.get_all_roles_for_user(username=user.email)
+    assert roles_list[0].role == "unverified"
+
+    email_verification = EmailVerification.get_email_verification_by_email(email=email)
+
+    response = client.post(f"/auth/emailverification?token=invalid_token")
+    assert response.status_code == 400
+    assert response.json["error"] == "Invalid token"
+
+    response = client.post(f"/auth/emailverification?token={email_verification.token}")
+    assert response.status_code == 201
+    assert response.json["message"] == f"User email verified for: {email_verification.email}"
+
+    roles_list = Role.get_all_roles_for_user(username=user.email)
+    assert roles_list[0].role == "free"
 
 def test_login_failure(client):
 	response = client.post("/auth/login", json={

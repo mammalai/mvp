@@ -74,6 +74,9 @@ def password_reset_request_email():
     email = data.get("email")
 
     user = User.get_user_by_email(email=email)
+    # If the user is not found, do not reveal this to the client by sending
+    # a 400 response. If we send a 400 response, an attacker could use this
+    # to determine if an email is registered with our service.
     if user is None:
         return jsonify({"message": "Password reset email sent"}), 201
     else:

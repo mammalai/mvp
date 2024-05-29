@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 import pytest
 from backend.app import create_app, db
-from backend.models.user import User, EmailVerification
+from backend.models.user import User, EmailPasswordReset, EmailVerification
 from backend.models.role import Role
 
 @pytest.fixture
@@ -97,3 +97,83 @@ def test_login_success(client, strong_password):
 
     assert auth_cookie is not None
     assert "HttpOnly" in auth_cookie
+	
+def test_reset_password_non_existent_user(client):
+    """
+    act
+    """
+    response = client.post("/auth/password-reset/request", json={
+        "email": "non_existent@email.com"
+    })
+    """
+    assert
+    """
+    assert response.status_code == 201
+    assert response.json["message"] == "Password reset email sent"
+
+def test_reset_password_wrong_token(client, strong_password):
+    with client.application.app_context():
+        """
+		arrange
+		"""
+        test_username = "wrong_reset_password_token"
+        email = f"{test_username}@gmail.com"
+        new_user = User(username=test_username, email=email)
+        new_user.set_password(password=strong_password)
+        user_role = Role(username=email, role="unverified")
+        
+        new_user.save()
+        user_role.save()
+
+    """
+    act
+    """
+    response = client.post("/auth/password-reset/request", json={
+        "email": email
+    })
+    assert response.status_code == 201
+    assert response.json["message"] == "Password reset email sent"
+
+    response = client.post("/auth/password-reset/password?token=non_existent_token", json={
+        "password": f"new_{strong_password}"
+    })
+    
+    """
+    assert
+    """
+    assert response.status_code == 400
+    assert response.json["error"] == "Invalid token"
+
+def test_reset_password(client, strong_password):
+    with client.application.app_context():
+        """
+		arrange
+		"""
+        test_username = "reset_password_user"
+        email = f"{test_username}@gmail.com"
+        new_user = User(username=test_username, email=email)
+        new_user.set_password(password=strong_password)
+        user_role = Role(username=email, role="unverified")
+        
+        new_user.save()
+        user_role.save()
+
+    """
+    act
+    """
+    response = client.post("/auth/password-reset/request", json={
+        "email": email
+    })
+    assert response.status_code == 201
+    assert response.json["message"] == "Password reset email sent"
+
+    epr = EmailPasswordReset.get_epr_by_email(email=email)
+
+    response = client.post(f"/auth/password-reset/password?token={epr.token}", json={
+        "password": f"new_{strong_password}"
+    })
+    assert response.status_code == 200
+    assert response.json["message"] == "Password reset successful"
+    """
+    assert
+    """

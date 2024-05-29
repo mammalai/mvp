@@ -74,6 +74,9 @@ def password_reset_request_email():
     email = data.get("email")
 
     user = User.get_user_by_email(email=email)
+    # If the user is not found, do not reveal this to the client by sending
+    # a 400 response. If we send a 400 response, an attacker could use this
+    # to determine if an email is registered with our service.
     if user is None:
         return jsonify({"message": "Password reset email sent"}), 201
     else:
@@ -91,10 +94,9 @@ def password_reset_request_email():
 
 @auth_bp.post("/emailverification")
 def email_verification():
-    verification_token = request.args.get("verification_token")
-    print(verification_token)
+    verification_token = request.args.get("token")
 
-    email_verification = EmailVerification.get_email_by_token(token=verification_token)
+    email_verification = EmailVerification.get_email_verification_by_token(token=verification_token)
     if email_verification is None:
         return jsonify({"error": "Invalid token"}), 400
     else:
@@ -125,15 +127,18 @@ def send_email_verification_email(email, verification_token):
                 <p>{verification_token}</p>
             """
     )
-    try:
-        sg = SendGridAPIClient('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')
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e)
-
+    sendgrid_api_key = os.environ.get("SENDGRID_API_KEY")
+    if sendgrid_api_key:
+        try:
+            sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+            response = sg.send(message)
+            print(response.status_code)
+            print(response.body)
+            print(response.headers)
+        except Exception as e:
+            print(e)
+    else:
+        print("No sendgrid API key found")
 
 @auth_bp.post("/emailregistration")
 def email_registration():

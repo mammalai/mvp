@@ -170,6 +170,9 @@ def test_reset_password(client, strong_password):
     })
     assert response.status_code == 200
     assert response.json["message"] == "Password reset successful"
+
+    user = User.query.filter_by(email=email).first()
+    assert user.check_password(f"new_{strong_password}")
     """
     assert
     """

@@ -35,6 +35,7 @@ def password_reset_new_password():
     else:
         # update the user's password from the data in the dictionary
         u = User.get_user_by_email(email=epr.email)
+        u.password = data.get("password")
         u.save()
         # delete the token so it can't be used again
         epr.delete()

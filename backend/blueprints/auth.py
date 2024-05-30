@@ -35,7 +35,7 @@ def password_reset_new_password():
     else:
         # update the user's password from the data in the dictionary
         u = User.get_user_by_email(email=epr.email)
-        u.set_password(password=data.get('password'))
+        u.password = data.get("password")
         u.save()
         # delete the token so it can't be used again
         epr.delete()
@@ -148,8 +148,7 @@ def email_registration():
     if user is not None:
         return jsonify({"error": "User already exists"}), 409
     # create the user
-    new_user = User(email=data.get("email"))
-    new_user.set_password(password=data.get("password"))
+    new_user = User(email=data.get("email"), password=data.get("password"))
     # add the user as a free user
     role = Role(username=new_user.email, role='unverified')
     
@@ -173,8 +172,7 @@ def register_user():
     if user is not None:
         return jsonify({"error": "User already exists"}), 409
     # create the user
-    new_user = User(username=data.get("username"), email=data.get("email"))
-    new_user.set_password(password=data.get("password"))
+    new_user = User(email=data.get("email"), password=data.get("password"))
     new_user.save()
     # add the user as a free user
     Role.add_role_for_user(username=new_user.email, role='free')

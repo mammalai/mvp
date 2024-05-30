@@ -13,10 +13,30 @@ class User(db.Model):
     id = db.Column(db.String(), primary_key=True, default=str(generate_uuid()))
     username = db.Column(db.String(), nullable=True)
     email = db.Column(db.String(), nullable=False)
-    password = db.Column(db.Text())
+    _password = db.Column(db.Text())
+
+    def __init__(self, email:str, password:str):
+        self.email = email
+        self._validate_strong_password(password)
+        self._password = generate_password_hash(password)
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+    # the @property and @password.setter are used to get and set the password - they will automatically validate and hash the password
+    @property
+    def password(self):
+        """
+            - The password property should not be accessed directly
+            - It should only be set by the set_password method, and we will
+            only return True or False to indicate if the password is set
+        """
+        return self._password is not None
+  
+    @password.setter
+    def password(self, value):
+        self._validate_strong_password(value)
+        self._password = generate_password_hash(value)
 
     def _validate_strong_password(self, password):
         if len(password) < 8:
@@ -28,12 +48,8 @@ class User(db.Model):
         if not re.search(r'[0-9]', password):
             raise ValueError("Password must contain at least one number")
 
-    def set_password(self, password):
-        self._validate_strong_password(password)
-        self.password = generate_password_hash(password)
-
     def check_password(self, password):
-        return check_password_hash(self.password, password)
+        return check_password_hash(self._password, password)
 
     @classmethod
     def get_user_by_username(cls, username):

@@ -1,6 +1,6 @@
 import sys
 import os 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 import pytest
 from backend.app import create_app, db
@@ -70,9 +70,7 @@ def test_login_success(client, strong_password):
         """
 		arrange
 		"""
-        test_username = "test_user"
-        new_user = User(username=test_username, email="test@gmail.com")
-        new_user.set_password(password=strong_password)
+        new_user = User(email="test@gmail.com", password=strong_password)
         """
         act
         """
@@ -118,8 +116,7 @@ def test_reset_password_wrong_token(client, strong_password):
 		"""
         test_username = "wrong_reset_password_token"
         email = f"{test_username}@gmail.com"
-        new_user = User(username=test_username, email=email)
-        new_user.set_password(password=strong_password)
+        new_user = User(email=email, password=strong_password)
         user_role = Role(username=email, role="unverified")
         
         new_user.save()
@@ -151,8 +148,7 @@ def test_reset_password(client, strong_password):
 		"""
         test_username = "reset_password_user"
         email = f"{test_username}@gmail.com"
-        new_user = User(username=test_username, email=email)
-        new_user.set_password(password=strong_password)
+        new_user = User(email=email, password=strong_password)
         user_role = Role(username=email, role="unverified")
         
         new_user.save()
@@ -174,6 +170,9 @@ def test_reset_password(client, strong_password):
     })
     assert response.status_code == 200
     assert response.json["message"] == "Password reset successful"
+
+    user = User.query.filter_by(email=email).first()
+    assert user.check_password(f"new_{strong_password}")
     """
     assert
     """

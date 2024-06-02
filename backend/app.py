@@ -9,7 +9,7 @@ from backend.extensions import db, jwt
 from datetime import timedelta
 
 import os
-from backend.config import TestConfig, DevConfig
+from backend.config import TestConfig, DevConfig, ProdConfig
 
 
 def create_app():
@@ -20,6 +20,8 @@ def create_app():
         app.config.from_object(TestConfig)
     elif os.environ.get("FLASK_ENV") == "DEV":
         app.config.from_object(DevConfig)
+    elif os.environ.get("FLASK_ENV") == "PROD":
+        app.config.from_object(ProdConfig)
     else:
         raise Exception("At least one config has not been set")
    

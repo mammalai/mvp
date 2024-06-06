@@ -21,7 +21,7 @@ class User(db.Model):
         self._password = generate_password_hash(password)
 
     def __repr__(self):
-        return f"<User {self.username}>"
+        return f"<User {self.email}>"
 
     # the @property and @password.setter are used to get and set the password - they will automatically validate and hash the password
     @property

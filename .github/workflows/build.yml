@@ -1,0 +1,43 @@
+# This workflow will do a clean install, build the source code and run tests across different versions of node
+# See: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: MVP API Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  run-tests:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+    - name: Checkout mvp
+      uses: actions/checkout@v4
+      with:
+        repository: mammalai/mvp
+        path: mvp
+    - name: Use python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install requirements
+      run: |
+        cd mvp
+        pip install -r requirements.txt
+    - name: Run tests
+      timeout-minutes: 10
+      run: |
+        cd mvp
+        pytest

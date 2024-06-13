@@ -1,7 +1,7 @@
 # This workflow will do a clean install, build the source code and run tests across different versions of node
 # See: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: OpenReview API Tests
+name: MVP API Tests
 
 on:
   pull_request:
@@ -15,8 +15,6 @@ concurrency:
 
 jobs:
   run-tests:
-    # env:
-    #   SENDGRID_API_KEY:
 
     runs-on: ubuntu-latest
 

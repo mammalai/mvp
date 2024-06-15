@@ -29,11 +29,15 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
 
-    # register bluepints
-    app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(user_bp, url_prefix="/users")
+    if os.environ.get("FLASK_ENV") == "TEST":
+        with app.app_context():
+            db.create_all()
 
-    @app.route('/echo', methods=['POST'])
+    # register bluepints
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(user_bp, url_prefix="/api/users")
+
+    @app.route('/api/echo', methods=['POST'])
     def echo():
         # Check if the request contains JSON data
         if not request.is_json:

@@ -29,7 +29,11 @@ export default defineConfig({
     // this ensures that the browser opens upon server start
     open: true,
     // this sets a default port to 3000
-    port: 3000
+    port: 3000,
+    // this sets the proxy to the backend server - flask by default runs on 5000
+    proxy: {
+      '/api': 'http://127.0.0.1:5000'
+    }
   },
   preview: {
     // this ensures that the browser opens upon preview start

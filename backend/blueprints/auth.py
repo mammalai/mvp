@@ -205,7 +205,7 @@ def login_user():
         response.set_cookie("refresh_token", refresh_token, httponly=True, samesite="Strict")
         return response
     else:
-        return jsonify({"error": "Invalid username or password"}), 400
+        return jsonify({"error": "Invalid username or password"}), 401
 
 
 @auth_bp.get("/whoami")

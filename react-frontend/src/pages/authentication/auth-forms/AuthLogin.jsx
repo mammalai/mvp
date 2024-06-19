@@ -28,6 +28,10 @@ import { Formik } from 'formik';
 // project import
 import AnimateButton from 'components/@extended/AnimateButton';
 
+// x-state
+import { setup, createMachine, fromPromise, assign } from 'xstate';
+import { useMachine } from '@xstate/react';
+
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
@@ -35,10 +39,63 @@ import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import FirebaseSocial from './FirebaseSocial';
 import { set } from 'lodash';
 
+const wait = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+/** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBiWAVwCNVcAXAbQAYBdRUABwD2sVrgH5eIAB6IAjABYAHCQDsCmR3XKOCgExydynQBoQAT0QBOAGwqOOnVZlWOHAMyu7OgL5eTaLHiEpLiwAMqMzCwsBFDUEGJgZPgAbgIA1on+OATEZGERrNH4UAgEqZjo0WKcXDUSgsJV4khSiK7yJFYOFhYArK5WPb0yDibmCCM2vUN2rjoWila9vT5+GNlBeeFMhTHUYABOBwIHJHwUlQBmJ6gkWYG5IduRRSVlAhVNNXUtDSJiEmkCFc1hIcgsHF6OkhOmmHGsY0QOlcvRIA36FmUcmWClxVlcPl8IHwAggcAk9xyRHqQn+zVAQIAtFZEQhmSQXJzoU5tL0sSsiZTNuQqDTGqJ6a0EPpWQoLCQnFYllDVGpYcpViAhY98jsojExXTAYhcRyFFiDCNVEsFqyZLoSL1OXY5IN3DjNdrSPRMJg4PBfrSmsaECqOSCOI4+Qp3MYzCaZGCej0FK65PpzXJPesHqRLuhcBQ6AcwIbgy0gWG3BCo6pY3b9EmesonfblINYYSvEA */
+const loginMachine = setup({
+  actors: {
+    handleSubmit: fromPromise(async ({ input }) => {
+      // const user = await fetchUser(input.userId);
+      console.log(input);
+      // console.log(user);
+      // console.log(password);
+      return {data:'vasdf'};
+    })
+  }
+}).createMachine({
+  initial: 'idle',
+  states: {
+    idle: { // entering details in the login form
+      on: {
+        submit: {
+          target: 'isSubmitting',
+        }
+      }
+    },
+    isSubmitting: { // submitting the form and waiting for the response
+      invoke: {
+        input: ({ context, event }) => ({ user: event.user, password: event.password }),
+        src: 'handleSubmit',
+        onDone: {
+          target: 'success',
+          actions: assign({ user: ({ event }) => event.output })
+        },
+        onError: {
+          target: 'failure',
+          actions: assign({ error: ({ event }) => event.error })
+        }
+      }
+    }, 
+    success: { // successfully logged in
+      type: 'final'
+    }, 
+    failure: {  // failed to login
+      type: 'final'
+    },
+  }
+});
+  
+  
+
 // ============================|| JWT - LOGIN ||============================ //
 
 export default function AuthLogin({ isDemo = false }) {
+
   const [checked, setChecked] = React.useState(false);
+
+  const [state, send] = useMachine(loginMachine);
 
   // form validation hooks
   const [showLoadIcon, setShowLoadIcon] = React.useState(false);
@@ -56,10 +113,6 @@ export default function AuthLogin({ isDemo = false }) {
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
-  };
-
-  const wait = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
   };
 
   const handleSubmit = (values) => {
@@ -109,7 +162,7 @@ export default function AuthLogin({ isDemo = false }) {
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
-        onSubmit={handleSubmit}
+        onSubmit={(values) => send({ type: 'submit', user: values.email, password: values.password })}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
@@ -236,6 +289,9 @@ export default function AuthLogin({ isDemo = false }) {
              
 
             </Grid>
+            <div>
+              {JSON.stringify(state)}
+            </div>
           </form>
         )}
       </Formik>

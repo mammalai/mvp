@@ -150,6 +150,18 @@ export default function AuthLogin({ isDemo = false }) {
 
   }
 
+  if (state.value === 'idle') {
+    //show form
+  } elif (state.value === 'loading') {
+    //show spinny thing
+  } elif (state.value === 'success') {
+    //redirect to home page
+  } elif (state.value === 'failure') {
+    //show error message from context
+    //set formik isubmitting to false
+  }
+
+
   return (
     <>
       <Formik

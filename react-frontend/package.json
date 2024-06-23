@@ -19,7 +19,8 @@
     "preview": "vite preview",
     "lint": "eslint \"*.{js,jsx,mjs}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "prepare": "cd .. && husky react-frontend/.husky"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",

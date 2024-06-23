@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
 
@@ -39,55 +39,107 @@ import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import FirebaseSocial from './FirebaseSocial';
 import { set } from 'lodash';
 
-const wait = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
-
-/** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBiWAVwCNVcAXAbQAYBdRUABwD2sVrgH5eIAB6IAjABYAHCQDsCmR3XKOCgExydynQBoQAT0QBOAGwqOOnVZlWOHAMyu7OgL5eTaLHiEpLiwAMqMzCwsBFDUEGJgZPgAbgIA1on+OATEZGERrNH4UAgEqZjo0WKcXDUSgsJV4khSiK7yJFYOFhYArK5WPb0yDibmCCM2vUN2rjoWila9vT5+GNlBeeFMhTHUYABOBwIHJHwUlQBmJ6gkWYG5IduRRSVlAhVNNXUtDSJiEmkCFc1hIcgsHF6OkhOmmHGsY0QOlcvRIA36FmUcmWClxVlcPl8IHwAggcAk9xyRHqQn+zVAQIAtFZEQhmSQXJzoU5tL0sSsiZTNuQqDTGqJ6a0EPpWQoLCQnFYllDVGpYcpViAhY98jsojExXTAYhcRyFFiDCNVEsFqyZLoSL1OXY5IN3DjNdrSPRMJg4PBfrSmsaECqOSCOI4+Qp3MYzCaZGCej0FK65PpzXJPesHqRLuhcBQ6AcwIbgy0gWG3BCo6pY3b9EmesonfblINYYSvEA */
 const loginMachine = setup({
   actors: {
-    handleSubmit: fromPromise(async ({ input }) => {
-      // const user = await fetchUser(input.userId);
-      console.log(input);
-      // console.log(user);
-      // console.log(password);
-      return {data:'vasdf'};
-    })
+      loginRequest: fromPromise(async (args) => {
+          return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                  axios.post('/api/auth/login', {
+                      'email': args.input.context.loginCredentials.email,
+                      'password': args.input.context.loginCredentials.password
+                  })
+                  .then(response => {
+                      resolve(response);
+                  })
+                  .catch(error => {
+                      reject(error);
+                  });
+                  
+              }, 2000);
+            });        
+      }),
+
+  },
+  actions: {
+      "consoleLogFetch": ({context, event}) => {
+          console.log("Action to print fetch event")
+          console.log(event)
+          // console.log(event.output)
+      },
+      "assignFromFetchToContext": assign(({context, event}) => {
+          console.log("Function to print and assign username and password")
+          // event.output contains the output of the loadTodos function
+          // return a partial dictionary of the context will update the context
+          return {
+              loginCredentials: {
+                  email: event.data.email,
+                  password: event.data.password
+              }
+          }
+      }),
+      "assignLoadinErrorMessage": assign(({context, event}) => {
+          console.log("ASSIGN LOADING ERROR")
+          const axiosError = event.error
+          if (
+              ('response' in axiosError) && 
+              ('data' in axiosError.response) &&
+              ('error' in axiosError.response.data)
+          ) {
+              console.log("ASSIGNING BAKCEND MESSAGE")
+              console.log(axiosError.response.data.error)
+              return {
+                  errorMessage: axiosError.response.data.error
+              }
+          } else {
+              console.log("ASSIGNING UNKNOWN ERROR")
+              return {
+                  errorMessage: "An unknown error occured. Please try again later"
+              }
+          }
+      }),
+      "consoleLogLoading" : ({context, event}) => {
+          console.log("Action to print loading")
+          console.log(context)
+          console.log(event)
+      },
   }
 }).createMachine({
-  initial: 'idle',
+  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QBGAGxCSAdgBMmgKyaAzEdO7NAFgAcJgDQgAnhutG9ho-t12AnEZC+rYAviFOaFh4hKQUUugQBFB0DMwQimBk+NxSANaZkTgExCRxCUkpjAgEOZgMCvjCIk3K0rLyispqCEZ+6iSmmgbq+kImRrZ+1k6uCLb9gUJL+iuaNqah4SCF0SVlifjJ9IxMYABOZ1JnJBIUDCxXqCQ7xbHxB0ep1dlSdR2NohaSBAbTkDS6iF6-UGw1G40m0xcGl8JACpiEfn06nU1n0flsQTCW3wUggcGULxirRkYM6wO6AFpNDNEEywhEMEUYmRKDRjmBqe1wfTELiWQh1LZ9CQhn5jHj1H4hPYjOztpzdm9yodKgLgaD-hCEKY-H4BiNAisCXLrOpdOL1L0SHa5YNcXZ3ME1ZSSudLmddYLaUoRQgrNClWZTKZ1NHNKaHXLUXjjH0+sZrN6Na8SLAAK6YTBwWCB-U0w2h8MDSPRmNxhNIiVCUwkaxWIzWD26JZGExEkJAA */
+  context: {
+      loginCredentials: {
+          email: "",
+          password: ""
+      },
+      errorMessage: ""
+  },
+  initial: 'idleState',
   states: {
-    idle: { // entering details in the login form
-      on: {
-        submit: {
-          target: 'isSubmitting',
-        }
-      }
-    },
-    isSubmitting: { // submitting the form and waiting for the response
-      invoke: {
-        input: ({ context, event }) => ({ user: event.user, password: event.password }),
-        src: 'handleSubmit',
-        onDone: {
-          target: 'success',
-          actions: assign({ user: ({ event }) => event.output })
-        },
-        onError: {
-          target: 'failure',
-          actions: assign({ error: ({ event }) => event.error })
-        }
-      }
-    }, 
-    success: { // successfully logged in
-      type: 'final'
-    }, 
-    failure: {  // failed to login
-      type: 'final'
-    },
+      idleState: {
+          on: {
+              fetchEvent: {
+                  target: 'loadingState',
+                  actions: ['consoleLogFetch', 'assignFromFetchToContext']
+              }
+          }
+      },
+      loadingState: {
+          invoke: {
+              src: "loginRequest",
+              input: ({ context, event }) => ({ context }),
+              onDone: {
+                  target: "successState",
+                  actions: ['consoleLogLoading'],
+              },
+              onError: {
+                  target: "errorState",
+                  actions: ['consoleLogLoading', 'assignLoadinErrorMessage'],
+              }
+          },
+      },
+      errorState: {},
+      successState: {}
   }
 });
-  
-  
 
 // ============================|| JWT - LOGIN ||============================ //
 
@@ -116,65 +168,84 @@ export default function AuthLogin({ isDemo = false }) {
   };
 
   const handleSubmit = (values) => {
-    
     console.log(values);
-    const waitForSeconds = async () => {
-      setIsSub(true);
-      setShowInvalidError(false);
-      setShowLoadIcon(true);
-      await wait(1000); // Wait for 1 seconds
-      axios.post('/api/auth/login', {'email': values.email, 'password': values.password})
-        .then(response => {
-          console.log(response);
-          console.log(response.status === 200)
-          // navigate to the home page
-          navigate('/');
-        })
-        .catch(error => {
-          console.log(error);
-          // represent and invalid email and password
-          if (error.response.status === 401) {
-            // show error message
-            setShowInvalidError(true);
-          // something else has gone wrong
-          } else {
-            setShowUnkownError(true);
-          }
-          // allow to submit again
-          setIsSub(false);
+    send({type: "fetchEvent", data: values});
+
+    axios.post('/api/auth/login', {'email': values.email, 'password': values.password})
+      .then(response => {
+        console.log("I AM SUCCESS")
+        console.log(response);
+        console.log(response.status === 200)
+        // // navigate to the home page
+        // navigate('/');
+      })
+      .catch(error => {
+        console.log(error);
+        
+      });
+  };
+    
+    // const waitForSeconds = async () => {
+    //   setIsSub(true);
+    //   setShowInvalidError(false);
+    //   setShowLoadIcon(true);
+    //   await wait(1000); // Wait for 1 seconds
+    //   axios.post('/api/auth/login', {'email': values.email, 'password': values.password})
+    //     .then(response => {
+    //       console.log(response);
+    //       console.log(response.status === 200)
+    //       // navigate to the home page
+    //       navigate('/');
+    //     })
+    //     .catch(error => {
+    //       console.log(error);
+    //       // represent and invalid email and password
+    //       if (error.response.status === 401) {
+    //         // show error message
+    //         setShowInvalidError(true);
+    //       // something else has gone wrong
+    //       } else {
+    //         setShowUnkownError(true);
+    //       }
+    //       // allow to submit again
+    //       setIsSub(false);
           
-        });
-      setShowLoadIcon(false);
-    };
-    waitForSeconds();
+    //     });
+    //   setShowLoadIcon(false);
+    // };
+    // waitForSeconds();
 
-  }
+  
 
-  if (state.value === 'idle') {
-    //show form
-  } elif (state.value === 'loading') {
-    //show spinny thing
-  } elif (state.value === 'success') {
-    //redirect to home page
-  } elif (state.value === 'failure') {
-    //show error message from context
-    //set formik isubmitting to false
-  }
+  // if (state.value === 'idle') {
+  //   //show form
+  // } elif (state.value === 'loading') {
+  //   //show spinny thing
+  // } elif (state.value === 'success') {
+  //   //redirect to home page
+  // } elif (state.value === 'failure') {
+  //   //show error message from context
+  //   //set formik isubmitting to false
+  // }
 
+  useEffect(() => {
+    console.log('MACHINE STATE:', state.value)
+    console.log(state);
+  }, [state]);
 
   return (
     <>
       <Formik
         initialValues={{
           email: 'salarsattiss@gmail.com',
-          password: 'Stongassword12345!',
+          password: '6PINEapplesfoo!!',
           submit: null
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
-        onSubmit={(values) => send({ type: 'submit', user: values.email, password: values.password })}
+        onSubmit={handleSubmit}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>

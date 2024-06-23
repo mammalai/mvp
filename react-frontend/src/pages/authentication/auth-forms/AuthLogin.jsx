@@ -104,7 +104,7 @@ const loginMachine = setup({
       },
   }
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QBGAGxCSAdgBMmgKyaAzEdO7NAFgAcJgDQgAnhutG9ho-t12AnEZC+rYAviFOaFh4hKQUUugQBFB0DMwQimBk+NxSANaZkTgExCRxCUkpjAgEOZgMCvjCIk3K0rLyispqCEZ+6iSmmgbq+kImRrZ+1k6uCLb9gUJL+iuaNqah4SCF0SVlifjJ9IxMYABOZ1JnJBIUDCxXqCQ7xbHxB0ep1dlSdR2NohaSBAbTkDS6iF6-UGw1G40m0xcGl8JACpiEfn06nU1n0flsQTCW3wUggcGULxirRkYM6wO6AFpNDNEEywhEMEUYmRKDRjmBqe1wfTELiWQh1LZ9CQhn5jHj1H4hPYjOztpzdm9yodKgLgaD-hCEKY-H4BiNAisCXLrOpdOL1L0SHa5YNcXZ3ME1ZSSudLmddYLaUoRQgrNClWZTKZ1NHNKaHXLUXjjH0+sZrN6Na8SLAAK6YTBwWCB-U0w2h8MDSPRmNxhNIiVCUwkaxWIzWD26JZGExEkJAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QBGAKyaSATiH79AJiPqhAZiFGANCACeiI0IAseoQDYjm55t0AOdXU-XU0AX1DbNCw8QlIKKXQIAig6BmYIRTAyfG4pAGssqJwCYhJ4xOTUxgQCXMwGBXxhEWblaVl5RWU1BE8ddWc-Z10Adm0RkZN1WwcEU10Scz8jPwNNcwGhIZHwyIxi2LKEpPwU+kYmMAAnK6krkgkKBhY71BIimNLyk7O0mpypPVOk1RK0kCB2nJGt1EO51AtzLo4YiRuY0atpvZEBsjCQXEZRpNUepUUjdiAPiVSNdblcqsw2BxsDw+IJRG0ZFCuuCes4rCQ4ZNEashC5NDNEINXMsQrp1EtPEJ4TtyfgpBA4MpKbEOR1oTzEABaIyuILrEYBIyI7S6CUIQIjEh8vqWTSTQXk7WlchUem6rlKA1zcwkALOTxBEbuFzOTGzE1+EjeTTwoQTELONHuT37T5xY6Vc5gf3AmEIWMh9wjeGmEa6QZDIZ22uh3xLczuYLrExGHPRKkkGl3P3gyGloN+Mah6PmcbuTQWTR+O0d9QkKOaaP18zOTNu7MRCm5gewACumEwcFgI8knPHoB6AUTs90iPcaLdpnczdjizbFuCeUhE3PxwnCIA */
   context: {
       loginCredentials: {
           email: "",
@@ -136,7 +136,14 @@ const loginMachine = setup({
               }
           },
       },
-      errorState: {},
+      errorState: {
+        on: {
+          fetchEvent: {
+              target: 'loadingState',
+              actions: ['consoleLogFetch', 'assignFromFetchToContext']
+          }
+        }
+      },
       successState: {}
   }
 });
@@ -184,53 +191,15 @@ export default function AuthLogin({ isDemo = false }) {
         
       });
   };
-    
-    // const waitForSeconds = async () => {
-    //   setIsSub(true);
-    //   setShowInvalidError(false);
-    //   setShowLoadIcon(true);
-    //   await wait(1000); // Wait for 1 seconds
-    //   axios.post('/api/auth/login', {'email': values.email, 'password': values.password})
-    //     .then(response => {
-    //       console.log(response);
-    //       console.log(response.status === 200)
-    //       // navigate to the home page
-    //       navigate('/');
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //       // represent and invalid email and password
-    //       if (error.response.status === 401) {
-    //         // show error message
-    //         setShowInvalidError(true);
-    //       // something else has gone wrong
-    //       } else {
-    //         setShowUnkownError(true);
-    //       }
-    //       // allow to submit again
-    //       setIsSub(false);
-          
-    //     });
-    //   setShowLoadIcon(false);
-    // };
-    // waitForSeconds();
-
   
-
-  // if (state.value === 'idle') {
-  //   //show form
-  // } elif (state.value === 'loading') {
-  //   //show spinny thing
-  // } elif (state.value === 'success') {
-  //   //redirect to home page
-  // } elif (state.value === 'failure') {
-  //   //show error message from context
-  //   //set formik isubmitting to false
-  // }
-
   useEffect(() => {
     console.log('MACHINE STATE:', state.value)
     console.log(state);
+
+    if (state.value === 'successState') {
+      navigate('/');
+    }
+
   }, [state]);
 
   return (
@@ -338,10 +307,10 @@ export default function AuthLogin({ isDemo = false }) {
               </Grid>
               : null}
 
-              {showUnkownError ?
+              {state.value === "errorState" ?
               <Grid item xs={12}>
                 <Typography color='red'>
-                  Something went wrong. Please try again later.
+                  {state.context.errorMessage}
                 </Typography>
               </Grid>
               : null}
@@ -363,18 +332,14 @@ export default function AuthLogin({ isDemo = false }) {
                 <FirebaseSocial />
               </Grid> */}
               
-              {showLoadIcon ? 
+              {state.value === "loadingState" ?
               <Grid item xs={12}>
                 <LinearProgress />
               </Grid>
               :
               null}
-             
-
+            
             </Grid>
-            <div>
-              {JSON.stringify(state)}
-            </div>
           </form>
         )}
       </Formik>

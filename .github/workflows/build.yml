@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  run-tests:
+  run-backend-tests:
     runs-on: ubuntu-latest
 
     strategy:
@@ -40,3 +40,29 @@ jobs:
         run: |
           cd mvp
           pytest
+  run-frontend-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout mvp
+        uses: actions/checkout@v4
+        with:
+          repository: mammalai/mvp
+          path: mvp
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: |
+          cd mvp
+          yarn install
+      - name: Run tests
+        timeout-minutes: 10
+        run: |
+          cd mvp
+          yarn lint

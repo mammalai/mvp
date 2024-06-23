@@ -42,10 +42,9 @@ export default [
 
       parser: babelParser,
       ecmaVersion: 12,
-      sourceType: 'script',
+      sourceType: 'module',
 
       parserOptions: {
-        sourceType: 'module',
         ecmaFeatures: {
           experimentalObjectRestSpread: true,
           impliedStrict: true,
@@ -76,7 +75,7 @@ export default [
       'react/react-in-jsx-scope': 'off',
       'no-undef': 'off',
       'react/display-name': 'off',
-      'react/jsx-filename-extension': 'off',
+      'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.js'] }],
       'no-param-reassign': 'off',
       'react/prop-types': 1,
       'react/require-default-props': 'off',
@@ -115,6 +114,10 @@ export default [
           trailingComma: 'all',
           tabWidth: 2,
           useTabs: false,
+          semi: true,
+          quoteProps: 'as-needed',
+          arrowParens: 'always',
+          endOfLine: 'lf',
         },
       ],
     },

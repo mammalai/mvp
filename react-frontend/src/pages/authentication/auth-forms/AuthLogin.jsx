@@ -177,19 +177,6 @@ export default function AuthLogin({ isDemo = false }) {
   const handleSubmit = (values) => {
     console.log(values);
     send({type: "fetchEvent", data: values});
-
-    axios.post('/api/auth/login', {'email': values.email, 'password': values.password})
-      .then(response => {
-        console.log("I AM SUCCESS")
-        console.log(response);
-        console.log(response.status === 200)
-        // // navigate to the home page
-        // navigate('/');
-      })
-      .catch(error => {
-        console.log(error);
-        
-      });
   };
   
   useEffect(() => {

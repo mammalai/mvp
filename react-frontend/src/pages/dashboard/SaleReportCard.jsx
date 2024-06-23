@@ -13,16 +13,16 @@ import SalesChart from './SalesChart';
 const status = [
   {
     value: 'today',
-    label: 'Today'
+    label: 'Today',
   },
   {
     value: 'month',
-    label: 'This Month'
+    label: 'This Month',
   },
   {
     value: 'year',
-    label: 'This Year'
-  }
+    label: 'This Year',
+  },
 ];
 
 // ==============================|| DEFAULT - SALES REPORT ||============================== //

@@ -9,7 +9,7 @@ function getColorStyle({ color, theme }) {
 
   return {
     color: main,
-    backgroundColor: lighter
+    backgroundColor: lighter,
   };
 }
 
@@ -24,7 +24,7 @@ export default function Badge(theme) {
         standard: {
           minWidth: theme.spacing(2),
           height: theme.spacing(2),
-          padding: theme.spacing(0.5)
+          padding: theme.spacing(0.5),
         },
         light: {
           ...defaultLightBadge,
@@ -33,9 +33,9 @@ export default function Badge(theme) {
           '&.MuiBadge-colorError': getColorStyle({ color: 'error', theme }),
           '&.MuiBadge-colorInfo': getColorStyle({ color: 'info', theme }),
           '&.MuiBadge-colorSuccess': getColorStyle({ color: 'success', theme }),
-          '&.MuiBadge-colorWarning': getColorStyle({ color: 'warning', theme })
-        }
-      }
-    }
+          '&.MuiBadge-colorWarning': getColorStyle({ color: 'warning', theme }),
+        },
+      },
+    },
   };
 }

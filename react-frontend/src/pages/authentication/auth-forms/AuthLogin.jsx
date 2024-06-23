@@ -20,7 +20,6 @@ import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useNavigate } from 'react-router-dom';
 
-
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -59,43 +58,41 @@ export default function AuthLogin({ isDemo = false }) {
   };
 
   const wait = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
   const handleSubmit = (values) => {
-    
     console.log(values);
     const waitForSeconds = async () => {
       setIsSub(true);
       setShowInvalidError(false);
       setShowLoadIcon(true);
       await wait(1000); // Wait for 1 seconds
-      axios.post('/api/auth/login', {'email': values.email, 'password': values.password})
-        .then(response => {
+      axios
+        .post('/api/auth/login', { email: values.email, password: values.password })
+        .then((response) => {
           console.log(response);
-          console.log(response.status === 200)
+          console.log(response.status === 200);
           // navigate to the home page
           navigate('/');
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           // represent and invalid email and password
           if (error.response.status === 401) {
             // show error message
             setShowInvalidError(true);
-          // something else has gone wrong
+            // something else has gone wrong
           } else {
             setShowUnkownError(true);
           }
           // allow to submit again
           setIsSub(false);
-          
         });
       setShowLoadIcon(false);
     };
     waitForSeconds();
-
-  }
+  };
 
   return (
     <>
@@ -103,11 +100,11 @@ export default function AuthLogin({ isDemo = false }) {
         initialValues={{
           email: 'salarsattiss@gmail.com',
           password: 'Stongassword12345!',
-          submit: null
+          submit: null,
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          password: Yup.string().max(255).required('Password is required')
+          password: Yup.string().max(255).required('Password is required'),
         })}
         onSubmit={handleSubmit}
       >
@@ -194,21 +191,17 @@ export default function AuthLogin({ isDemo = false }) {
                   <FormHelperText error>{errors.submit}</FormHelperText>
                 </Grid>
               )}
-              {showInvalidError ?
-              <Grid item xs={12}>
-                <Typography color='red'>
-                  This email and password does not exist.
-                </Typography>
-              </Grid>
-              : null}
+              {showInvalidError ? (
+                <Grid item xs={12}>
+                  <Typography color="red">This email and password does not exist.</Typography>
+                </Grid>
+              ) : null}
 
-              {showUnkownError ?
-              <Grid item xs={12}>
-                <Typography color='red'>
-                  Something went wrong. Please try again later.
-                </Typography>
-              </Grid>
-              : null}
+              {showUnkownError ? (
+                <Grid item xs={12}>
+                  <Typography color="red">Something went wrong. Please try again later.</Typography>
+                </Grid>
+              ) : null}
 
               <Grid item xs={12}>
                 <AnimateButton>
@@ -226,15 +219,12 @@ export default function AuthLogin({ isDemo = false }) {
               <Grid item xs={12}>
                 <FirebaseSocial />
               </Grid> */}
-              
-              {showLoadIcon ? 
-              <Grid item xs={12}>
-                <LinearProgress />
-              </Grid>
-              :
-              null}
-             
 
+              {showLoadIcon ? (
+                <Grid item xs={12}>
+                  <LinearProgress />
+                </Grid>
+              ) : null}
             </Grid>
           </form>
         )}

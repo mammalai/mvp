@@ -57,7 +57,7 @@ export default function NavItem({ item, level }) {
         py: !drawerOpen && level === 1 ? 1.25 : 1,
         ...(drawerOpen && {
           '&:hover': {
-            bgcolor: 'primary.lighter'
+            bgcolor: 'primary.lighter',
           },
           '&.Mui-selected': {
             bgcolor: 'primary.lighter',
@@ -65,21 +65,21 @@ export default function NavItem({ item, level }) {
             color: iconSelectedColor,
             '&:hover': {
               color: iconSelectedColor,
-              bgcolor: 'primary.lighter'
-            }
-          }
+              bgcolor: 'primary.lighter',
+            },
+          },
         }),
         ...(!drawerOpen && {
           '&:hover': {
-            bgcolor: 'transparent'
+            bgcolor: 'transparent',
           },
           '&.Mui-selected': {
             '&:hover': {
-              bgcolor: 'transparent'
+              bgcolor: 'transparent',
             },
-            bgcolor: 'transparent'
-          }
-        })
+            bgcolor: 'transparent',
+          },
+        }),
       }}
     >
       {itemIcon && (
@@ -94,16 +94,16 @@ export default function NavItem({ item, level }) {
               alignItems: 'center',
               justifyContent: 'center',
               '&:hover': {
-                bgcolor: 'secondary.lighter'
-              }
+                bgcolor: 'secondary.lighter',
+              },
             }),
             ...(!drawerOpen &&
               isSelected && {
                 bgcolor: 'primary.lighter',
                 '&:hover': {
-                  bgcolor: 'primary.lighter'
-                }
-              })
+                  bgcolor: 'primary.lighter',
+                },
+              }),
           }}
         >
           {itemIcon}

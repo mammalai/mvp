@@ -34,7 +34,7 @@ import SettingOutlined from '@ant-design/icons/SettingOutlined';
 const avatarSX = {
   width: 36,
   height: 36,
-  fontSize: '1rem'
+  fontSize: '1rem',
 };
 
 const actionSX = {
@@ -44,7 +44,7 @@ const actionSX = {
   right: 'auto',
   alignSelf: 'flex-start',
 
-  transform: 'none'
+  transform: 'none',
 };
 
 // ==============================|| HEADER CONTENT - NOTIFICATION ||============================== //
@@ -123,8 +123,8 @@ export default function Notification() {
                         py: 0.5,
                         '&.Mui-selected': { bgcolor: 'grey.50', color: 'text.primary' },
                         '& .MuiAvatar-root': avatarSX,
-                        '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' }
-                      }
+                        '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' },
+                      },
                     }}
                   >
                     <ListItemButton selected={read > 0}>

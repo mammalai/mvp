@@ -34,7 +34,7 @@ import avatar4 from 'assets/images/users/avatar-4.png';
 const avatarSX = {
   width: 36,
   height: 36,
-  fontSize: '1rem'
+  fontSize: '1rem',
 };
 
 // action style
@@ -44,7 +44,7 @@ const actionSX = {
   top: 'auto',
   right: 'auto',
   alignSelf: 'flex-start',
-  transform: 'none'
+  transform: 'none',
 };
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
@@ -153,8 +153,8 @@ export default function DashboardDefault() {
               '& .MuiListItemButton-root': {
                 py: 1.5,
                 '& .MuiAvatar-root': avatarSX,
-                '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' }
-              }
+                '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' },
+              },
             }}
           >
             <ListItemButton divider>

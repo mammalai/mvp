@@ -20,34 +20,34 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardDefault />
+      element: <DashboardDefault />,
     },
     {
       path: 'color',
-      element: <Color />
+      element: <Color />,
     },
     {
       path: 'dashboard',
       children: [
         {
           path: 'default',
-          element: <DashboardDefault />
-        }
-      ]
+          element: <DashboardDefault />,
+        },
+      ],
     },
     {
       path: 'sample-page',
-      element: <SamplePage />
+      element: <SamplePage />,
     },
     {
       path: 'shadow',
-      element: <Shadow />
+      element: <Shadow />,
     },
     {
       path: 'typography',
-      element: <Typography />
-    }
-  ]
+      element: <Typography />,
+    },
+  ],
 };
 
 export default MainRoutes;

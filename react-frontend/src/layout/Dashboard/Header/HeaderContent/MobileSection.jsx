@@ -79,10 +79,10 @@ export default function MobileSection() {
             {
               name: 'offset',
               options: {
-                offset: [0, 9]
-              }
-            }
-          ]
+                offset: [0, 9],
+              },
+            },
+          ],
         }}
       >
         {({ TransitionProps }) => (

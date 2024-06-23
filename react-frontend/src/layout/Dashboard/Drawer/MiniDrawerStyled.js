@@ -12,23 +12,23 @@ const openedMixin = (theme) => ({
 
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen
+    duration: theme.transitions.duration.enteringScreen,
   }),
 
   overflowX: 'hidden',
-  boxShadow: 'none'
+  boxShadow: 'none',
 });
 
 const closedMixin = (theme) => ({
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen
+    duration: theme.transitions.duration.leavingScreen,
   }),
 
   overflowX: 'hidden',
   width: 0,
   borderRight: 'none',
-  boxShadow: theme.customShadows.z1
+  boxShadow: theme.customShadows.z1,
 });
 
 // ==============================|| DRAWER - MINI STYLED ||============================== //
@@ -40,12 +40,12 @@ const MiniDrawerStyled = styled(Drawer, { shouldForwardProp: (prop) => prop !== 
   boxSizing: 'border-box',
   ...(open && {
     ...openedMixin(theme),
-    '& .MuiDrawer-paper': openedMixin(theme)
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
   ...(!open && {
     ...closedMixin(theme),
-    '& .MuiDrawer-paper': closedMixin(theme)
-  })
+    '& .MuiDrawer-paper': closedMixin(theme),
+  }),
 }));
 
 export default MiniDrawerStyled;

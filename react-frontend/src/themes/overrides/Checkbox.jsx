@@ -18,13 +18,13 @@ function getColorStyle({ color, theme }) {
     '&:hover': {
       backgroundColor: lighter,
       '& .icon': {
-        borderColor: main
-      }
+        borderColor: main,
+      },
     },
     '&.Mui-focusVisible': {
       outline: `2px solid ${dark}`,
-      outlineOffset: -4
-    }
+      outlineOffset: -4,
+    },
   };
 }
 
@@ -47,8 +47,8 @@ function checkboxStyle(size) {
 
   return {
     '& .icon': {
-      fontSize: `${sizes.fontSize}rem`
-    }
+      fontSize: `${sizes.fontSize}rem`,
+    },
   };
 }
 
@@ -63,30 +63,30 @@ export default function Checkbox(theme) {
         className: 'size-small',
         icon: <BorderOutlined className="icon" />,
         checkedIcon: <CheckSquareFilled className="icon" />,
-        indeterminateIcon: <MinusSquareFilled className="icon" />
+        indeterminateIcon: <MinusSquareFilled className="icon" />,
       },
       styleOverrides: {
         root: {
           borderRadius: 0,
           color: palette.secondary[300],
           '&.size-small': {
-            ...checkboxStyle('small')
+            ...checkboxStyle('small'),
           },
           '&.size-medium': {
-            ...checkboxStyle('medium')
+            ...checkboxStyle('medium'),
           },
           '&.size-large': {
-            ...checkboxStyle('large')
-          }
+            ...checkboxStyle('large'),
+          },
         },
         colorPrimary: getColorStyle({ color: 'primary', theme }),
         colorSecondary: getColorStyle({ color: 'secondary', theme }),
         colorSuccess: getColorStyle({ color: 'success', theme }),
         colorWarning: getColorStyle({ color: 'warning', theme }),
         colorInfo: getColorStyle({ color: 'info', theme }),
-        colorError: getColorStyle({ color: 'error', theme })
-      }
-    }
+        colorError: getColorStyle({ color: 'error', theme }),
+      },
+    },
   };
 }
 

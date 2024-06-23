@@ -15,26 +15,26 @@ function getColorStyle({ theme, color, type }) {
     case 'filled':
       return {
         color: contrastText,
-        background: main
+        background: main,
       };
     case 'outlined':
       return {
         color: main,
         border: '1px solid',
         borderColor: main,
-        background: 'transparent'
+        background: 'transparent',
       };
     case 'combined':
       return {
         color: main,
         border: '1px solid',
         borderColor: light,
-        background: lighter
+        background: lighter,
       };
     default:
       return {
         color: main,
-        background: lighter
+        background: lighter,
       };
   }
 }
@@ -48,38 +48,38 @@ function getSizeStyle(size) {
         border: '2px solid',
         fontSize: '0.675rem',
         width: 20,
-        height: 20
+        height: 20,
       };
     case 'xs':
       return {
         fontSize: '0.75rem',
         width: 24,
-        height: 24
+        height: 24,
       };
     case 'sm':
       return {
         fontSize: '0.875rem',
         width: 32,
-        height: 32
+        height: 32,
       };
     case 'lg':
       return {
         fontSize: '1.2rem',
         width: 52,
-        height: 52
+        height: 52,
       };
     case 'xl':
       return {
         fontSize: '1.5rem',
         width: 64,
-        height: 64
+        height: 64,
       };
     case 'md':
     default:
       return {
         fontSize: '1rem',
         width: 40,
-        height: 40
+        height: 40,
       };
   }
 }
@@ -89,9 +89,9 @@ const AvatarStyle = styled(MuiAvatar, { shouldForwardProp: (prop) => prop !== 'c
     ...getSizeStyle(size),
     ...getColorStyle({ theme, color, type }),
     ...(size === 'badge' && {
-      borderColor: theme.palette.background.default
-    })
-  })
+      borderColor: theme.palette.background.default,
+    }),
+  }),
 );
 
 export default function Avatar({ children, color = 'primary', type, size = 'md', ...others }) {
@@ -111,5 +111,5 @@ Avatar.propTypes = {
   color: PropTypes.string,
   type: PropTypes.any,
   size: PropTypes.string,
-  others: PropTypes.any
+  others: PropTypes.any,
 };

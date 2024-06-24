@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
 
@@ -28,6 +28,10 @@ import { Formik } from 'formik';
 // project import
 import AnimateButton from 'components/@extended/AnimateButton';
 
+// x-state
+import { setup, createMachine, fromPromise, assign } from 'xstate';
+import { useMachine } from '@xstate/react';
+
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
@@ -35,10 +39,122 @@ import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import FirebaseSocial from './FirebaseSocial';
 import { set } from 'lodash';
 
+const loginMachine = setup({
+  actors: {
+      loginRequest: fromPromise(async (args) => {
+          return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                  axios.post('/api/auth/login', {
+                      'email': args.input.context.loginCredentials.email,
+                      'password': args.input.context.loginCredentials.password
+                  })
+                  .then(response => {
+                      resolve(response);
+                  })
+                  .catch(error => {
+                      reject(error);
+                  });
+                  
+              }, 2000);
+            });        
+      }),
+
+  },
+  actions: {
+      "consoleLogFetch": ({context, event}) => {
+          console.log("Action to print fetch event")
+          console.log(event)
+          // console.log(event.output)
+      },
+      "assignFromFetchToContext": assign(({context, event}) => {
+          console.log("Function to print and assign username and password")
+          // event.output contains the output of the loadTodos function
+          // return a partial dictionary of the context will update the context
+          return {
+              loginCredentials: {
+                  email: event.data.email,
+                  password: event.data.password
+              }
+          }
+      }),
+      "assignLoadinErrorMessage": assign(({context, event}) => {
+          console.log("ASSIGN LOADING ERROR")
+          const axiosError = event.error
+          if (
+              ('response' in axiosError) && 
+              ('data' in axiosError.response) &&
+              ('error' in axiosError.response.data)
+          ) {
+              console.log("ASSIGNING BAKCEND MESSAGE")
+              console.log(axiosError.response.data.error)
+              return {
+                  errorMessage: axiosError.response.data.error
+              }
+          } else {
+              console.log("ASSIGNING UNKNOWN ERROR")
+              return {
+                  errorMessage: "An unknown error occured. Please try again later"
+              }
+          }
+      }),
+      "consoleLogLoading" : ({context, event}) => {
+          console.log("Action to print loading")
+          console.log(context)
+          console.log(event)
+      },
+  }
+}).createMachine({
+  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QBGAKyaSATiH79AJiPqhAZiFGANCACeiI0IAseoQDYjm55t0AOdXU-XU0AX1DbNCw8QlIKKXQIAig6BmYIRTAyfG4pAGssqJwCYhJ4xOTUxgQCXMwGBXxhEWblaVl5RWU1BE8ddWc-Z10Adm0RkZN1WwcEU10Scz8jPwNNcwGhIZHwyIxi2LKEpPwU+kYmMAAnK6krkgkKBhY71BIimNLyk7O0mpypPVOk1RK0kCB2nJGt1EO51AtzLo4YiRuY0atpvZEBsjCQXEZRpNUepUUjdiAPiVSNdblcqsw2BxsDw+IJRG0ZFCuuCes4rCQ4ZNEashC5NDNEINXMsQrp1EtPEJ4TtyfgpBA4MpKbEOR1oTzEABaIyuILrEYBIyI7S6CUIQIjEh8vqWTSTQXk7WlchUem6rlKA1zcwkALOTxBEbuFzOTGzE1+EjeTTwoQTELONHuT37T5xY6Vc5gf3AmEIWMh9wjeGmEa6QZDIZ22uh3xLczuYLrExGHPRKkkGl3P3gyGloN+Mah6PmcbuTQWTR+O0d9QkKOaaP18zOTNu7MRCm5gewACumEwcFgI8knPHoB6AUTs90iPcaLdpnczdjizbFuCeUhE3PxwnCIA */
+  context: {
+      loginCredentials: {
+          email: "",
+          password: ""
+      },
+      errorMessage: ""
+  },
+  initial: 'idleState',
+  states: {
+      idleState: {
+          on: {
+              fetchEvent: {
+                  target: 'loadingState',
+                  actions: ['consoleLogFetch', 'assignFromFetchToContext']
+              }
+          }
+      },
+      loadingState: {
+          invoke: {
+              src: "loginRequest",
+              input: ({ context, event }) => ({ context }),
+              onDone: {
+                  target: "successState",
+                  actions: ['consoleLogLoading'],
+              },
+              onError: {
+                  target: "errorState",
+                  actions: ['consoleLogLoading', 'assignLoadinErrorMessage'],
+              }
+          },
+      },
+      errorState: {
+        on: {
+          fetchEvent: {
+              target: 'loadingState',
+              actions: ['consoleLogFetch', 'assignFromFetchToContext']
+          }
+        }
+      },
+      successState: {}
+  }
+});
+
 // ============================|| JWT - LOGIN ||============================ //
 
 export default function AuthLogin({ isDemo = false }) {
+
   const [checked, setChecked] = React.useState(false);
+
+  const [state, send] = useMachine(loginMachine);
 
   // form validation hooks
   const [showLoadIcon, setShowLoadIcon] = React.useState(false);
@@ -58,51 +174,27 @@ export default function AuthLogin({ isDemo = false }) {
     event.preventDefault();
   };
 
-  const wait = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  };
-
   const handleSubmit = (values) => {
-    
     console.log(values);
-    const waitForSeconds = async () => {
-      setIsSub(true);
-      setShowInvalidError(false);
-      setShowLoadIcon(true);
-      await wait(1000); // Wait for 1 seconds
-      axios.post('/api/auth/login', {'email': values.email, 'password': values.password})
-        .then(response => {
-          console.log(response);
-          console.log(response.status === 200)
-          // navigate to the home page
-          navigate('/');
-        })
-        .catch(error => {
-          console.log(error);
-          // represent and invalid email and password
-          if (error.response.status === 401) {
-            // show error message
-            setShowInvalidError(true);
-          // something else has gone wrong
-          } else {
-            setShowUnkownError(true);
-          }
-          // allow to submit again
-          setIsSub(false);
-          
-        });
-      setShowLoadIcon(false);
-    };
-    waitForSeconds();
+    send({type: "fetchEvent", data: values});
+  };
+  
+  useEffect(() => {
+    console.log('MACHINE STATE:', state.value)
+    console.log(state);
 
-  }
+    if (state.value === 'successState') {
+      navigate('/');
+    }
+
+  }, [state]);
 
   return (
     <>
       <Formik
         initialValues={{
           email: 'salarsattiss@gmail.com',
-          password: 'Stongassword12345!',
+          password: '6PINEapplesfoo!!',
           submit: null
         }}
         validationSchema={Yup.object().shape({
@@ -202,10 +294,10 @@ export default function AuthLogin({ isDemo = false }) {
               </Grid>
               : null}
 
-              {showUnkownError ?
+              {state.value === "errorState" ?
               <Grid item xs={12}>
                 <Typography color='red'>
-                  Something went wrong. Please try again later.
+                  {state.context.errorMessage}
                 </Typography>
               </Grid>
               : null}
@@ -227,14 +319,13 @@ export default function AuthLogin({ isDemo = false }) {
                 <FirebaseSocial />
               </Grid> */}
               
-              {showLoadIcon ? 
+              {state.value === "loadingState" ?
               <Grid item xs={12}>
                 <LinearProgress />
               </Grid>
               :
               null}
-             
-
+            
             </Grid>
           </form>
         )}

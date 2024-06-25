@@ -8,7 +8,6 @@ import Box from '@mui/material/Box';
 
 // project import
 import MainCard from 'components/MainCard';
-import ComponentWrapper from './ComponentWrapper';
 import ComponentSkeleton from './ComponentSkeleton';
 
 function ColorBox({ bgcolor, title, data, dark, main }) {

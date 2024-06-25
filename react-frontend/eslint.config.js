@@ -29,10 +29,11 @@ export default [
     ),
   ),
   {
+    files: ['**/*.js', '**/*.jsx'],
     plugins: {
       prettier,
       react: fixupPluginRules(react),
-      'react-hooks': fixupPluginRules(reactHooks),
+      // 'react-hooks': fixupPluginRules(reactHooks),
     },
 
     languageOptions: {
@@ -46,8 +47,8 @@ export default [
 
       parserOptions: {
         ecmaFeatures: {
-          experimentalObjectRestSpread: true,
-          impliedStrict: true,
+          // experimentalObjectRestSpread: true,
+          // impliedStrict: true,
           jsx: true,
         },
       },
@@ -64,7 +65,7 @@ export default [
 
       'import/resolver': {
         node: {
-          moduleDirectory: ['node_modules', 'src/'],
+          moduleDirectory: ['node_modules'],
         },
       },
     },
@@ -73,11 +74,11 @@ export default [
       'react/jsx-uses-react': 'error',
       'react/jsx-uses-vars': 'error',
       'react/react-in-jsx-scope': 'off',
-      'no-undef': 'off',
+      'no-undef': 'error',
       'react/display-name': 'off',
       'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.js'] }],
       'no-param-reassign': 'off',
-      'react/prop-types': 1,
+      'react/prop-types': 'off',
       'react/require-default-props': 'off',
       'react/no-array-index-key': 'off',
       'react/jsx-props-no-spreading': 'off',

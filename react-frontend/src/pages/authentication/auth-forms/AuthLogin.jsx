@@ -1,16 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
 
 // material-ui
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
@@ -31,14 +26,9 @@ import AnimateButton from 'components/@extended/AnimateButton';
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
-import FirebaseSocial from './FirebaseSocial';
-import { set } from 'lodash';
-
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin({ isDemo = false }) {
-  const [checked, setChecked] = React.useState(false);
-
+export default function AuthLogin() {
   // form validation hooks
   const [showLoadIcon, setShowLoadIcon] = React.useState(false);
   const [showInvalidError, setShowInvalidError] = React.useState(false);
@@ -62,7 +52,6 @@ export default function AuthLogin({ isDemo = false }) {
   };
 
   const handleSubmit = (values) => {
-    console.log(values);
     const waitForSeconds = async () => {
       setIsSub(true);
       setShowInvalidError(false);
@@ -70,14 +59,11 @@ export default function AuthLogin({ isDemo = false }) {
       await wait(1000); // Wait for 1 seconds
       axios
         .post('/api/auth/login', { email: values.email, password: values.password })
-        .then((response) => {
-          console.log(response);
-          console.log(response.status === 200);
+        .then(() => {
           // navigate to the home page
           navigate('/');
         })
         .catch((error) => {
-          console.log(error);
           // represent and invalid email and password
           if (error.response.status === 401) {
             // show error message
@@ -108,7 +94,7 @@ export default function AuthLogin({ isDemo = false }) {
         })}
         onSubmit={handleSubmit}
       >
-        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+        {({ errors, handleBlur, handleChange, handleSubmit, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>

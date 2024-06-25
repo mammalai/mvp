@@ -65,4 +65,5 @@ jobs:
         timeout-minutes: 10
         run: |
           cd mvp
-          yarn lint
+          yarn run lint
+          yarn run prettier:check

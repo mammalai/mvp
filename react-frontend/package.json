@@ -20,6 +20,7 @@
     "lint": "eslint \"src/**/*.{mjs,js,jsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{mjs,js,jsx}\"",
     "prettier": "prettier --write \"src/**/*.{mjs,js,jsx}\"",
+    "prettier:check": "prettier --check \"src/**/*.{mjs,js,jsx}\"",
     "prepare": "cd .. && husky react-frontend/.husky"
   },
   "dependencies": {

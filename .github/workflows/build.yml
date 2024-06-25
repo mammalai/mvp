@@ -64,6 +64,6 @@ jobs:
       - name: Run tests
         timeout-minutes: 10
         run: |
-          cd mvp
+          cd mvp/react-frontend
           yarn run lint
           yarn run prettier:check

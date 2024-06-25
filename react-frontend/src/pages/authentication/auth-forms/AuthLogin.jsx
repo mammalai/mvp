@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
 
 // material-ui
@@ -24,15 +23,12 @@ import { Formik } from 'formik';
 import AnimateButton from 'components/@extended/AnimateButton';
 
 // x-state
-import { setup, createMachine, fromPromise, assign } from 'xstate';
+import { setup, fromPromise, assign } from 'xstate';
 import { useMachine } from '@xstate/react';
 
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
-
-import FirebaseSocial from './FirebaseSocial';
-import { set } from 'lodash';
 
 const loginMachine = setup({
   actors: {
@@ -55,12 +51,12 @@ const loginMachine = setup({
     }),
   },
   actions: {
-    consoleLogFetch: ({ context, event }) => {
+    consoleLogFetch: ({ event }) => {
       console.log('Action to print fetch event');
       console.log(event);
       // console.log(event.output)
     },
-    assignFromFetchToContext: assign(({ context, event }) => {
+    assignFromFetchToContext: assign(({ event }) => {
       console.log('Function to print and assign username and password');
       // event.output contains the output of the loadTodos function
       // return a partial dictionary of the context will update the context
@@ -71,7 +67,7 @@ const loginMachine = setup({
         },
       };
     }),
-    assignLoadinErrorMessage: assign(({ context, event }) => {
+    assignLoadinErrorMessage: assign(({ event }) => {
       console.log('ASSIGN LOADING ERROR');
       const axiosError = event.error;
       if ('response' in axiosError && 'data' in axiosError.response && 'error' in axiosError.response.data) {
@@ -115,7 +111,7 @@ const loginMachine = setup({
     loadingState: {
       invoke: {
         src: 'loginRequest',
-        input: ({ context, event }) => ({ context }),
+        input: ({ context }) => ({ context }),
         onDone: {
           target: 'successState',
           actions: ['consoleLogLoading'],
@@ -140,16 +136,12 @@ const loginMachine = setup({
 
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin({ isDemo = false }) {
-  const [checked, setChecked] = React.useState(false);
-
+export default function AuthLogin() {
   const [state, send] = useMachine(loginMachine);
 
   // form validation hooks
-  const [showLoadIcon, setShowLoadIcon] = React.useState(false);
-  const [showInvalidError, setShowInvalidError] = React.useState(false);
-  const [isSub, setIsSub] = React.useState(false);
-  const [showUnkownError, setShowUnkownError] = React.useState(false);
+  const [showInvalidError] = React.useState(false);
+  const [isSub] = React.useState(false);
 
   // react-router navigate hook
   const navigate = useNavigate();

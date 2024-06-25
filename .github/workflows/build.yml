@@ -59,7 +59,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: |
-          cd mvp
+          cd mvp/react-frontend
           yarn install
       - name: Run tests
         timeout-minutes: 10

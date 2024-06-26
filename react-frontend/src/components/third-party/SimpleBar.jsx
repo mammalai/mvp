@@ -12,7 +12,7 @@ import { BrowserView, MobileView } from 'react-device-detect';
 const RootStyle = styled(BrowserView)({
   flexGrow: 1,
   height: '100%',
-  overflow: 'hidden'
+  overflow: 'hidden',
 });
 
 // scroll bar wrapper
@@ -20,21 +20,21 @@ const SimpleBarStyle = styled(SimpleBar)(({ theme }) => ({
   maxHeight: '100%',
   '& .simplebar-scrollbar': {
     '&:before': {
-      background: alpha(theme.palette.grey[500], 0.48)
+      background: alpha(theme.palette.grey[500], 0.48),
     },
     '&.simplebar-visible:before': {
-      opacity: 1
-    }
+      opacity: 1,
+    },
   },
   '& .simplebar-track.simplebar-vertical': {
-    width: 10
+    width: 10,
   },
   '& .simplebar-track.simplebar-horizontal .simplebar-scrollbar': {
-    height: 6
+    height: 6,
   },
   '& .simplebar-mask': {
-    zIndex: 'inherit'
-  }
+    zIndex: 'inherit',
+  },
 }));
 
 // ==============================|| SIMPLE SCROLL BAR ||============================== //

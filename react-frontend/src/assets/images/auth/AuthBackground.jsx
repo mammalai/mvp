@@ -13,7 +13,7 @@ export default function AuthBackground() {
         filter: 'blur(18px)',
         zIndex: -1,
         bottom: 0,
-        transform: 'inherit'
+        transform: 'inherit',
       }}
     >
       <svg width="100%" height="calc(100vh - 175px)" viewBox="0 0 405 809" fill="none" xmlns="http://www.w3.org/2000/svg">

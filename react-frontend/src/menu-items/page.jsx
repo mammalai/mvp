@@ -4,7 +4,7 @@ import { LoginOutlined, ProfileOutlined } from '@ant-design/icons';
 // icons
 const icons = {
   LoginOutlined,
-  ProfileOutlined
+  ProfileOutlined,
 };
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
@@ -20,7 +20,7 @@ const pages = {
       type: 'item',
       url: '/login',
       icon: icons.LoginOutlined,
-      target: true
+      target: true,
     },
     {
       id: 'register1',
@@ -28,9 +28,9 @@ const pages = {
       type: 'item',
       url: '/register',
       icon: icons.ProfileOutlined,
-      target: true
-    }
-  ]
+      target: true,
+    },
+  ],
 };
 
 export default pages;

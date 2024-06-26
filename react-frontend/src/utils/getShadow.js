@@ -33,7 +33,7 @@ const getShadow = (theme, shadow) => {
 
 getShadow.propTypes = {
   theme: PropTypes.object,
-  shadow: PropTypes.string
+  shadow: PropTypes.string,
 };
 
 export default getShadow;

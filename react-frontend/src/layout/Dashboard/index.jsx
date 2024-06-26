@@ -23,7 +23,6 @@ export default function DashboardLayout() {
 
   useEffect(() => {
     handlerDrawerOpen(!downXL);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [downXL]);
 
   if (menuMasterLoading) return <Loader />;

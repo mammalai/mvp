@@ -11,19 +11,19 @@ export default defineConfig({
   // https://github.com/jpuri/react-draft-wysiwyg/issues/1317
   base: '/', // accessing env variable is not possible here. So hard coding this.
   define: {
-    global: 'window'
+    global: 'window',
   },
   resolve: {
     alias: [
       {
         find: /^~(.+)/,
-        replacement: path.join(process.cwd(), 'node_modules/$1')
+        replacement: path.join(process.cwd(), 'node_modules/$1'),
       },
       {
         find: /^src(.+)/,
-        replacement: path.join(process.cwd(), 'src/$1')
-      }
-    ]
+        replacement: path.join(process.cwd(), 'src/$1'),
+      },
+    ],
   },
   server: {
     // this ensures that the browser opens upon server start
@@ -32,13 +32,13 @@ export default defineConfig({
     port: 3000,
     // this sets the proxy to the backend server - flask by default runs on 5000
     proxy: {
-      '/api': 'http://127.0.0.1:5000'
-    }
+      '/api': 'http://127.0.0.1:5000',
+    },
   },
   preview: {
     // this ensures that the browser opens upon preview start
     open: true,
     // this sets a default port to 3000
-    port: 3000
-  }
+    port: 3000,
+  },
 });

@@ -31,7 +31,7 @@ const rows = [
   createData(13256498, 'Keyboard', 125, 2, 70999),
   createData(98753263, 'Mouse', 89, 2, 10570),
   createData(98753275, 'Desktop', 185, 1, 98063),
-  createData(98753291, 'Chair', 100, 0, 14001)
+  createData(98753291, 'Chair', 100, 0, 14001),
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -65,33 +65,33 @@ const headCells = [
     id: 'tracking_no',
     align: 'left',
     disablePadding: false,
-    label: 'Tracking No.'
+    label: 'Tracking No.',
   },
   {
     id: 'name',
     align: 'left',
     disablePadding: true,
-    label: 'Product Name'
+    label: 'Product Name',
   },
   {
     id: 'fat',
     align: 'right',
     disablePadding: false,
-    label: 'Total Order'
+    label: 'Total Order',
   },
   {
     id: 'carbs',
     align: 'left',
     disablePadding: false,
 
-    label: 'Status'
+    label: 'Status',
   },
   {
     id: 'protein',
     align: 'right',
     disablePadding: false,
-    label: 'Total Amount'
-  }
+    label: 'Total Amount',
+  },
 ];
 
 // ==============================|| ORDER TABLE - HEADER ||============================== //
@@ -160,7 +160,7 @@ export default function OrderTable() {
           position: 'relative',
           display: 'block',
           maxWidth: '100%',
-          '& td, & th': { whiteSpace: 'nowrap' }
+          '& td, & th': { whiteSpace: 'nowrap' },
         }}
       >
         <Table aria-labelledby="tableTitle">

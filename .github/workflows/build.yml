@@ -5,17 +5,16 @@ name: MVP API Tests
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
   push:
-    branches: [ main ]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
-  run-tests:
-
+  run-backend-tests:
     runs-on: ubuntu-latest
 
     strategy:
@@ -23,21 +22,48 @@ jobs:
         python-version: [3.11]
 
     steps:
-    - name: Checkout mvp
-      uses: actions/checkout@v4
-      with:
-        repository: mammalai/mvp
-        path: mvp
-    - name: Use python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install requirements
-      run: |
-        cd mvp
-        pip install -r requirements.txt
-    - name: Run tests
-      timeout-minutes: 10
-      run: |
-        cd mvp
-        pytest
+      - name: Checkout mvp
+        uses: actions/checkout@v4
+        with:
+          repository: mammalai/mvp
+          path: mvp
+      - name: Use python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install requirements
+        run: |
+          cd mvp
+          pip install -r requirements.txt
+      - name: Run tests
+        timeout-minutes: 10
+        run: |
+          cd mvp
+          pytest
+  run-frontend-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout mvp
+        uses: actions/checkout@v4
+        with:
+          repository: mammalai/mvp
+          path: mvp
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: |
+          cd mvp/react-frontend
+          yarn install
+      - name: Run tests
+        timeout-minutes: 10
+        run: |
+          cd mvp/react-frontend
+          yarn run lint
+          yarn run prettier:check

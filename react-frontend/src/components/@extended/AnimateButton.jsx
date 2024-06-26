@@ -32,7 +32,7 @@ export default function AnimateButton({ children, type = 'scale', direction = 'r
             repeat: Infinity,
             repeatType: 'loop',
             duration: 2,
-            repeatDelay: 0
+            repeatDelay: 0,
           }}
         >
           {children}
@@ -57,7 +57,7 @@ export default function AnimateButton({ children, type = 'scale', direction = 'r
       if (typeof scale === 'number') {
         scale = {
           hover: scale,
-          tap: scale
+          tap: scale,
         };
       }
       return (
@@ -73,5 +73,5 @@ AnimateButton.propTypes = {
   type: PropTypes.oneOf(['slide', 'scale', 'rotate']),
   direction: PropTypes.oneOf(['up', 'down', 'left', 'right']),
   offset: PropTypes.number,
-  scale: PropTypes.object
+  scale: PropTypes.object,
 };

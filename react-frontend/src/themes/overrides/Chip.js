@@ -10,8 +10,8 @@ function getColor({ color, theme }) {
   return {
     '&.Mui-focusVisible': {
       outline: `2px solid ${dark}`,
-      outlineOffset: 2
-    }
+      outlineOffset: 2,
+    },
   };
 }
 
@@ -26,9 +26,9 @@ function getColorStyle({ color, theme }) {
     '& .MuiChip-deleteIcon': {
       color: main,
       '&:hover': {
-        color: light
-      }
-    }
+        color: light,
+      },
+    },
   };
 }
 
@@ -42,18 +42,18 @@ export default function Chip(theme) {
         root: {
           borderRadius: 4,
           '&:active': {
-            boxShadow: 'none'
+            boxShadow: 'none',
           },
           '&.MuiChip-colorPrimary': getColor({ color: 'primary', theme }),
           '&.MuiChip-colorSecondary': getColor({ color: 'secondary', theme }),
           '&.MuiChip-colorError': getColor({ color: 'error', theme }),
           '&.MuiChip-colorInfo': getColor({ color: 'info', theme }),
           '&.MuiChip-colorSuccess': getColor({ color: 'success', theme }),
-          '&.MuiChip-colorWarning': getColor({ color: 'warning', theme })
+          '&.MuiChip-colorWarning': getColor({ color: 'warning', theme }),
         },
         sizeLarge: {
           fontSize: '1rem',
-          height: 40
+          height: 40,
         },
         light: {
           ...defaultLightChip,
@@ -62,7 +62,7 @@ export default function Chip(theme) {
           '&.MuiChip-lightError': getColorStyle({ color: 'error', theme }),
           '&.MuiChip-lightInfo': getColorStyle({ color: 'info', theme }),
           '&.MuiChip-lightSuccess': getColorStyle({ color: 'success', theme }),
-          '&.MuiChip-lightWarning': getColorStyle({ color: 'warning', theme })
+          '&.MuiChip-lightWarning': getColorStyle({ color: 'warning', theme }),
         },
         combined: {
           border: '1px solid',
@@ -72,9 +72,9 @@ export default function Chip(theme) {
           '&.MuiChip-combinedError': getColorStyle({ color: 'error', theme }),
           '&.MuiChip-combinedInfo': getColorStyle({ color: 'info', theme }),
           '&.MuiChip-combinedSuccess': getColorStyle({ color: 'success', theme }),
-          '&.MuiChip-combinedWarning': getColorStyle({ color: 'warning', theme })
-        }
-      }
-    }
+          '&.MuiChip-combinedWarning': getColorStyle({ color: 'warning', theme }),
+        },
+      },
+    },
   };
 }

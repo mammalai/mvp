@@ -8,7 +8,6 @@ import Box from '@mui/material/Box';
 
 // project import
 import MainCard from 'components/MainCard';
-import ComponentWrapper from './ComponentWrapper';
 import ComponentSkeleton from './ComponentSkeleton';
 
 function ColorBox({ bgcolor, title, data, dark, main }) {
@@ -22,7 +21,7 @@ function ColorBox({ bgcolor, title, data, dark, main }) {
           py: 2.5,
           bgcolor,
           color: dark ? 'grey.800' : '#ffffff',
-          border: main ? '1px dashed' : '1px solid transparent'
+          border: main ? '1px dashed' : '1px solid transparent',
         }}
       >
         {title && (
@@ -137,5 +136,5 @@ ColorBox.propTypes = {
   title: PropTypes.string,
   data: PropTypes.object,
   dark: PropTypes.bool,
-  main: PropTypes.bool
+  main: PropTypes.bool,
 };

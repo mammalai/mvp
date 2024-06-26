@@ -19,7 +19,7 @@ export default function Dot({ color, size, variant, sx }) {
         borderRadius: '50%',
         bgcolor: variant === 'outlined' ? '' : main,
         ...(variant === 'outlined' && { border: `1px solid ${main}` }),
-        ...sx
+        ...sx,
       }}
     />
   );

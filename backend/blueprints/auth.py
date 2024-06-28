@@ -43,6 +43,10 @@ def password_reset_new_password():
     
 def send_password_reset_email(email, reset_token):
     print(f"Sending password reset email to {email}")
+
+    # if we are in test mode, do not send the email
+    if os.environ.get("FLASK_ENV") == "TEST":
+        return
     
     message = Mail(
         from_email=f'info@{os.environ.get("DOMAIN_NAME")}',
@@ -118,6 +122,10 @@ def email_verification():
 
 def send_email_verification_email(email, verification_token):
     print(f"Sending email verification email to {email}")
+
+    if os.environ.get("FLASK_ENV") == "TEST":
+        return
+
     message = Mail(
         from_email=f'info@{os.environ.get("DOMAIN_NAME")}',
         to_emails=email,

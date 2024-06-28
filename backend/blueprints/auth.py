@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, current_app
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -23,7 +23,7 @@ import os
 
 auth_bp = Blueprint("auth", __name__)
 
-@auth_bp.post("/password-reset/password")
+@auth_bp.post("/password")
 def password_reset_new_password():
     reset_token = request.args.get("token")
     data = request.get_json()
@@ -55,23 +55,29 @@ def send_password_reset_email(email, reset_token):
                 </strong>
                 <br>
                 <br>
-                <a href="http://localhost:5000/auth/resetpassword?email={email}&{reset_token}">Click here to reset your password</a>
+                <a href="{current_app.config['FRONT_END_URL']}/password-reset/password?token={reset_token}">Click here to reset your password</a>
                 <p>{reset_token}</p>
             """
     )
-    # try:
-    #     sg = SendGridAPIClient('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')
-    #     response = sg.send(message)
-    #     print(response.status_code)
-    #     print(response.body)
-    #     print(response.headers)
-    # except Exception as e:
-    #     print(e)
-
-@auth_bp.post("/password-reset/request")
+    sendgrid_api_key = os.environ.get("SENDGRID_API_KEY")
+    if sendgrid_api_key:
+        try:
+            sg = SendGridAPIClient(sendgrid_api_key)
+            response = sg.send(message)
+            print(response.status_code)
+            print(response.body)
+            print(response.headers)
+        except Exception as e:
+            print(e)
+            raise Exception("Error sending email") from e
+    else:
+        raise Exception("No sendgrid API key found")
+    
+@auth_bp.post("/password/reset")
 def password_reset_request_email():
     data = request.get_json()
     email = data.get("email")
+    print(f"Password reset request for email: {email}")
 
     user = User.get_user_by_email(email=email)
     # If the user is not found, do not reveal this to the client by sending
@@ -87,12 +93,12 @@ def password_reset_request_email():
             old_epr.delete()
         # create a new password reset token
         new_reset = EmailPasswordReset(email=user.email, token=token)
-        new_reset.save()
         send_password_reset_email(user.email, token)
+        new_reset.save() # only save the reset token if the email was sent
         return jsonify({"message": "Password reset email sent"}), 201
 
 
-@auth_bp.post("/emailverification")
+@auth_bp.post("/verification")
 def email_verification():
     verification_token = request.args.get("token")
 
@@ -115,7 +121,7 @@ def send_email_verification_email(email, verification_token):
     message = Mail(
         from_email=f'info@{os.environ.get("DOMAIN_NAME")}',
         to_emails=email,
-        subject=f'{os.environ.get("DOMAIN_NAME")} - Email verification',
+        subject=f'{os.environ.get("DOMAIN_NAME")} - Account verification',
         html_content=
             f"""
                 <strong>
@@ -123,7 +129,7 @@ def send_email_verification_email(email, verification_token):
                 </strong>
                 <br>
                 <br>
-                <a href="http://localhost:5000/auth/verify?email={email}&{verification_token}">Click here to verify your email</a>
+                <a href="{current_app.config['FRONT_END_URL']}/register-verify?token={verification_token}">Click here to verify your email</a>
                 <p>{verification_token}</p>
             """
     )
@@ -137,10 +143,11 @@ def send_email_verification_email(email, verification_token):
             print(response.headers)
         except Exception as e:
             print(e)
+            raise Exception("Error sending email") from e
     else:
-        print("No sendgrid API key found")
+        raise Exception("No sendgrid API key found")
 
-@auth_bp.post("/emailregistration")
+@auth_bp.post("/registration")
 def email_registration():
     data = request.get_json()
     user = User.get_user_by_email(email=data.get("email"))

@@ -37,7 +37,7 @@ const registerMachine = setup({
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           axios
-            .post('/api/auth/emailregistration', {
+            .post('/api/auth/registration', {
               email: args.input.context.loginCredentials.email,
               password: args.input.context.loginCredentials.password,
             })
@@ -166,9 +166,9 @@ export default function AuthRegister() {
           initialValues={{
             // firstname: 'Salar',
             // lastname: 'Satti',
-            email: '',
+            email: 'salarsattiss@gmail.com',
             // company: '',
-            password: '',
+            password: 'Stongassword12345!!',
             submit: null,
           }}
           validationSchema={Yup.object().shape({

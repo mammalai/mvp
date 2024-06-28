@@ -7,7 +7,9 @@ import MinimalLayout from 'layout/MinimalLayout';
 // render - login
 const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
 const AuthRegister = Loadable(lazy(() => import('pages/authentication/register')));
-
+const AuthRegisterVerify = Loadable(lazy(() => import('pages/authentication/register-verify')));
+const AuthRequestEmail = Loadable(lazy(() => import('pages/authentication/password-reset/request-email')));
+const AuthNewPassword = Loadable(lazy(() => import('pages/authentication/password-reset/new-password')));
 // ==============================|| AUTH ROUTING ||============================== //
 
 const LoginRoutes = {
@@ -21,6 +23,18 @@ const LoginRoutes = {
     {
       path: '/register',
       element: <AuthRegister />,
+    },
+    {
+      path: '/register-verify',
+      element: <AuthRegisterVerify />,
+    },
+    {
+      path: '/password-reset/request',
+      element: <AuthRequestEmail />,
+    },
+    {
+      path: '/password-reset/password',
+      element: <AuthNewPassword />,
     },
   ],
 };

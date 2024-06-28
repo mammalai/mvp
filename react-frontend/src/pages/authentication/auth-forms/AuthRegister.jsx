@@ -166,9 +166,9 @@ export default function AuthRegister() {
           initialValues={{
             // firstname: 'Salar',
             // lastname: 'Satti',
-            email: 'salarsattiss@gmail.com',
+            email: '',
             // company: '',
-            password: '6PINEapplesfoo!!',
+            password: '',
             submit: null,
           }}
           validationSchema={Yup.object().shape({

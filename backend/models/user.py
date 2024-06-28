@@ -10,12 +10,13 @@ def generate_uuid():
 
 class User(db.Model):
     __tablename__ = "users"
-    id = db.Column(db.String(), primary_key=True, default=str(generate_uuid()))
+    id = db.Column(db.String(), primary_key=True)
     username = db.Column(db.String(), nullable=True)
     email = db.Column(db.String(), nullable=False)
     _password = db.Column(db.Text())
 
     def __init__(self, email:str, password:str):
+        self.id=str(generate_uuid())
         self.email = email
         self._validate_strong_password(password)
         self._password = generate_password_hash(password)

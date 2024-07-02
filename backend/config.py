@@ -45,6 +45,7 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
 -----END RSA PUBLIC KEY-----'''
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1) # you probably want to change this to a short time
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    FRONT_END_URL = 'http://localhost:3000'
 
 
 class DevConfig:
@@ -89,6 +90,7 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
 -----END RSA PUBLIC KEY-----'''
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    FRONT_END_URL = 'http://localhost:3000'
 
 class ProdConfig:
     load_dotenv()

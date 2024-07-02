@@ -29,7 +29,7 @@ def test_register_with_verification(client, strong_password):
     """
     act
     """
-    response = client.post("/api/auth/emailregistration", json={
+    response = client.post("/api/auth/registration", json={
         "email": email,
         "password": strong_password
     })
@@ -46,11 +46,11 @@ def test_register_with_verification(client, strong_password):
 
     email_verification = EmailVerification.get_email_verification_by_email(email=email)
 
-    response = client.post(f"/api/auth/emailverification?token=invalid_token")
+    response = client.post(f"/api/auth/verification?token=invalid_token")
     assert response.status_code == 400
     assert response.json["error"] == "Invalid token"
 
-    response = client.post(f"/api/auth/emailverification?token={email_verification.token}")
+    response = client.post(f"/api/auth/verification?token={email_verification.token}")
     assert response.status_code == 201
     assert response.json["message"] == f"User email verified for: {email_verification.email}"
 
@@ -100,7 +100,7 @@ def test_reset_password_non_existent_user(client):
     """
     act
     """
-    response = client.post("/api/auth/password-reset/request", json={
+    response = client.post("/api/auth/password/reset", json={
         "email": "non_existent@email.com"
     })
     """
@@ -125,13 +125,13 @@ def test_reset_password_wrong_token(client, strong_password):
     """
     act
     """
-    response = client.post("/api/auth/password-reset/request", json={
+    response = client.post("/api/auth/password/reset", json={
         "email": email
     })
     assert response.status_code == 201
     assert response.json["message"] == "Password reset email sent"
 
-    response = client.post("/api/auth/password-reset/password?token=non_existent_token", json={
+    response = client.post("/api/auth/password?token=non_existent_token", json={
         "password": f"new_{strong_password}"
     })
     
@@ -157,7 +157,7 @@ def test_reset_password(client, strong_password):
     """
     act
     """
-    response = client.post("/api/auth/password-reset/request", json={
+    response = client.post("/api/auth/password/reset", json={
         "email": email
     })
     assert response.status_code == 201
@@ -165,7 +165,7 @@ def test_reset_password(client, strong_password):
 
     epr = EmailPasswordReset.get_epr_by_email(email=email)
 
-    response = client.post(f"/api/auth/password-reset/password?token={epr.token}", json={
+    response = client.post(f"/api/auth/password?token={epr.token}", json={
         "password": f"new_{strong_password}"
     })
     assert response.status_code == 200

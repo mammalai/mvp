@@ -29,7 +29,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
 
-    if os.environ.get("FLASK_ENV") == "TEST":
+    if os.environ.get("FLASK_ENV") == "DEV":
         with app.app_context():
             db.create_all()
 

@@ -60,7 +60,8 @@ def password_reset_new_password():
         # check if the partial password hash is the same as the old partial password
         if check_password_hash(decoded_token['password_hash'], user._password[16:32]):
             # set the new password
-            user.password = data.get("new_password")
+            user.password = data.get("password")
+            user.save()
             return jsonify({"message": "Password reset successful"}), 200
         else:
             return jsonify({"error": "Invalid token"}), 400        

@@ -223,7 +223,7 @@ def test_reset_password_expiration(client, strong_password):
     time.sleep(current_app.config['JWT_PASSWORD_TOKEN_EXPIRES'].seconds+2)
 
     response = client.post(f"/api/auth/password?token={verification_token}", json={
-        "new_password": f"new_{strong_password}"
+        "password": f"new_{strong_password}"
     })
     assert response.status_code == 401
     assert response.json["error"] == "Token has expired"
@@ -260,14 +260,14 @@ def test_reset_password(client, strong_password):
         expires_delta=current_app.config["JWT_PASSWORD_TOKEN_EXPIRES"] # how long before a token expires
     )
 
+    """
+    assert
+    """
     response = client.post(f"/api/auth/password?token={verification_token}", json={
-        "new_password": f"new_{strong_password}"
+        "password": f"new_{strong_password}"
     })
     assert response.status_code == 200
     assert response.json["message"] == "Password reset successful"
 
     user = User.query.filter_by(email=email).first()
     assert user.check_password(f"new_{strong_password}")
-    """
-    assert
-    """

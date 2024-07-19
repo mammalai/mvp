@@ -52,9 +52,14 @@ def create_app():
     # load user
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_headers, jwt_data):
+        """
+        This function will be called whenever a protected route is accessed e.g. protected by @jwt_required()
+        And it is a callback to get data bout the user
+        """
         identity = jwt_data["sub"]
-
-        return User.query.filter_by(username=identity).one_or_none()
+        return identity
+    # this will go to the database and get everything about the user
+    #     return User.query.filter_by(email=identity).one_or_none()
 
     # additional claims
     @jwt.additional_claims_loader

@@ -304,14 +304,14 @@ def login_user():
 @auth_bp.get("/whoami")
 @jwt_required()
 def whoami():
-    return jsonify(
-        {
-            "message": "message",
+    current_user = get_jwt_identity()
+    return jsonify({
+        "message": {
             "user_details": {
-                "email": current_user.email,
+                "email": current_user,
             },
         }
-    )
+    })
 
 @auth_bp.get("/refresh")
 @jwt_required(refresh=True) # refresh – If True, requires a refresh JWT to access this endpoint. If False, requires an access JWT to access this endpoint. Defaults to False.

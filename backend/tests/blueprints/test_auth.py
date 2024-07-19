@@ -271,3 +271,21 @@ def test_reset_password(client, strong_password):
 
     user = User.query.filter_by(email=email).first()
     assert user.check_password(f"new_{strong_password}")
+
+def test_whoami(client):
+    """
+    arrange
+    """
+    identity = "salarsattiss@gmail.com"
+    new_access_token = create_access_token(identity=identity)
+
+    headers={"Authorization": f"Bearer {new_access_token}"}
+    """
+    act
+    """
+    response = client.get("/api/auth/whoami", headers=headers)
+    """
+    assert
+    """
+    assert(response.status_code == 200)
+    assert(response.json["message"]["user_details"]["email"] == identity)

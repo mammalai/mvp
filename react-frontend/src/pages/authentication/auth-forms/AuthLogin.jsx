@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -30,6 +30,9 @@ import { useMachine } from '@xstate/react';
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
+
+// state
+import { MachineContext } from '../../../context';
 
 const loginMachine = setup({
   actors: {
@@ -76,7 +79,7 @@ const loginMachine = setup({
     }),
   },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QBGAKyaSATiH79AJiPqhAZiFGANCACeiI0IAseoQDYjm55t0AOdXU-XU0AX1DbNCw8QlIKKXQIAig6BmYIRTAyfG4pAGssqJwCYhJ4xOTUxgQCXMwGBXxhEWblaVl5RWU1BE8ddWc-Z10Adm0RkZN1WwcEU10Scz8jPwNNcwGhIZHwyIxi2LKEpPwU+kYmMAAnK6krkgkKBhY71BIimNLyk7O0mpypPVOk1RK0kCB2nJGt1EO51AtzLo4YiRuY0atpvZEBsjCQXEZRpNUepUUjdiAPiVSNdblcqsw2BxsDw+IJRG0ZFCuuCes4rCQ4ZNEashC5NDNEINXMsQrp1EtPEJ4TtyfgpBA4MpKbEOR1oTzEABaIyuILrEYBIyI7S6CUIQIjEh8vqWTSTQXk7WlchUem6rlKA1zcwkALOTxBEbuFzOTGzE1+EjeTTwoQTELONHuT37T5xY6Vc5gf3AmEIWMh9wjeGmEa6QZDIZ22uh3xLczuYLrExGHPRKkkGl3P3gyGloN+Mah6PmcbuTQWTR+O0d9QkKOaaP18zOTNu7MRCm5gewACumEwcFgI8knPHoB6AUTs90iPcaLdpnczdjizbFuCeUhE3PxwnCIA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QAmdQHYSADi3qhAZgCMugJwA2Y+aMBWADQgAnoiPmALCUuX1J9ebaWh52Rh4AvuFOaFh4hKQUUugQBFB0DMwQimBk+NxSANY5MTgExCSJyanpjAgE+ZgMCvjCIq3K0rLyispqCJa66npCJp7qHupGlh5a5k6uCAC0Jl5aunYG-kK6ppaeRpHRGKXxFUkp+Gn0jExgAE53UnckEhQMLE+oJCVx5ZUXVwydTyUka3RaonaSBAnTkzV6biE5hIo2MRmMIxWjhciEWRh0Wl8YV0ug8RimfnUhxAPzKpHujzuNWYbA42B4fEEog6MjhPWhfRMWjsJHMJPshNMoSmRnmiH8QxJA22dg2wo2kSiIHwUggcGUtPiPK68IFiDsJj0Rl0lncKpWxjlSz8yOtgQ8I3U1kGQks1MN5XIVGZxr5SjNCBMQi8Fp2qo2JOM6ydASEJCEdnMwqRmaFvv9x1+CXO1WuYFD4IRCA8ujTCq0JiMkxMJmmcxxCCsJC0BiE6nWQgbpmFBdidJIDKeIehsMrEfMyJ2Nrt6wdso7y1bJFV+PMdksdjJ7hWo5O5VgAFdMJg4LBp5JeXPQH09mmDD30epD9opk7lqY9AsSZ3Q8VsqU1IA */
   context: {
     loginCredentials: {
       email: '',
@@ -124,6 +127,7 @@ const loginMachine = setup({
 
 export default function AuthLogin() {
   const [state, send] = useMachine(loginMachine);
+  const [state_central, send_central, service_central] = useContext(MachineContext); // eslint-disable-line
 
   // form validation hooks
   const [showInvalidError] = React.useState(false);
@@ -147,6 +151,9 @@ export default function AuthLogin() {
 
   useEffect(() => {
     if (state.value === 'successState') {
+      // set the auth machine to AuthState
+      send_central({ type: 'login' });
+      localStorage.setItem('user', 'David');
       navigate('/');
     }
   }, [state]);
@@ -155,8 +162,8 @@ export default function AuthLogin() {
     <>
       <Formik
         initialValues={{
-          email: '',
-          password: '',
+          email: 'salarsattiss@gmail.com',
+          password: 'Stongassword12345!!',
           submit: null,
         }}
         validationSchema={Yup.object().shape({

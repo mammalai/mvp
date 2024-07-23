@@ -1,4 +1,4 @@
-import { lazy, useContext, useEffect } from 'react';
+import { lazy, useEffect } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
@@ -15,7 +15,8 @@ const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')))
 
 import { Navigate } from 'react-router-dom';
 
-import { MachineContext } from '../context';
+import { SomeMachineContext } from '../context';
+import { useSelector } from '@xstate/react';
 
 const ProtectedRoutes = () => {
   /* eslint-disable */
@@ -32,7 +33,9 @@ const ProtectedRoutes = () => {
   //   // send to machine
   // }
   // console.log("YO MOFAKA")
-  const [state, send, service] = useContext(MachineContext);
+  // const [state, send, service] = useContext(SomeMachineContext);
+  const someActorRef = SomeMachineContext.useActorRef();
+  const state = useSelector(someActorRef, (snapshot) => snapshot);
 
   useEffect(() => {
     console.log('ROUTER: YO MOFAKA');
@@ -44,7 +47,7 @@ const ProtectedRoutes = () => {
 
   // return (state.value === 'AuthState' ? <Dashboard /> : <Navigate to="/login" replace />);
 
-  if (state.value === 'AuthState') {
+  if (state?.value === 'AuthState') {
     return <Dashboard />;
   } else {
     return <Navigate to="/login" replace />;

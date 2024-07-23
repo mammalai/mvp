@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -32,7 +32,7 @@ import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
 // state
-import { MachineContext } from '../../../context';
+import { SomeMachineContext } from '../../../context';
 
 const loginMachine = setup({
   actors: {
@@ -127,7 +127,10 @@ const loginMachine = setup({
 
 export default function AuthLogin() {
   const [state, send] = useMachine(loginMachine);
-  const [state_central, send_central, service_central] = useContext(MachineContext); // eslint-disable-line
+  // const [state_central, send_central, service_central] = useContext(SomeMachineContext); // eslint-disable-line
+
+  // const count = SomeMachineContext.useSelector((state) => state.context.count);
+  const someActorRef = SomeMachineContext.useActorRef();
 
   // form validation hooks
   const [showInvalidError] = React.useState(false);
@@ -152,7 +155,8 @@ export default function AuthLogin() {
   useEffect(() => {
     if (state.value === 'successState') {
       // set the auth machine to AuthState
-      send_central({ type: 'login' });
+      console.log('Login success');
+      someActorRef.send({ type: 'login' });
       localStorage.setItem('user', 'David');
       navigate('/');
     }

@@ -6,28 +6,30 @@ import ThemeCustomization from 'themes';
 
 import ScrollTop from 'components/ScrollTop';
 
-import { MachineContext, contextMachine } from './context';
-import { useMachine } from '@xstate/react';
-import { useEffect } from 'react';
+import { machineActor, SomeMachineContext } from './context';
+// import { useActor } from '@xstate/react';
+// import { useEffect } from 'react';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
 export default function App() {
-  const [state, send, service] = useMachine(contextMachine);
-  const machine = [state, send, service];
+  // const [state, send, service] = useActor(machineActor);
+  // const machine = [state, send, service];
 
-  useEffect(() => {
-    console.log('FROM APP.JSX - YO MOFAKA');
-    console.log('Machine state:', state);
-  }, [state]);
+  // useEffect(() => {
+  //   console.log('FROM APP.JSX - YO MOFAKA');
+  //   console.log('Machine state:', state);
+  // }, [state]);
+
+  machineActor.start();
 
   return (
-    <MachineContext.Provider value={machine}>
+    <SomeMachineContext.Provider value={machineActor}>
       <ThemeCustomization>
         <ScrollTop>
           <RouterProvider router={router} />
         </ScrollTop>
       </ThemeCustomization>
-    </MachineContext.Provider>
+    </SomeMachineContext.Provider>
   );
 }

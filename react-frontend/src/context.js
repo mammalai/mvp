@@ -82,7 +82,8 @@
 // export default AuthMachine;
 
 import React from 'react';
-import { setup, fromPromise } from 'xstate';
+import { setup, fromPromise, createActor } from 'xstate';
+import { createActorContext } from '@xstate/react';
 
 export const contextMachine = setup({
   actors: {
@@ -139,4 +140,16 @@ export const contextMachine = setup({
   },
 });
 
+const restoredState = JSON.parse(localStorage.getItem('contextMachine'));
+
+export const machineActor = createActor(contextMachine, { snapshot: restoredState });
+
+machineActor.subscribe((snapshot) => {
+  console.log('snapshot', snapshot);
+  const persistedState = machineActor.getPersistedSnapshot();
+  localStorage.setItem('contextMachine', JSON.stringify(persistedState));
+});
+
 export const MachineContext = React.createContext(null);
+
+export const SomeMachineContext = createActorContext(contextMachine);

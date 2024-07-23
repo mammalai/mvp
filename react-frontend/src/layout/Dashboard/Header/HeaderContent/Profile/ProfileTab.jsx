@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 
 // material-ui
 import List from '@mui/material/List';
@@ -15,12 +15,14 @@ import UserOutlined from '@ant-design/icons/UserOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
 
 // state
-import { MachineContext } from '../../../../../context';
+import { SomeMachineContext } from '../../../../../context';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
 export default function ProfileTab() {
-  const [state, send, service] = useContext(MachineContext); // eslint-disable-line
+  // const [state, send, service] = useContext(SomeMachineContext); // eslint-disable-line
+
+  const someActorRef = SomeMachineContext.useActorRef();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -59,7 +61,7 @@ export default function ProfileTab() {
         selected={selectedIndex === 2}
         onClick={() => {
           localStorage.removeItem('user');
-          send({ type: 'logout' });
+          someActorRef.send({ type: 'logout' });
           console.log('LOGOUTY');
         }}
       >

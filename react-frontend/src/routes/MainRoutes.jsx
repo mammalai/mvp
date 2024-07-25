@@ -1,4 +1,4 @@
-import { lazy, useEffect } from 'react';
+import { lazy } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
@@ -14,46 +14,14 @@ const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')))
 // ==============================|| MAIN ROUTING ||============================== //
 
 import { Navigate } from 'react-router-dom';
-
-import { SomeMachineContext } from '../context';
-import { useSelector } from '@xstate/react';
+import { machineActor } from '../context';
 
 const ProtectedRoutes = () => {
-  /* eslint-disable */
-  {
-    /* 
-  if (localStorage.getItem("token")) {
-    return <Dashboard />;
-  } 
-  */
-  }
-
-  // localStorageToken = localStorage.getItem("token");
-  // if (localStorageToken) {
-  //   // send to machine
-  // }
-  // console.log("YO MOFAKA")
-  // const [state, send, service] = useContext(SomeMachineContext);
-  const someActorRef = SomeMachineContext.useActorRef();
-  const state = useSelector(someActorRef, (snapshot) => snapshot);
-
-  useEffect(() => {
-    console.log('ROUTER: YO MOFAKA');
-    console.log('Machine state:', state);
-  }, [state]);
-
-  // const localStorageToken = true; //localStorage.getItem("token");
-  // return localStorageToken ? <Dashboard /> : <Navigate to="/login" replace />;
-
-  // return (state.value === 'AuthState' ? <Dashboard /> : <Navigate to="/login" replace />);
-
-  if (state?.value === 'AuthState') {
+  if (machineActor.getSnapshot().matches('AuthState')) {
     return <Dashboard />;
   } else {
     return <Navigate to="/login" replace />;
   }
-
-  /* eslint-enable */
 };
 
 const MainRoutes = {

@@ -32,7 +32,7 @@ import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
 // state
-import { SomeMachineContext } from '../../../context';
+import { machineActor } from '../../../context';
 
 const loginMachine = setup({
   actors: {
@@ -127,10 +127,6 @@ const loginMachine = setup({
 
 export default function AuthLogin() {
   const [state, send] = useMachine(loginMachine);
-  // const [state_central, send_central, service_central] = useContext(SomeMachineContext); // eslint-disable-line
-
-  // const count = SomeMachineContext.useSelector((state) => state.context.count);
-  const someActorRef = SomeMachineContext.useActorRef();
 
   // form validation hooks
   const [showInvalidError] = React.useState(false);
@@ -154,10 +150,7 @@ export default function AuthLogin() {
 
   useEffect(() => {
     if (state.value === 'successState') {
-      // set the auth machine to AuthState
-      console.log('Login success');
-      someActorRef.send({ type: 'login' });
-      localStorage.setItem('user', 'David');
+      machineActor.send({ type: 'login' });
       navigate('/');
     }
   }, [state]);

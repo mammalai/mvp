@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, useState, useEffect } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
@@ -14,12 +14,20 @@ const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')))
 // ==============================|| MAIN ROUTING ||============================== //
 
 import { Navigate } from 'react-router-dom';
-import { machineActor } from '../context';
+import { machineActor } from '../store';
 
 const ProtectedRoutes = () => {
-  if (machineActor.getSnapshot().matches('AuthState')) {
+  const [state] = useState(machineActor.getSnapshot().value);
+
+  useEffect(() => {
+    console.log('SldsrjglskTATE');
+  }, [state]);
+
+  if (state === 'AuthState') {
+    console.log('DASHY');
     return <Dashboard />;
   } else {
+    console.log('LOGGYOUTTY');
     return <Navigate to="/login" replace />;
   }
 };

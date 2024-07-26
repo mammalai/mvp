@@ -32,30 +32,29 @@ import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
 // state
-import { machineActor } from '../../../context';
+import { machineActor } from '../../../store';
 
 const loginMachine = setup({
   actors: {
-    loginRequest: fromPromise(async (args) => {
+    loginRequest: fromPromise(async ({ input: loginCredentials }) => {
       return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          axios
-            .post('/api/auth/login', {
-              email: args.input.context.loginCredentials.email,
-              password: args.input.context.loginCredentials.password,
-            })
-            .then((response) => {
-              resolve(response);
-            })
-            .catch((error) => {
-              reject(error);
+        setTimeout(async () => {
+          try {
+            const response = await axios.post('/api/auth/login', {
+              email: loginCredentials.email,
+              password: loginCredentials.password,
             });
+            resolve(response);
+          } catch (error) {
+            console.log('ERROR', error);
+            reject(error);
+          }
         }, 2000);
       });
     }),
   },
   actions: {
-    assignFromFetchToContext: assign(({ event }) => {
+    assignLoginCredentials: assign(({ event }) => {
       // event.output contains the output of the loadTodos function
       // return a partial dictionary of the context will update the context
       return {
@@ -77,6 +76,12 @@ const loginMachine = setup({
         };
       }
     }),
+    assignResponseData: assign(({ event }) => {
+      console.log('EVENTY', event);
+      return {
+        fetchResponseBody: event.output.data,
+      };
+    }),
   },
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QAmdQHYSADi3qhAZgCMugJwA2Y+aMBWADQgAnoiPmALCUuX1J9ebaWh52Rh4AvuFOaFh4hKQUUugQBFB0DMwQimBk+NxSANY5MTgExCSJyanpjAgE+ZgMCvjCIq3K0rLyispqCJa66npCJp7qHupGlh5a5k6uCAC0Jl5aunYG-kK6ppaeRpHRGKXxFUkp+Gn0jExgAE53UnckEhQMLE+oJCVx5ZUXVwydTyUka3RaonaSBAnTkzV6biE5hIo2MRmMIxWjhciEWRh0Wl8YV0ug8RimfnUhxAPzKpHujzuNWYbA42B4fEEog6MjhPWhfRMWjsJHMJPshNMoSmRnmiH8QxJA22dg2wo2kSiIHwUggcGUtPiPK68IFiDsJj0Rl0lncKpWxjlSz8yOtgQ8I3U1kGQks1MN5XIVGZxr5SjNCBMQi8Fp2qo2JOM6ydASEJCEdnMwqRmaFvv9x1+CXO1WuYFD4IRCA8ujTCq0JiMkxMJmmcxxCCsJC0BiE6nWQgbpmFBdidJIDKeIehsMrEfMyJ2Nrt6wdso7y1bJFV+PMdksdjJ7hWo5O5VgAFdMJg4LBp5JeXPQH09mmDD30epD9opk7lqY9AsSZ3Q8VsqU1IA */
@@ -86,6 +91,7 @@ const loginMachine = setup({
       password: '',
     },
     errorMessage: '',
+    fetchResponseBody: {},
   },
   initial: 'idleState',
   states: {
@@ -93,17 +99,17 @@ const loginMachine = setup({
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignFromFetchToContext'],
+          actions: ['assignLoginCredentials'],
         },
       },
     },
     loadingState: {
       invoke: {
         src: 'loginRequest',
-        input: ({ context }) => ({ context }),
+        input: ({ context }) => context.loginCredentials,
         onDone: {
           target: 'successState',
-          actions: [],
+          actions: ['assignResponseData'],
         },
         onError: {
           target: 'errorState',
@@ -115,7 +121,7 @@ const loginMachine = setup({
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignFromFetchToContext'],
+          actions: ['assignLoginCredentials'],
         },
       },
     },
@@ -145,12 +151,13 @@ export default function AuthLogin() {
   };
 
   const handleSubmit = (values) => {
+    console.log(values);
     send({ type: 'fetchEvent', data: values });
   };
 
   useEffect(() => {
     if (state.value === 'successState') {
-      machineActor.send({ type: 'login' });
+      machineActor.send({ type: 'login', data: state.context.fetchResponseBody });
       navigate('/');
     }
   }, [state]);

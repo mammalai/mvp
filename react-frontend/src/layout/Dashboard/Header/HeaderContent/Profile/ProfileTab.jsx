@@ -15,15 +15,11 @@ import UserOutlined from '@ant-design/icons/UserOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
 
 // state
-// import { SomeMachineContext } from '../../../../../context';
+import { machineActor } from '../../../../../store';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
 export default function ProfileTab() {
-  // const [state, send, service] = useContext(SomeMachineContext); // eslint-disable-line
-
-  // const someActorRef = SomeMachineContext.useActorRef();
-
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleListItemClick = (index) => {
@@ -60,9 +56,8 @@ export default function ProfileTab() {
       <ListItemButton
         selected={selectedIndex === 2}
         onClick={() => {
-          localStorage.removeItem('user');
-          // someActorRef.send({ type: 'logout' });
-          console.log('LOGOUTY');
+          machineActor.send({ type: 'logout' });
+          console.log('PROFILE TAB LOGOUTY');
         }}
       >
         <ListItemIcon>

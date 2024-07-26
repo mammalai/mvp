@@ -1,4 +1,4 @@
-import { setup, fromPromise, createActor } from 'xstate';
+import { setup, fromPromise, createActor, assign } from 'xstate';
 
 export const contextMachine = setup({
   actors: {
@@ -15,42 +15,48 @@ export const contextMachine = setup({
     }),
   },
   actions: {
-    logoutAction: () => {
-      console.log('removing item');
-      localStorage.removeItem('user');
-    },
+    logoutAction: assign(() => {
+      console.log('LOGOUT ACTION');
+      // localStorage.removeItem('snapshot');
+      return {
+        accessToken: null,
+      };
+    }),
+    assignAccessToken: assign(({ event }) => {
+      return {
+        accessToken: event.data.access_token,
+      };
+    }),
+    assignResponseData: assign(({ event }) => {
+      console.log('EVENTY', event);
+      return {
+        fetchResponseBody: event.output.data,
+      };
+    }),
   },
 }).createMachine({
   id: 'context',
   context: {
     user: null,
+    accessToken: null,
   },
   initial: 'UnAuthState',
   states: {
-    // CheckLocalStorageTokenState: {
-    //   invoke: {
-    //     src: 'loginRequest',
-    //     input: ({ context }) => ({ context }),
-    //     onDone: {
-    //       target: 'AuthState',
-    //       actions: [],
-    //     },
-    //     onError: {
-    //       target: 'UnAuthState',
-    //       actions: [],
-    //     },
-    //   },
-    // },
     AuthState: {
       on: {
-        logout: 'UnAuthState',
-        actions: [{ type: 'logoutAction' }],
+        logout: {
+          target: 'UnAuthState',
+          actions: [{ type: 'logoutAction' }],
+        },
       },
     },
     UnAuthState: {
       entry: () => console.log('HALLO'),
       on: {
-        login: 'AuthState',
+        login: {
+          target: 'AuthState',
+          actions: ['assignAccessToken'],
+        },
       },
     },
   },

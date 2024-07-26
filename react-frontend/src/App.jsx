@@ -6,7 +6,7 @@ import ThemeCustomization from 'themes';
 
 import ScrollTop from 'components/ScrollTop';
 
-import { machineActor } from './context';
+import { machineActor } from './store';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 

@@ -1,4 +1,4 @@
-import { lazy, useState, useEffect } from 'react';
+import { lazy, useEffect } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
@@ -16,14 +16,16 @@ const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')))
 import { Navigate } from 'react-router-dom';
 import { machineActor } from '../store';
 
+import { useSelector } from '@xstate/react';
+
 const ProtectedRoutes = () => {
-  const [state] = useState(machineActor.getSnapshot().value);
+  const machineActorState = useSelector(machineActor, (snapshot) => snapshot.value);
 
   useEffect(() => {
-    console.log('SldsrjglskTATE');
-  }, [state]);
+    console.log('ProtectedRoutes state', machineActorState);
+  }, [machineActorState]);
 
-  if (state === 'AuthState') {
+  if (machineActorState === 'AuthState') {
     console.log('DASHY');
     return <Dashboard />;
   } else {

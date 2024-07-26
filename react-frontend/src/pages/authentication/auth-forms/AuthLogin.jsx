@@ -46,7 +46,6 @@ const loginMachine = setup({
             });
             resolve(response);
           } catch (error) {
-            console.log('ERROR', error);
             reject(error);
           }
         }, 2000);
@@ -77,7 +76,6 @@ const loginMachine = setup({
       }
     }),
     assignResponseData: assign(({ event }) => {
-      console.log('EVENTY', event);
       return {
         fetchResponseBody: event.output.data,
       };
@@ -151,7 +149,6 @@ export default function AuthLogin() {
   };
 
   const handleSubmit = (values) => {
-    console.log(values);
     send({ type: 'fetchEvent', data: values });
   };
 
@@ -166,8 +163,8 @@ export default function AuthLogin() {
     <>
       <Formik
         initialValues={{
-          email: 'salarsattiss@gmail.com',
-          password: 'Stongassword12345!!',
+          email: '',
+          password: '',
           submit: null,
         }}
         validationSchema={Yup.object().shape({

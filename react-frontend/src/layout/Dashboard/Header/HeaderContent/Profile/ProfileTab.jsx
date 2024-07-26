@@ -57,7 +57,6 @@ export default function ProfileTab() {
         selected={selectedIndex === 2}
         onClick={() => {
           machineActor.send({ type: 'logout' });
-          console.log('PROFILE TAB LOGOUTY');
         }}
       >
         <ListItemIcon>

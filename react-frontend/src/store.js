@@ -16,8 +16,7 @@ export const contextMachine = setup({
   },
   actions: {
     logoutAction: assign(() => {
-      console.log('LOGOUT ACTION');
-      // localStorage.removeItem('snapshot');
+      // on logout we will simply remove the access token
       return {
         accessToken: null,
       };
@@ -28,7 +27,6 @@ export const contextMachine = setup({
       };
     }),
     assignResponseData: assign(({ event }) => {
-      console.log('EVENTY', event);
       return {
         fetchResponseBody: event.output.data,
       };
@@ -51,7 +49,6 @@ export const contextMachine = setup({
       },
     },
     UnAuthState: {
-      entry: () => console.log('HALLO'),
       on: {
         login: {
           target: 'AuthState',
@@ -66,8 +63,8 @@ const restoredState = JSON.parse(localStorage.getItem('contextMachine'));
 
 export const machineActor = createActor(contextMachine, { snapshot: restoredState });
 
+// eslint-disable-next-line
 machineActor.subscribe((snapshot) => {
-  console.log('snapshot', snapshot);
   const persistedState = machineActor.getPersistedSnapshot();
   localStorage.setItem('contextMachine', JSON.stringify(persistedState));
 });

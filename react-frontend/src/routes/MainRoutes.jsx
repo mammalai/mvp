@@ -21,15 +21,9 @@ import { useSelector } from '@xstate/react';
 const ProtectedRoutes = () => {
   const machineActorState = useSelector(machineActor, (snapshot) => snapshot.value);
 
-  useEffect(() => {
-    console.log('ProtectedRoutes state', machineActorState);
-  }, [machineActorState]);
-
   if (machineActorState === 'AuthState') {
-    console.log('DASHY');
     return <Dashboard />;
   } else {
-    console.log('LOGGYOUTTY');
     return <Navigate to="/login" replace />;
   }
 };

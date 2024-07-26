@@ -1,4 +1,4 @@
-import { lazy, useEffect } from 'react';
+import { lazy } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';

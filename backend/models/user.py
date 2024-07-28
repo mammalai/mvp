@@ -68,63 +68,6 @@ class User(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-
-class EmailVerification(db.Model):
-    """
-    Verify a user's email address before promoting a user's role from
-    a "unverified" role to "free" roler
-    """
-    __tablename__ = "email_verification"
-    email = db.Column(db.String(), primary_key=True, nullable=False)
-    token = db.Column(db.String(), nullable=False)
-    created_at = db.Column(db.DateTime(), default=datetime.utcnow)
-
-    def __repr__(self):
-        return f"<EmailVerification {self.email}: {self.token}>"
-    
-    @classmethod
-    def get_email_verification_by_token(cls, token):
-        return cls.query.filter_by(token=token).first()
-
-    @classmethod
-    def get_email_verification_by_email(cls, email):
-        return cls.query.filter_by(email=email).first()
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-
-class EmailPasswordReset(db.Model):
-    """A table to store password reset tokens for users"""
-
-    __tablename__ = "password_reset"
-    email = db.Column(db.String(), primary_key=True, nullable=False)
-    token = db.Column(db.String(), nullable=False)
-    created_at = db.Column(db.DateTime(), default=datetime.utcnow)
-
-    def __repr__(self):
-        return f"<PasswordReset {self.email}: {self.token}>"
-
-    @classmethod
-    def get_epr_by_email(cls, email):
-        return cls.query.filter_by(email=email).first()
-    
-    @classmethod
-    def get_epr_by_token(cls, token):
-        return cls.query.filter_by(token=token).first() 
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
 """
 To create this table in the database
 

@@ -1,4 +1,6 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
+
+from jwt import ExpiredSignatureError
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -6,14 +8,14 @@ from flask_jwt_extended import (
     get_jwt,
     current_user,
     get_jwt_identity,
+    decode_token
 )
+
 
 import sys
 from backend.models.user import User
 from backend.models.token import TokenBlocklist 
 from backend.models.role import Role
-from backend.models.user import EmailVerification
-from backend.models.user import EmailPasswordReset
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -21,25 +23,48 @@ from sendgrid.helpers.mail import Mail
 import uuid
 import os
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from datetime import datetime, timedelta
+
 auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.post("/password")
 def password_reset_new_password():
+    """
+        Update the user's password with a new password
+    """
     reset_token = request.args.get("token")
     data = request.get_json()
-    # use the token to get the email/user password reset
-    epr = EmailPasswordReset.get_epr_by_token(token=reset_token)
+    # check if the token is expired
+    try:
+        # decode the token
+        decoded_token = decode_token(reset_token) # if the token is expired, this will raise an exception
+    except Exception as e:
+        if (type(e) == ExpiredSignatureError):
+            return jsonify({"error": "Token has expired"}), 401
+        else:
+            return jsonify({"error": "Invalid token"}), 401
+    # check if the token is of the correct type
+    # make sure the token is of registration token - no other token types are allowed
+    if decoded_token["type"] != "password_reset": #TO DO: move logic to decorator
+        return jsonify({"error": "Not a registration token"}), 401
+    # get the user email from the decoded token
+    user_email = decoded_token['sub']
 
-    if epr is None:
+    user = User.get_user_by_email(email=user_email)
+
+    if user is None:
         return jsonify({"error": "Invalid token"}), 400
     else:
-        # update the user's password from the data in the dictionary
-        u = User.get_user_by_email(email=epr.email)
-        u.password = data.get("password")
-        u.save()
-        # delete the token so it can't be used again
-        epr.delete()
-        return jsonify({"message": "Password reset successful"}), 200
+        # check if the partial password hash is the same as the old partial password
+        if check_password_hash(decoded_token['password_hash'], user._password[16:32]):
+            # set the new password
+            user.password = data.get("password")
+            user.save()
+            return jsonify({"message": "Password reset successful"}), 200
+        else:
+            return jsonify({"error": "Invalid token"}), 400        
     
 def send_password_reset_email(email, reset_token):
     print(f"Sending password reset email to {email}")
@@ -79,6 +104,9 @@ def send_password_reset_email(email, reset_token):
     
 @auth_bp.post("/password/reset")
 def password_reset_request_email():
+    """
+        Send a password reset email to the user
+    """
     data = request.get_json()
     email = data.get("email")
     print(f"Password reset request for email: {email}")
@@ -90,34 +118,64 @@ def password_reset_request_email():
     if user is None:
         return jsonify({"message": "Password reset email sent"}), 201
     else:
-        token = str(uuid.uuid4())
-        # remove any old password reset tokens
-        old_epr = EmailPasswordReset.get_epr_by_email(email=user.email)
-        if old_epr is not None:
-            old_epr.delete()
-        # create a new password reset token
-        new_reset = EmailPasswordReset(email=user.email, token=token)
-        send_password_reset_email(user.email, token)
-        new_reset.save() # only save the reset token if the email was sent
+        verification_token = create_access_token(
+            identity=user.email, # user email as the identity
+            additional_claims={"type": "password_reset", "password_hash":generate_password_hash(user._password[16:32])}, # type referes to the token type
+            expires_delta=current_app.config["JWT_PASSWORD_TOKEN_EXPIRES"] # how long before a token expires
+        )
+        send_password_reset_email(user.email, verification_token)
         return jsonify({"message": "Password reset email sent"}), 201
 
+@auth_bp.post("/justjwt")
+def test_jwt():
+    verification_token = request.args.get("token")
+    print(f"Verification token: {verification_token}")
+    decoded_token = decode_token(verification_token) # decode_token returns the decoded token (python dict) from an encoded JWT.
+    
+    try:
+        decoded_token = decode_token(verification_token)
+        jsonify({"message": "User email verified"}), 200
+    except Exception as e:
+        if (type(e) == ExpiredSignatureError):
+            return jsonify({"error": "Token expired"}), 400
+        else:
+            raise e
+
+
+    print(decoded_token)
+    return jsonify({"message": "Token decoded bruh"}), 200
 
 @auth_bp.post("/verification")
 def email_verification():
+    """
+        This endpoint will allow a user to verify their email address but will allow multiple 
+        authentication tokens to be active.
+    """
+    # get the token from the URL query string
     verification_token = request.args.get("token")
 
-    email_verification = EmailVerification.get_email_verification_by_token(token=verification_token)
-    if email_verification is None:
-        return jsonify({"error": "Invalid token"}), 400
-    else:
-        # delete any roles that are labelled as unverified
-        user_roles = Role.get_all_roles_for_user(username=email_verification.email)
+    try:
+        # decode the token
+        decoded_token = decode_token(verification_token) # if the token is expired, this will raise an exception
+    except Exception as e:
+        if (type(e) == ExpiredSignatureError):
+            return jsonify({"error": "Token has expired"}), 401
+        else:
+            return jsonify({"error": "Invalid token"}), 401
+    # make sure the token is of registration token - no other token types are allowed
+    if decoded_token["type"] != "registration": #TO DO: move logic to decorator
+        return jsonify({"error": "Not a registration token"}), 401
+    # get the user email from the decoded token
+    user_email = decoded_token['sub']
+    # delete any roles that are labelled as unverified
+    user_roles = Role.get_all_roles_for_user(username=user_email)
+    if (len(user_roles)) == 1 and (user_roles[0].role == 'unverified'): # there should only be one role called unverified
         user_roles[0].delete()
-
         # add the user as a free user
-        Role.add_role_for_user(username=email_verification.email, role='free')
-        email_verification.delete()
-        return jsonify({"message": f"User email verified for: {email_verification.email}"}), 201
+        Role.add_role_for_user(username=user_email, role='free')
+        return jsonify({"message": f"User email verified for: {user_email}"}), 201
+    else:
+        return jsonify({"error": "User already verified"}), 401
 
 
 def send_email_verification_email(email, verification_token):
@@ -158,25 +216,45 @@ def send_email_verification_email(email, verification_token):
 @auth_bp.post("/registration")
 def email_registration():
     data = request.get_json()
+
+    # check the database for the user
     user = User.get_user_by_email(email=data.get("email"))
-
-    if user is not None:
-        return jsonify({"error": "User already exists"}), 409
-    # create the user
-    new_user = User(email=data.get("email"), password=data.get("password"))
-    # add the user as a free user
-    role = Role(username=new_user.email, role='unverified')
-    
-    verification_token = str(uuid.uuid4())
-    new_verification = EmailVerification(email=new_user.email, token=verification_token)
-    
-    role.save()
-    new_user.save()
-    new_verification.save()
-
-    send_email_verification_email(new_user.email, verification_token)
-
-    return jsonify({"message": "User created"}), 201
+    # if the user does not exist
+    if user is None:
+        # create the user
+        new_user = User(email=data.get("email"), password=data.get("password"))
+        # add the user role to be an unverified user
+        role = Role(username=new_user.email, role='unverified')
+        # create a JWT access token
+        verification_token = create_access_token(
+            identity=new_user.email, # user email as the identity
+            additional_claims={"type": "registration"}, # type referes to the token type
+            expires_delta=current_app.config["JWT_REGISTRATION_TOKEN_EXPIRES"] # how long before a token expires
+        )
+        # commit everything to the database and send the email
+        role.save()
+        new_user.save()
+        send_email_verification_email(new_user.email, verification_token)
+        return jsonify({"message": "User created"}), 201
+    # if the user exists
+    else:
+        # check the roles in the database
+        user_roles = Role.get_all_roles_for_user(username=user.email)
+        # if there is one role and that role is unverified, create a new token and resend the verification email
+        if (len(user_roles)) == 1 and (user_roles[0] == 'unverified'):
+            # create a JWT access token
+            verification_token = create_access_token(
+                identity=new_user.email, # user email as the identity
+                additional_claims={"type": "registration"}, # type referes to the token type
+                expires_delta=current_app.config["JWT_REGISTRATION_TOKEN_EXPIRES"] # how long before a token expires
+            )
+            # resend the verification email
+            send_email_verification_email(new_user.email, verification_token)
+            return jsonify({"message": "User exists, resending verificaiton email"}), 200
+        # if there are other roles apart from unverified the user is already verified
+        else:  
+            return jsonify({"error": "User already verified"}), 409
+   
 
 
 @auth_bp.post("/register")
@@ -226,17 +304,17 @@ def login_user():
 @auth_bp.get("/whoami")
 @jwt_required()
 def whoami():
-    return jsonify(
-        {
-            "message": "message",
+    current_user = get_jwt_identity()
+    return jsonify({
+        "message": {
             "user_details": {
-                "email": current_user.email,
+                "email": current_user,
             },
         }
-    )
+    })
 
 @auth_bp.get("/refresh")
-@jwt_required(refresh=True)
+@jwt_required(refresh=True) # refresh – If True, requires a refresh JWT to access this endpoint. If False, requires an access JWT to access this endpoint. Defaults to False.
 def refresh_access():
     identity = get_jwt_identity()
 

@@ -11,12 +11,26 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
 
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
-
 // ==============================|| MAIN ROUTING ||============================== //
+
+import { Navigate } from 'react-router-dom';
+import { machineActor } from '../store';
+
+import { useSelector } from '@xstate/react';
+
+const ProtectedRoutes = () => {
+  const machineActorState = useSelector(machineActor, (snapshot) => snapshot.value);
+
+  if (machineActorState === 'AuthState') {
+    return <Dashboard />;
+  } else {
+    return <Navigate to="/login" replace />;
+  }
+};
 
 const MainRoutes = {
   path: '/',
-  element: <Dashboard />,
+  element: <ProtectedRoutes />,
   children: [
     {
       path: '/',

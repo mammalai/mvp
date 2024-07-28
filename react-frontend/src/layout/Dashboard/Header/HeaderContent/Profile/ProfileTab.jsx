@@ -14,6 +14,9 @@ import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
 
+// state
+import { machineActor } from '../../../../../store';
+
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
 export default function ProfileTab() {
@@ -50,7 +53,12 @@ export default function ProfileTab() {
         </ListItemIcon>
         <ListItemText primary="Billing" />
       </ListItemButton>
-      <ListItemButton selected={selectedIndex === 2}>
+      <ListItemButton
+        selected={selectedIndex === 2}
+        onClick={() => {
+          machineActor.send({ type: 'logout' });
+        }}
+      >
         <ListItemIcon>
           <LogoutOutlined />
         </ListItemIcon>

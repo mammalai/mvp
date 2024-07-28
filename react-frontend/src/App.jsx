@@ -6,9 +6,13 @@ import ThemeCustomization from 'themes';
 
 import ScrollTop from 'components/ScrollTop';
 
+import { machineActor } from './store';
+
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
 export default function App() {
+  machineActor.start();
+
   return (
     <ThemeCustomization>
       <ScrollTop>

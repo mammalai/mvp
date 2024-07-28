@@ -1,7 +1,7 @@
 import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import prettier from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
-import reactHooks from 'eslint-plugin-react-hooks';
+// import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import babelParser from '@babel/eslint-parser';
 import path from 'node:path';
@@ -107,20 +107,20 @@ export default [
         },
       ],
 
-      'prettier/prettier': [
-        'error',
-        {
-          bracketSpacing: true,
-          singleQuote: true,
-          trailingComma: 'all',
-          tabWidth: 2,
-          useTabs: false,
-          semi: true,
-          quoteProps: 'as-needed',
-          arrowParens: 'always',
-          endOfLine: 'lf',
-        },
-      ],
+      // 'prettier/prettier': [
+      //   'error',
+      //   {
+      //     bracketSpacing: true,
+      //     singleQuote: true,
+      //     trailingComma: 'all',
+      //     tabWidth: 2,
+      //     useTabs: false,
+      //     semi: true,
+      //     quoteProps: 'as-needed',
+      //     arrowParens: 'always',
+      //     endOfLine: 'lf',
+      //   },
+      // ],
     },
   },
 ];

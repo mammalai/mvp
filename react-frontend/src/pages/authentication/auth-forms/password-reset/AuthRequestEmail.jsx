@@ -131,7 +131,7 @@ export default function AuthLogin() {
     <>
       <Formik
         initialValues={{
-          email: 'salarsattiss@gmail.com',
+          email: '',
           submit: null,
         }}
         validationSchema={Yup.object().shape({

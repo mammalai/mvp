@@ -1,15 +1,14 @@
 from flask import Flask, jsonify, request
 
 import sys
-# from backend.blueprints.auth import auth_bp
+from backend.blueprints.auth import auth_bp
 # from backend.blueprints.user import user_bp
 
-# from backend.models.sqlalchemy.user import User
-from backend.models import User
+# from backend.models import User
 
-# from backend.models.token import TokenBlocklist
+# from backend.models import TokenBlocklist
 # from backend.extensions import db, jwt
-from backend.extensions import db_mongo, jwt
+from backend.extensions import db, db_mongo, jwt
 
 
 from datetime import timedelta
@@ -32,16 +31,16 @@ def create_app():
         raise Exception("At least one config has not been set")
    
     # initialize exts
-    # db.init_app(app)
+    db.init_app(app)
     db_mongo.init_app(app)
     jwt.init_app(app)
 
-    # if os.environ.get("FLASK_ENV") == "DEV":
-    #     with app.app_context():
-    #         db.create_all()
+    if os.environ.get("FLASK_ENV") == "DEV":
+        with app.app_context():
+            db.create_all()
 
     # register bluepints
-    # app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
     # app.register_blueprint(user_bp, url_prefix="/api/users")
 
     @app.route('/api/echo', methods=['POST'])

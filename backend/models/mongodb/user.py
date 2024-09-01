@@ -6,21 +6,13 @@ from datetime import datetime
 
 from dataclasses import dataclass, asdict
 
+from .mongobase import MongoBaseClass
+
 def generate_uuid():
     return uuid4()
 
 @dataclass
-class MongoBaseClass():
-
-    def dict(self):
-        """a method to convert the dataclass to a dictionary"""
-        return {k: v for k, v in asdict(self).items()}
-
-    def save(self):
-        NotImplementedError()
-
-@dataclass
-class User(MongoBaseClass, MongoClass2):
+class User(MongoBaseClass):
     
     __collectionname__ = "users"
     email:str
@@ -50,7 +42,6 @@ class User(MongoBaseClass, MongoClass2):
   
     @password.setter
     def password(self, value):
-        print(value)
         self._validate_strong_password(value)
         self._password = generate_password_hash(value)
 
@@ -70,18 +61,22 @@ class User(MongoBaseClass, MongoClass2):
     @classmethod
     def get_user_by_email(cls, email):
         """return the first user with this email"""
-        user_dict = list(db_mongo.db.users.find({ "email": email }))[0]
+        results_list = list(db_mongo.db[cls.__collectionname__].find({ "email": email }))
+        if results_list == []:
+            return None
+        user_dict = results_list[0]
         user_dict.pop("_id") # TO DO: You can remove this ID using a mongo DB query/projection
         user_dict["password"] = user_dict.pop("_password")
         return cls(**user_dict)
 
     def save(self):
         #using upsert here which means update if exists and insert if not
-        db_mongo.db["__collectionname__"].replace_one({"id": self.id}, self.dict(), upsert=True)
+        print("SAVE MONGO DB")
+        db_mongo.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
 
     def delete(self):
         """delete the user from the database"""
-        db_mongo.db["__collectionname__"].delete_one({"id": self.id})
+        db_mongo.db[self.__collectionname__].delete_one({"id": self.id})
 
 
 """

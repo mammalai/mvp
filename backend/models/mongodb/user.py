@@ -1,5 +1,5 @@
 import re
-from backend.extensions import db_mongo
+from backend.extensions import db
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -70,18 +70,18 @@ class User(MongoBaseClass, MongoClass2):
     @classmethod
     def get_user_by_email(cls, email):
         """return the first user with this email"""
-        user_dict = list(db_mongo.db.users.find({ "email": email }))[0]
+        user_dict = list(db.db.users.find({ "email": email }))[0]
         user_dict.pop("_id") # TO DO: You can remove this ID using a mongo DB query/projection
         user_dict["password"] = user_dict.pop("_password")
         return cls(**user_dict)
 
     def save(self):
         #using upsert here which means update if exists and insert if not
-        db_mongo.db["__collectionname__"].replace_one({"id": self.id}, self.dict(), upsert=True)
+        db.db["__collectionname__"].replace_one({"id": self.id}, self.dict(), upsert=True)
 
     def delete(self):
         """delete the user from the database"""
-        db_mongo.db["__collectionname__"].delete_one({"id": self.id})
+        db.db["__collectionname__"].delete_one({"id": self.id})
 
 
 """

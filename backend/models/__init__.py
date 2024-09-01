@@ -9,3 +9,6 @@ if os.environ.get("DB_TYPE") == "mongodb":
 else:
     print("Using SQLAlchemy")
     from .sqlalchemy.user import User
+
+from .sqlalchemy.role import Role
+from .sqlalchemy.token import TokenBlocklist

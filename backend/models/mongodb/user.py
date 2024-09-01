@@ -20,7 +20,7 @@ class MongoBaseClass():
         NotImplementedError()
 
 @dataclass
-class User(MongoBaseClass, MongoClass2):
+class User(MongoBaseClass):
     
     __collectionname__ = "users"
     email:str

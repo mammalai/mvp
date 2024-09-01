@@ -1,11 +1,17 @@
 from flask import Flask, jsonify, request
 
 import sys
-from backend.blueprints.auth import auth_bp
-from backend.blueprints.user import user_bp
-from backend.models.user import User
-from backend.models.token import TokenBlocklist
-from backend.extensions import db, jwt
+# from backend.blueprints.auth import auth_bp
+# from backend.blueprints.user import user_bp
+
+# from backend.models.sqlalchemy.user import User
+from backend.models import User
+
+# from backend.models.token import TokenBlocklist
+# from backend.extensions import db, jwt
+from backend.extensions import db_mongo, jwt
+
+
 from datetime import timedelta
 
 import os
@@ -26,16 +32,17 @@ def create_app():
         raise Exception("At least one config has not been set")
    
     # initialize exts
-    db.init_app(app)
+    # db.init_app(app)
+    db_mongo.init_app(app)
     jwt.init_app(app)
 
-    if os.environ.get("FLASK_ENV") == "DEV":
-        with app.app_context():
-            db.create_all()
+    # if os.environ.get("FLASK_ENV") == "DEV":
+    #     with app.app_context():
+    #         db.create_all()
 
     # register bluepints
-    app.register_blueprint(auth_bp, url_prefix="/api/auth")
-    app.register_blueprint(user_bp, url_prefix="/api/users")
+    # app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    # app.register_blueprint(user_bp, url_prefix="/api/users")
 
     @app.route('/api/echo', methods=['POST'])
     def echo():
@@ -103,12 +110,12 @@ def create_app():
     More info:https://stackoverflow.com/questions/21978658/invalidating-json-web-tokens
 
     """
-    @jwt.token_in_blocklist_loader
-    def token_in_blocklist_callback(jwt_header, jwt_data):        
-        jti = jwt_data['jti']
+    # @jwt.token_in_blocklist_loader
+    # def token_in_blocklist_callback(jwt_header, jwt_data):        
+    #     jti = jwt_data['jti']
 
-        token = db.session.query(TokenBlocklist).filter(TokenBlocklist.jti == jti).scalar()
+    #     token = db.session.query(TokenBlocklist).filter(TokenBlocklist.jti == jti).scalar()
 
-        return token is not None
+    #     return token is not None
 
     return app

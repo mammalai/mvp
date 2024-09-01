@@ -1,5 +1,5 @@
 import re
-from backend.extensions import db_mongo
+from backend.extensions import db
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime

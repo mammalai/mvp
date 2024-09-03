@@ -19,11 +19,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 def client():
     app = create_app()
     #   app.testing = True
+    # with app.test_client() as testclient:
+    #     with app.app_context():
+    #         app.config.from_object(TestConfig)
+    #         db.create_all()
+    #         yield testclient
     with app.test_client() as testclient:
-        with app.app_context():
-            app.config.from_object(TestConfig)
-            db.create_all()
-            yield testclient
+        yield testclient
 
 @pytest.fixture
 def strong_password():

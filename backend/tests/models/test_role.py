@@ -10,10 +10,12 @@ from backend.models import Role
 def client():
 	app = create_app()
 	#   app.testing = True
+	# with app.test_client() as testclient:
+	# 	with app.app_context():
+	# 		db.create_all()
+	# 		yield testclient
 	with app.test_client() as testclient:
-		with app.app_context():
-			db.create_all()
-			yield testclient
+		yield testclient
 
 def test_create_role(client):
 	with client.application.app_context():

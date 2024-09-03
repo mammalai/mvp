@@ -61,7 +61,7 @@ class User(MongoBaseClass):
     @classmethod
     def get_user_by_email(cls, email):
         """return the first user with this email"""
-        results_list = list(db_mongo.db[cls.__collectionname__].find({ "email": email }))
+        results_list = list(db.db[cls.__collectionname__].find({ "email": email }))
         if results_list == []:
             return None
         user_dict = results_list[0]
@@ -72,11 +72,11 @@ class User(MongoBaseClass):
     def save(self):
         #using upsert here which means update if exists and insert if not
         print("SAVE MONGO DB")
-        db_mongo.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
+        db.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
 
     def delete(self):
         """delete the user from the database"""
-        db_mongo.db[self.__collectionname__].delete_one({"id": self.id})
+        db.db[self.__collectionname__].delete_one({"id": self.id})
 
 
 """

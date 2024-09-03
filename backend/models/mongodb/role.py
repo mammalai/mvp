@@ -3,7 +3,7 @@ from datetime import datetime
 
 from dataclasses import dataclass, field
 
-from backend.extensions import db_mongo
+from backend.extensions import db
 from .mongobase import MongoBaseClass
 
 
@@ -38,7 +38,7 @@ class Role(MongoBaseClass):
     def save(self):
         if self.id == None:
             self.id = generate_uuid_str()
-        db_mongo.db[self.__collectionname__].replace_one(
+        db.db[self.__collectionname__].replace_one(
             {
                 'username': self.username,
                 'role': self.role
@@ -48,11 +48,11 @@ class Role(MongoBaseClass):
         )
 
     def delete(self):
-        db_mongo.db[self.__collectionname__].delete_one({"id": self.id})
+        db.db[self.__collectionname__].delete_one({"id": self.id})
 
     @classmethod
     def get_all_roles_for_user(cls, username):
-        results_list = list(db_mongo.db[self.__collectionname__]\
+        results_list = list(db.db[self.__collectionname__]\
             .find({ "username": username }))
         if results_list == []:
             return None
@@ -65,7 +65,7 @@ class Role(MongoBaseClass):
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return False
 
-        results_list = list(db_mongo.db[cls.__collectionname__].\
+        results_list = list(db.db[cls.__collectionname__].\
             find({
                 "username": username,
                 "role": role   
@@ -85,7 +85,7 @@ class Role(MongoBaseClass):
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return
         
-        results_list = list(db_mongo.db[cls.__collectionname__].\
+        results_list = list(db.db[cls.__collectionname__].\
             find({
                 "username": username,
                 "role": role   
@@ -107,7 +107,7 @@ class Role(MongoBaseClass):
             return
         
         if cls.role_exists_for_user(username, role):
-            db_mongo.db[cls.__collectionname__].\
+            db.db[cls.__collectionname__].\
             delete_one({
                 "username": username,
                 "role": role   

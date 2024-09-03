@@ -8,7 +8,7 @@ from backend.blueprints.auth import auth_bp
 
 # from backend.models import TokenBlocklist
 # from backend.extensions import db, jwt
-from backend.extensions import db, db_mongo, jwt
+from backend.extensions import db, jwt
 
 
 from datetime import timedelta
@@ -32,7 +32,7 @@ def create_app():
    
     # initialize exts
     db.init_app(app)
-    db_mongo.init_app(app)
+    # db_mongo.init_app(app)
     jwt.init_app(app)
 
     if os.environ.get("FLASK_ENV") == "DEV":

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 class TestConfig:
     # SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    MONGO_URI = "mongodb://localhost:27017/mvp_test"
     SECRET_KEY = "2934948fn394fnqp4ifqp394fSRHF8EFH9WEFn9"
     JWT_ALGORITHM="RS256"
     JWT_PRIVATE_KEY='''-----BEGIN PRIVATE KEY-----
@@ -55,6 +56,7 @@ class DevConfig:
     MONGO_URI = "mongodb://localhost:27017/flask" # mongodb standard port, and flask is the name of the database
 
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    MONGO_URI = "mongodb://localhost:27017/mvp_dev"
     SECRET_KEY = "293"
     JWT_ALGORITHM="RS256"
     JWT_PRIVATE_KEY='''-----BEGIN PRIVATE KEY-----
@@ -102,6 +104,7 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
 class ProdConfig:
     load_dotenv()
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+    MONGO_URI = os.getenv('MONGO_URI')
     SECRET_KEY = os.getenv('SECRET_KEY')
     JWT_ALGORITHM="RS256"
     JWT_PRIVATE_KEY=os.getenv('JWT_PRIVATE_KEY')

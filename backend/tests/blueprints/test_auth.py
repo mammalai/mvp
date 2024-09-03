@@ -48,7 +48,7 @@ def test_register_with_verification(client, strong_password):
     """
     assert
     """
-    user = User.query.filter_by(email=email).first()
+    user = User.get_user_by_email(email)
     assert user is not None
     assert user.email == email
     assert user.check_password(strong_password)
@@ -89,7 +89,7 @@ def test_register_with_verification_expired_token(client, strong_password):
     """
     assert
     """
-    user = User.query.filter_by(email=email).first()
+    user = User.get_user_by_email(email)
     assert user is not None
     assert user.email == email
     assert user.check_password(strong_password)
@@ -271,7 +271,7 @@ def test_reset_password(client, strong_password):
     assert response.status_code == 200
     assert response.json["message"] == "Password reset successful"
 
-    user = User.query.filter_by(email=email).first()
+    user = User.get_user_by_email(email)
     assert user.check_password(f"new_{strong_password}")
 
 def test_whoami(client):

@@ -33,7 +33,7 @@ def test_create_user(client, strong_password):
 		"""
 		new_user.save()
 		# Add assertions to verify that the user was created successfully
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		"""
 		assert
 		"""
@@ -53,12 +53,12 @@ def test_delete_user(client, strong_password):
 		"""
 		act
 		"""
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		new_user.delete()
 		"""
 		assert
 		"""
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		assert user is None
 
 def test_update_with_weak_password(client, strong_password):
@@ -101,12 +101,12 @@ def test_update_user_password(client, strong_password):
 		"""
 		act
 		"""
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		user.password = f"new_{strong_password}"
 		user.save()
 		"""
 		assert
 		"""
-		user = User.query.filter_by(email=test_email).all()
+		user = User.get_user_by_email(test_email)
 		assert(len(user) == 1)
 		assert user[0].check_password(f"new_{strong_password}")

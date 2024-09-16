@@ -36,27 +36,15 @@ class Role(MongoBaseClass):
         return f'<Role {self.username}={self.role}>'
 
     def save(self):
-        if self.id == None:
-            self.id = generate_uuid_str()
-        db.db[self.__collectionname__].replace_one(
-            {
-                'username': self.username,
-                'role': self.role
-            },
-            self.dict(),
-            upsert=True,
-        )
+        db.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
 
     def delete(self):
         db.db[self.__collectionname__].delete_one({"id": self.id})
 
     @classmethod
     def get_all_roles_for_user(cls, username):
-        results_list = list(db.db[self.__collectionname__]\
-            .find({ "username": username }))
-        if results_list == []:
-            return None
-        return [cls(**r) for r in results_list]
+        roles_list = cls.query.filter_by(username=username).all()
+        return [r_db for r_db in roles_list]
     
     @classmethod
     def role_exists_for_user(cls, username, role):
@@ -65,18 +53,12 @@ class Role(MongoBaseClass):
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return False
 
-        results_list = list(db.db[cls.__collectionname__].\
-            find({
-                "username": username,
-                "role": role   
-            })
-        )
-        if results_list == []:
-            return False
-            print(f'Role "{role}" does not exist for user "{username}".')
-        else:
+        if cls.query.filter_by(username=username, role=role).first() is not None:
             print(f'Role "{role}" exists for user "{username}".')
             return True
+        else:
+            print(f'Role "{role}" does not exist for user "{username}".')
+            return False
     
     @classmethod
     def add_role_for_user(cls, username, role):
@@ -85,19 +67,13 @@ class Role(MongoBaseClass):
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return
         
-        results_list = list(db.db[cls.__collectionname__].\
-            find({
-                "username": username,
-                "role": role   
-            })
-        )
-        if results_list == []:
+        if cls.role_exists_for_user(username, role):
+            pass
+        else:
             new_role = cls(username=username, role=role)
             new_role.save()
             print(f'Role "{role}" added for user "{username}".')
-        else:
-            print(f'Role "{role}" already exists for user "{username}".')
-            
+
             
     @classmethod
     def remove_role_for_user(cls, username, role):
@@ -107,11 +83,8 @@ class Role(MongoBaseClass):
             return
         
         if cls.role_exists_for_user(username, role):
-            db.db[cls.__collectionname__].\
-            delete_one({
-                "username": username,
-                "role": role   
-            })
+            db_role = cls.query.filter_by(username=username, role=role).first()
+            db_role.delete()
             print(f'Role "{role}" removed for user "{username}".')
         else:
             print(f'Role "{role}" does not exist for user "{username}".')

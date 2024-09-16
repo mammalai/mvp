@@ -17,15 +17,22 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 @pytest.fixture
 def client():
-    app = create_app()
-    #   app.testing = True
-    # with app.test_client() as testclient:
-    #     with app.app_context():
-    #         app.config.from_object(TestConfig)
-    #         db.create_all()
-    #         yield testclient
-    with app.test_client() as testclient:
-        yield testclient
+	app = create_app()
+	
+	if os.environ.get("DB_TYPE") == "mongodb":
+		with app.test_client() as testclient:
+			with app.app_context():
+				# clean up the database after running the test
+				db.cx.drop_database('mvp_test')
+				yield testclient
+	elif os.environ.get("DB_TYPE") == "sqlalchemy":
+		with app.test_client() as testclient:
+			with app.app_context():
+				db.create_all()
+				yield testclient
+	else:
+		raise Exception("DB_TYPE not set in configuration.")
+    
 
 @pytest.fixture
 def strong_password():

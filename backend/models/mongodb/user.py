@@ -19,13 +19,19 @@ class User(MongoBaseClass):
     _password:str
     id:str
 
-    def __init__(self, email:str, password:str, id:str = None):
+    def __init__(self, email:str, id:str = None, password:str = None, _password:str = None):
         if id == None:
             self.id = str(generate_uuid())
         else:
             self.id = id
         self.email = email
-        self.password = password  # This calls the setter method
+
+        if password is not None:
+            self.password = password    # This calls the setter method
+        elif _password is not None:
+            self._password = _password # this is when initializing from the database - we already have the hash so should not call the password() setter
+        else:
+            raise TypeError("Password or _password (the hash of the password) must be provided")
 
     def __repr__(self):
         return f"<User {self.email}>"
@@ -61,29 +67,13 @@ class User(MongoBaseClass):
     @classmethod
     def get_user_by_email(cls, email):
         """return the first user with this email"""
-        results_list = list(db.db[cls.__collectionname__].find({ "email": email }))
-        if results_list == []:
-            return None
-        user_dict = results_list[0]
-        user_dict.pop("_id") # TO DO: You can remove this ID using a mongo DB query/projection
-        user_dict["password"] = user_dict.pop("_password")
-        return cls(**user_dict)
+        return cls.query.filter_by(email=email).first()
 
     def save(self):
         #using upsert here which means update if exists and insert if not
-        print("SAVE MONGO DB")
         db.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
 
     def delete(self):
         """delete the user from the database"""
         db.db[self.__collectionname__].delete_one({"id": self.id})
 
-
-"""
-To create this table in the database
-
-Run:
-$ flask shell
->>> from backend.models.user import User
->>> db.create_all()
-"""

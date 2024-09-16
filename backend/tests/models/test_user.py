@@ -9,13 +9,20 @@ from backend.models import User
 @pytest.fixture
 def client():
 	app = create_app()
-	#   app.testing = True
-	# with app.test_client() as testclient:
-	# 	with app.app_context():
-	# 		db.create_all()
-	# 		yield testclient
-	with app.test_client() as testclient:
-		yield testclient
+	
+	if os.environ.get("DB_TYPE") == "mongodb":
+		with app.test_client() as testclient:
+			with app.app_context():
+				# clean up the database after running the test
+				db.cx.drop_database('mvp_test')
+				yield testclient
+	elif os.environ.get("DB_TYPE") == "sqlalchemy":
+		with app.test_client() as testclient:
+			with app.app_context():
+				db.create_all()
+				yield testclient
+	else:
+		raise Exception("DB_TYPE not set in configuration.")
 
 @pytest.fixture
 def strong_password():
@@ -108,5 +115,5 @@ def test_update_user_password(client, strong_password):
 		assert
 		"""
 		user = User.get_user_by_email(test_email)
-		assert(len(user) == 1)
-		assert user[0].check_password(f"new_{strong_password}")
+		assert(user is not None)
+		assert user.check_password(f"new_{strong_password}")

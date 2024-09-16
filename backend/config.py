@@ -53,8 +53,6 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
 
 
 class DevConfig:
-    MONGO_URI = "mongodb://localhost:27017/flask" # mongodb standard port, and flask is the name of the database
-
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     MONGO_URI = "mongodb://localhost:27017/mvp_dev"
     SECRET_KEY = "293"

@@ -61,7 +61,6 @@ class Role(db.Model):
     
     @classmethod
     def add_role_for_user(cls, username, role):
-        
         if role not in ROLES:
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return
@@ -85,7 +84,7 @@ class Role(db.Model):
             db_role.delete()
             print(f'Role "{role}" removed for user "{username}".')
         else:
-            pass
+            print(f'Role "{role}" does not exist for user "{username}".')
 
 
 '''

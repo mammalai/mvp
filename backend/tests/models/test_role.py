@@ -4,16 +4,25 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 
 import pytest
 from backend.app import create_app, db
-from backend.models.role import Role
+from backend.models import Role
 
 @pytest.fixture
 def client():
 	app = create_app()
-	#   app.testing = True
-	with app.test_client() as testclient:
-		with app.app_context():
-			db.create_all()
-			yield testclient
+	
+	if os.environ.get("DB_TYPE") == "mongodb":
+		with app.test_client() as testclient:
+			with app.app_context():
+				# clean up the database after running the test
+				db.cx.drop_database('mvp_test')
+				yield testclient
+	elif os.environ.get("DB_TYPE") == "sqlalchemy":
+		with app.test_client() as testclient:
+			with app.app_context():
+				db.create_all()
+				yield testclient
+	else:
+		raise Exception("DB_TYPE not set in configuration.")
 
 def test_create_role(client):
 	with client.application.app_context():

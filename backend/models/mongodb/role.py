@@ -1,10 +1,14 @@
-from backend.extensions import db
 from uuid import uuid4
 from datetime import datetime
 
-def generate_uuid():
-    return uuid4()
+from dataclasses import dataclass, field
 
+from backend.extensions import db
+from .mongobase import MongoBaseClass
+
+
+def generate_uuid_str():
+    return str(uuid4())
 
 ROLES = {
     'unverified': {
@@ -21,24 +25,21 @@ ROLES = {
     },
 }
 
-class Role(db.Model):
-    __tablename__ = 'roles'
-    id = db.Column(db.String(), primary_key=True, default=str(generate_uuid()))
-    username = db.Column(db.String(), nullable=False)
-    role = db.Column(db.String(), nullable=False)
-    
+@dataclass
+class Role(MongoBaseClass):
+    __collectionname__ = 'roles'
+    username:str
+    role:str
+    id:str = field(default_factory=generate_uuid_str)
+
     def __repr__(self):
         return f'<Role {self.username}={self.role}>'
 
     def save(self):
-        if self.id == None:
-            self.id = str(generate_uuid())
-        db.session.add(self)
-        db.session.commit()
+        db.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
 
     def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+        db.db[self.__collectionname__].delete_one({"id": self.id})
 
     @classmethod
     def get_all_roles_for_user(cls, username):
@@ -73,19 +74,20 @@ class Role(db.Model):
             new_role.save()
             print(f'Role "{role}" added for user "{username}".')
 
+            
     @classmethod
     def remove_role_for_user(cls, username, role):
 
         if role not in ROLES:
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return
-
+        
         if cls.role_exists_for_user(username, role):
             db_role = cls.query.filter_by(username=username, role=role).first()
             db_role.delete()
             print(f'Role "{role}" removed for user "{username}".')
         else:
-            pass
+            print(f'Role "{role}" does not exist for user "{username}".')
 
 
 '''
@@ -95,6 +97,6 @@ from backend.models.role import Role
 u = User.get_user_by_username(username='salarsatti')
 r = Role.get_role_by_username(username='salarsatti')
 
-role = Role(username=user.username, email=user.email, role='free')
+role = Role(username=user.username, role='free')
 '''
 

@@ -4,16 +4,25 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 
 import pytest
 from backend.app import create_app, db
-from backend.models.user import User
+from backend.models import User
 
 @pytest.fixture
 def client():
 	app = create_app()
-	#   app.testing = True
-	with app.test_client() as testclient:
-		with app.app_context():
-			db.create_all()
-			yield testclient
+	
+	if os.environ.get("DB_TYPE") == "mongodb":
+		with app.test_client() as testclient:
+			with app.app_context():
+				# clean up the database after running the test
+				db.cx.drop_database('mvp_test')
+				yield testclient
+	elif os.environ.get("DB_TYPE") == "sqlalchemy":
+		with app.test_client() as testclient:
+			with app.app_context():
+				db.create_all()
+				yield testclient
+	else:
+		raise Exception("DB_TYPE not set in configuration.")
 
 @pytest.fixture
 def strong_password():
@@ -31,7 +40,7 @@ def test_create_user(client, strong_password):
 		"""
 		new_user.save()
 		# Add assertions to verify that the user was created successfully
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		"""
 		assert
 		"""
@@ -51,12 +60,12 @@ def test_delete_user(client, strong_password):
 		"""
 		act
 		"""
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		new_user.delete()
 		"""
 		assert
 		"""
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		assert user is None
 
 def test_update_with_weak_password(client, strong_password):
@@ -99,12 +108,12 @@ def test_update_user_password(client, strong_password):
 		"""
 		act
 		"""
-		user = User.query.filter_by(email=test_email).first()
+		user = User.get_user_by_email(test_email)
 		user.password = f"new_{strong_password}"
 		user.save()
 		"""
 		assert
 		"""
-		user = User.query.filter_by(email=test_email).all()
-		assert(len(user) == 1)
-		assert user[0].check_password(f"new_{strong_password}")
+		user = User.get_user_by_email(test_email)
+		assert(user is not None)
+		assert user.check_password(f"new_{strong_password}")

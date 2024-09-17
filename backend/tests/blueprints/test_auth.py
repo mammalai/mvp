@@ -4,8 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 
 import pytest
 from backend.app import create_app, db
-from backend.models.user import User
-from backend.models.role import Role
+from backend.models import User
+from backend.models import Role
 
 import time
 from flask import current_app
@@ -17,13 +17,22 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 @pytest.fixture
 def client():
-    app = create_app()
-    #   app.testing = True
-    with app.test_client() as testclient:
-        with app.app_context():
-            app.config.from_object(TestConfig)
-            db.create_all()
-            yield testclient
+	app = create_app()
+	
+	if os.environ.get("DB_TYPE") == "mongodb":
+		with app.test_client() as testclient:
+			with app.app_context():
+				# clean up the database after running the test
+				db.cx.drop_database('mvp_test')
+				yield testclient
+	elif os.environ.get("DB_TYPE") == "sqlalchemy":
+		with app.test_client() as testclient:
+			with app.app_context():
+				db.create_all()
+				yield testclient
+	else:
+		raise Exception("DB_TYPE not set in configuration.")
+    
 
 @pytest.fixture
 def strong_password():
@@ -46,7 +55,7 @@ def test_register_with_verification(client, strong_password):
     """
     assert
     """
-    user = User.query.filter_by(email=email).first()
+    user = User.get_user_by_email(email)
     assert user is not None
     assert user.email == email
     assert user.check_password(strong_password)
@@ -87,7 +96,7 @@ def test_register_with_verification_expired_token(client, strong_password):
     """
     assert
     """
-    user = User.query.filter_by(email=email).first()
+    user = User.get_user_by_email(email)
     assert user is not None
     assert user.email == email
     assert user.check_password(strong_password)
@@ -269,7 +278,7 @@ def test_reset_password(client, strong_password):
     assert response.status_code == 200
     assert response.json["message"] == "Password reset successful"
 
-    user = User.query.filter_by(email=email).first()
+    user = User.get_user_by_email(email)
     assert user.check_password(f"new_{strong_password}")
 
 def test_whoami(client):

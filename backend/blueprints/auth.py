@@ -13,9 +13,10 @@ from flask_jwt_extended import (
 
 
 import sys
-from backend.models.user import User
-from backend.models.token import TokenBlocklist 
-from backend.models.role import Role
+
+from backend.models import User
+# from backend.models.token import TokenBlocklist 
+from backend.models import Role
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -260,16 +261,16 @@ def email_registration():
 @auth_bp.post("/register")
 def register_user():
     data = request.get_json()
-    user = User.get_user_by_username(username=data.get("username"))
+    user = User.get_user_by_email(email=data.get("email"))
 
     if user is not None:
         return jsonify({"error": "User already exists"}), 409
     # create the user
     new_user = User(email=data.get("email"), password=data.get("password"))
-    new_user.save()
+    
     # add the user as a free user
     Role.add_role_for_user(username=new_user.email, role='free')
-
+    new_user.save()
     return jsonify({"message": "User created"}), 201
 
 
@@ -313,25 +314,25 @@ def whoami():
         }
     })
 
-@auth_bp.get("/refresh")
-@jwt_required(refresh=True) # refresh – If True, requires a refresh JWT to access this endpoint. If False, requires an access JWT to access this endpoint. Defaults to False.
-def refresh_access():
-    identity = get_jwt_identity()
+# @auth_bp.get("/refresh")
+# @jwt_required(refresh=True) # refresh – If True, requires a refresh JWT to access this endpoint. If False, requires an access JWT to access this endpoint. Defaults to False.
+# def refresh_access():
+#     identity = get_jwt_identity()
 
-    new_access_token = create_access_token(identity=identity)
+#     new_access_token = create_access_token(identity=identity)
 
-    return jsonify({"access_token": new_access_token})
+#     return jsonify({"access_token": new_access_token})
 
 
-@auth_bp.get('/logout')
-@jwt_required(verify_type=False) 
-def logout_user():
-    jwt = get_jwt()
+# @auth_bp.get('/logout')
+# @jwt_required(verify_type=False) 
+# def logout_user():
+#     jwt = get_jwt()
 
-    jti = jwt['jti']
-    token_type = jwt['type']
+#     jti = jwt['jti']
+#     token_type = jwt['type']
 
-    token_b = TokenBlocklist(jti=jti)
-    token_b.save()
+#     token_b = TokenBlocklist(jti=jti)
+#     token_b.save()
 
-    return jsonify({"message": f"{token_type} token revoked successfully"}) , 200
+#     return jsonify({"message": f"{token_type} token revoked successfully"}) , 200

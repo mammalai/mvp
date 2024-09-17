@@ -4,22 +4,34 @@ from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+from dataclasses import dataclass, asdict
+
+from .mongobase import MongoBaseClass
+
 def generate_uuid():
     return uuid4()
+
+@dataclass
+class User(MongoBaseClass):
     
+    __collectionname__ = "users"
+    email:str
+    _password:str
+    id:str
 
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.String(), primary_key=True)
-    username = db.Column(db.String(), nullable=True)
-    email = db.Column(db.String(), nullable=False)
-    _password = db.Column(db.Text())
-
-    def __init__(self, email:str, password:str):
-        self.id=str(generate_uuid())
+    def __init__(self, email:str, id:str = None, password:str = None, _password:str = None):
+        if id == None:
+            self.id = str(generate_uuid())
+        else:
+            self.id = id
         self.email = email
-        self._validate_strong_password(password)
-        self._password = generate_password_hash(password)
+
+        if password is not None:
+            self.password = password    # This calls the setter method
+        elif _password is not None:
+            self._password = _password # this is when initializing from the database - we already have the hash so should not call the password() setter
+        else:
+            raise TypeError("Password or _password (the hash of the password) must be provided")
 
     def __repr__(self):
         return f"<User {self.email}>"
@@ -53,26 +65,15 @@ class User(db.Model):
         return check_password_hash(self._password, password)
 
     @classmethod
-    def get_user_by_username(cls, username):
-        return cls.query.filter_by(username=username).first()
-    
-    @classmethod
     def get_user_by_email(cls, email):
+        """return the first user with this email"""
         return cls.query.filter_by(email=email).first()
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        #using upsert here which means update if exists and insert if not
+        db.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
 
     def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+        """delete the user from the database"""
+        db.db[self.__collectionname__].delete_one({"id": self.id})
 
-"""
-To create this table in the database
-
-Run:
-$ flask shell
->>> from backend.models.user import User
->>> db.create_all()
-"""

@@ -20,6 +20,8 @@ jobs:
     strategy:
       matrix:
         python-version: [3.11]
+        db-type: [mongodb, sqlalchemy]
+        mongodb-version: [7.0]
 
     steps:
       - name: Checkout mvp
@@ -27,6 +29,11 @@ jobs:
         with:
           repository: mammalai/mvp
           path: mvp
+      - name: Start MongoDB
+        if: matrix.db-type == 'mongodb'
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
       - name: Use python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -36,6 +43,8 @@ jobs:
           cd mvp
           pip install -r requirements.txt
       - name: Run tests
+        env:
+          DB_TYPE: ${{ matrix.db-type }}
         timeout-minutes: 10
         run: |
           cd mvp

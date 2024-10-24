@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 import pytest
 from backend.app import create_app, db
 from backend.models import User
+from backend.config import TestConfig
 
 @pytest.fixture
 def client():
@@ -13,9 +14,11 @@ def client():
 	if os.environ.get("DB_TYPE") == "mongodb":
 		with app.test_client() as testclient:
 			with app.app_context():
-				# clean up the database after running the test
-				db.cx.drop_database('mvp_test')
+				# clean up the database before running the test
+				db.cx.drop_database(f'{TestConfig.project_name}')
 				yield testclient
+		# drop the database after running the test
+		db.cx.drop_database(f'{TestConfig.project_name}')
 	elif os.environ.get("DB_TYPE") == "sqlalchemy":
 		with app.test_client() as testclient:
 			with app.app_context():

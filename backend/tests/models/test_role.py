@@ -14,9 +14,11 @@ def client():
 	if os.environ.get("DB_TYPE") == "mongodb":
 		with app.test_client() as testclient:
 			with app.app_context():
-				# clean up the database after running the test
+				# clean up the database before running the test
 				db.cx.drop_database(f'{TestConfig.project_name}')
 				yield testclient
+		# drop the database after running the test
+		db.cx.drop_database(f'{TestConfig.project_name}')
 	elif os.environ.get("DB_TYPE") == "sqlalchemy":
 		with app.test_client() as testclient:
 			with app.app_context():

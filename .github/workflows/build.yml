@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.11]
-        db-type: [mongodb, sqlalchemy]
+        db-type: [mongodb]
         mongodb-version: [7.0]
 
     steps:

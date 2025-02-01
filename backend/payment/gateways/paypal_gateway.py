@@ -3,12 +3,14 @@ from urllib.parse import urljoin
 import requests
 from requests.auth import HTTPBasicAuth
 from backend.payment.gateways.base import PaymentGateway
+from backend.helpers.utils import multi_urljoin
+from backend.helpers.errors import PaypalError, MVPError
 
 class PayPalGateway(PaymentGateway):
     def __init__(self, client_id, client_secret):
         self.base_url = "https://api-m.sandbox.paypal.com" # TODO: Move to paypal config
-        self.auth_url = urljoin(self.base_url, "v1/oauth2/token") # TODO: Move to paypal config
-        self.orders_url = urljoin(self.base_url, "v2/checkout/orders") # TODO: Move to paypal config
+        self.auth_url = multi_urljoin(self.base_url, "/v1/oauth2/token") # TODO: Move to paypal config
+        self.orders_url = multi_urljoin(self.base_url, "/v2/checkout/orders") # TODO: Move to paypal config
         self.client_id = client_id
         self.client_secret = client_secret
 
@@ -36,7 +38,7 @@ class PayPalGateway(PaymentGateway):
         # }
         return response.json()
 
-    def initialize_payment(self, purchase_units, payment_source):
+    def initialize_payment(self, purchase_units, payment_source=None):
         access_token = self.__authenticate().get("access_token")
         headers = {
             'Content-Type': 'application/json',
@@ -46,11 +48,16 @@ class PayPalGateway(PaymentGateway):
 
         data = {
             "intent": "CAPTURE", # May be changed to "AUTHORIZE" if needed in the future
-            "purchase_units": purchase_units,
-            "payment_source": payment_source,
+            "purchase_units": purchase_units
         }
 
-        response = requests.post(self.orders_url, headers=headers, data=data)
+        # data = '{ "intent": "CAPTURE", "purchase_units": [ { "amount": { "currency_code": "USD", "value": "100.00" } } ] }'
+        # data = json.dumps(data)
+
+        if payment_source is not None:
+            data["payment_source"] = payment_source
+
+        response = requests.post(self.orders_url, headers=headers, json=data)
         # Response contains the following (there are more fields):
         # {
         #     "id": "5O190127TN364720T", <--- This is the order ID
@@ -58,11 +65,43 @@ class PayPalGateway(PaymentGateway):
         #     ...
         # }
         order = response.json()
-        return {
-            "id": order.get("id"),
-            "status": order.get("status"),
-            "create_time": order.get("create_time"),
-        }
+        if response.status_code > 399:
+            # Handle error response
+            raise MVPError("Error creating payment") from PaypalError(
+                name=order.get("name"),
+                message=order.get("message"),
+                status_code=response.status_code,
+                debug_id=order.get("debug_id")
+            )
+        
+        # {
+        #     'id': '1PN63320AH9169723',
+        #     'status': 'CREATED',
+        #     'links': [
+        #         {
+        #             'href': 'https://api.sandbox.paypal.com/v2/checkout/orders/1PN63320AH9169723',
+        #             'rel': 'self',
+        #             'method': 'GET'
+        #         },
+        #         {
+        #             'href': 'https://www.sandbox.paypal.com/checkoutnow?token=1PN63320AH9169723',
+        #             'rel': 'approve',
+        #             'method': 'GET'
+        #         },
+        #         {
+        #             'href': 'https://api.sandbox.paypal.com/v2/checkout/orders/1PN63320AH9169723',
+        #             'rel': 'update',
+        #             'method': 'PATCH'
+        #         },
+        #         {
+        #             'href': 'https://api.sandbox.paypal.com/v2/checkout/orders/1PN63320AH9169723/capture',
+        #             'rel': 'capture',
+        #             'method': 'POST'
+        #         }
+        #     ]
+        # }
+
+        return order
     
     def execute_payment(self, order_id):
         access_token = self.__authenticate().get("access_token")
@@ -73,11 +112,23 @@ class PayPalGateway(PaymentGateway):
             'Authorization': f'Bearer {access_token}', # TODO: Try using f'Basic self.client_id:self.secret' instead
         }
 
-        response = requests.post(urljoin(self.orders_url, order_id, 'capture'), headers=headers)
+        url = multi_urljoin(self.orders_url, order_id, 'capture')
+        response = requests.post(url, headers=headers)
 
-        response = requests.get(urljoin(self.orders_url, order_id), headers=headers)
+        order = response.json()
+        if response.status_code > 399:
+            # Handle error response
+            raise MVPError("Error executing payment") from PaypalError(
+                name=order.get("name"),
+                message=order.get("message"),
+                status_code=response.status_code,
+                debug_id=order.get("debug_id")
+            )
 
-        return response.json()
+        # response = requests.get(multi_urljoin(self.orders_url, order_id), headers=headers)
+
+        # print("Order after executing payment:", order)
+        return order
     
     def get_payment_status(self, order_id):
         access_token = self.__authenticate().get("access_token")
@@ -85,5 +136,5 @@ class PayPalGateway(PaymentGateway):
         headers = {
             'Authorization': f'Bearer {access_token}', # TODO: Try using f'Basic self.client_id:self.secret' instead
         }
-        response = requests.get(urljoin(self.orders_url, order_id), headers=headers)
+        response = requests.get(multi_urljoin(self.orders_url, order_id), headers=headers)
         return response.json().get("status")

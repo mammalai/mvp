@@ -7,9 +7,9 @@ class PaymentService:
         """Initialize with a specific payment gateway instance."""
         self.gateway = gateway
     
-    def create_payment(self, purchase_units, payment_source):
+    def create_payment(self, purchase_units, payment_source=None):
         """Create a payment."""
-        return self.gateway.initialize_payment(purchase_units, payment_source)
+        return self.gateway.initialize_payment(purchase_units, payment_source=payment_source)
     
     def execute_payment(self, order_id):
         """Execute an approved payment."""

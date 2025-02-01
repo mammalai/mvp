@@ -49,9 +49,9 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     JWT_REGISTRATION_TOKEN_EXPIRES = timedelta(seconds=2)
     JWT_PASSWORD_TOKEN_EXPIRES = timedelta(seconds=2)
+    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
     FRONT_END_URL = 'http://localhost:3000'
-
-
 
 class DevConfig:
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
@@ -99,6 +99,8 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     JWT_REGISTRATION_TOKEN_EXPIRES = timedelta(days=1)
     JWT_PASSWORD_TOKEN_EXPIRES = timedelta(minutes=15)
+    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
     FRONT_END_URL = 'http://localhost:3000'
 
 class ProdConfig:
@@ -112,5 +114,7 @@ class ProdConfig:
     JWT_PUBLIC_KEY=os.getenv('JWT_PUBLIC_KEY')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
     SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
     

@@ -183,6 +183,7 @@ def send_email_verification_email(email, verification_token):
     print(f"Sending email verification email to {email}")
 
     if os.environ.get("FLASK_ENV") == "TEST" or os.environ.get("FLASK_ENV") == None:
+        print(f"Verification url: {current_app.config['FRONT_END_URL']}/register-verify?token={verification_token}")
         return
 
     message = Mail(

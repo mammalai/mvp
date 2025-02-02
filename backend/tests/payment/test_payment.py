@@ -51,20 +51,15 @@ def test_payment(client, strong_password):
 			"paypal": {
 				"experience_context": {
 					"payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED",
-					# "brand_name": os.getenv("PROJECT_NAME"),
 					"locale": "en-US",
 					"landing_page": "LOGIN",
-					# "shipping_preference": "SET_PROVIDED_ADDRESS",
 					"user_action": "PAY_NOW",
-					# "return_url": "https://example.com/returnUrl",
-					# "cancel_url": "https://example.com/cancelUrl"
 				}
 			}
 		}
 		order = gateway.initialize_payment(purchase_units, payment_source=payment_source)
 		assert order.get("status") == "PAYER_ACTION_REQUIRED"
 		assert order.get("id") is not None
-		# assert order.get("create_time") is not None
 
 		# Simulate capturing the payment
 		# capture_response = gateway.execute_payment(order.get("id"))

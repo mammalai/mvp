@@ -42,7 +42,7 @@ class PayPalGateway(PaymentGateway):
         access_token = self.__authenticate().get("access_token")
         headers = {
             'Content-Type': 'application/json',
-            # 'PayPal-Request-Id': '7b92603e-77ed-4896-8e78-5dea2050476a',
+            # 'PayPal-Request-Id': '7b92603e-77ed-4896-8e78-5dea2050476a', # TODO: Create own id
             'Authorization': f'Bearer {access_token}', # TODO: Try using f'Basic self.client_id:self.secret' instead
         }
 
@@ -50,9 +50,6 @@ class PayPalGateway(PaymentGateway):
             "intent": "CAPTURE", # May be changed to "AUTHORIZE" if needed in the future
             "purchase_units": purchase_units
         }
-
-        # data = '{ "intent": "CAPTURE", "purchase_units": [ { "amount": { "currency_code": "USD", "value": "100.00" } } ] }'
-        # data = json.dumps(data)
 
         if payment_source is not None:
             data["payment_source"] = payment_source
@@ -73,33 +70,6 @@ class PayPalGateway(PaymentGateway):
                 status_code=response.status_code,
                 debug_id=order.get("debug_id")
             )
-        
-        # {
-        #     'id': '1PN63320AH9169723',
-        #     'status': 'CREATED',
-        #     'links': [
-        #         {
-        #             'href': 'https://api.sandbox.paypal.com/v2/checkout/orders/1PN63320AH9169723',
-        #             'rel': 'self',
-        #             'method': 'GET'
-        #         },
-        #         {
-        #             'href': 'https://www.sandbox.paypal.com/checkoutnow?token=1PN63320AH9169723',
-        #             'rel': 'approve',
-        #             'method': 'GET'
-        #         },
-        #         {
-        #             'href': 'https://api.sandbox.paypal.com/v2/checkout/orders/1PN63320AH9169723',
-        #             'rel': 'update',
-        #             'method': 'PATCH'
-        #         },
-        #         {
-        #             'href': 'https://api.sandbox.paypal.com/v2/checkout/orders/1PN63320AH9169723/capture',
-        #             'rel': 'capture',
-        #             'method': 'POST'
-        #         }
-        #     ]
-        # }
 
         return order
     
@@ -108,7 +78,7 @@ class PayPalGateway(PaymentGateway):
 
         headers = {
             'Content-Type': 'application/json',
-            # 'PayPal-Request-Id': '7b92603e-77ed-4896-8e78-5dea2050476a',
+            # 'PayPal-Request-Id': '7b92603e-77ed-4896-8e78-5dea2050476a', TODO: Create own id
             'Authorization': f'Bearer {access_token}', # TODO: Try using f'Basic self.client_id:self.secret' instead
         }
 
@@ -125,9 +95,6 @@ class PayPalGateway(PaymentGateway):
                 debug_id=order.get("debug_id")
             )
 
-        # response = requests.get(multi_urljoin(self.orders_url, order_id), headers=headers)
-
-        # print("Order after executing payment:", order)
         return order
     
     def get_payment_status(self, order_id):

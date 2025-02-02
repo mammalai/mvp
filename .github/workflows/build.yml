@@ -45,6 +45,8 @@ jobs:
       - name: Run tests
         env:
           DB_TYPE: ${{ matrix.db-type }}
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PAYPAL_SECRET: ${{ secrets.PAYPAL_SECRET }}
         timeout-minutes: 10
         run: |
           cd mvp

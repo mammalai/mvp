@@ -6,6 +6,10 @@ def create_order_blueprint(order_service):
 
     @order_bp.post("")
     def create_order():
+        """
+        This is triggered when you hit "Pay with paypal"
+        The front-end calls this API to log the order and the amount of the order
+        """
         print("CREATING ORDER V2...")
         # TODO: compute purchase_units from cart
         cart = request.get_json().get("cart")
@@ -27,6 +31,11 @@ def create_order_blueprint(order_service):
 
     @order_bp.post("/<order_id>/capture")
     def capture_order(order_id):
+        """
+        This is called by paypal to let you know the payment has been captured
+
+        NOTE: create_order() needs to be called first, and must be successfull before capture_order() can be called
+        """
         order = order_service.complete_order(order_id)
         return jsonify(order.dict()), 200
 

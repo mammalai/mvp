@@ -6,6 +6,9 @@ from .mongobase import MongoBaseClass
 
 # @dataclass
 class Order(MongoBaseClass):
+    """
+    This is a class that manages the orders and the data and the interaction with the database (currently only supports paypa;)
+    """
     __collectionname__ = "orders"
     STATUS_CREATED = "CREATED"
     STATUS_SAVED = "SAVED"
@@ -24,6 +27,9 @@ class Order(MongoBaseClass):
     update_time: str
 
     def __init__(self, order_details):
+        """
+        order_details is a json that is created by paypal and is primarily used to create the order object
+        """
         self.id = order_details.get("id")
         self.status = order_details.get("status", 'UNKNOWN')
         self.payment_source = order_details.get("payment_source")

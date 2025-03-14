@@ -23,10 +23,10 @@ def client():
 		with app.test_client() as testclient:
 			with app.app_context():
 				# clean up the database before running the test
-				db.cx.drop_database(f'{TestConfig.project_name}')
+				db.cx.drop_database(f'{TestConfig.PROJECT_NAME}')
 				yield testclient
         # drop the database after running the test
-		db.cx.drop_database(f'{TestConfig.project_name}')
+		db.cx.drop_database(f'{TestConfig.PROJECT_NAME}')
 	elif os.environ.get("DB_TYPE") == "sqlalchemy":
 		with app.test_client() as testclient:
 			with app.app_context():

@@ -3,9 +3,11 @@ Flask-SQLAlchemy==3.1.1
 Flask-RESTful==0.3.10
 Flask-JWT-Extended==4.6.0
 Flask-PyMongo==2.3.0
+Flask-Cors==5.0.0
 python-dotenv==1.0.1
 marshmallow==3.21.1
 sendgrid==6.11.0
 cryptography==42.0.8
+requests==2.*  # Allow any version of requests 2.x
 # tests
 pytest==8.2.1

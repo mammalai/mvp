@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 class TestConfig:
     # SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    project_name = "mvp_test"
-    MONGO_URI = f"mongodb://localhost:27017/{project_name}"
+    PROJECT_NAME = "mvp_test"
+    MONGO_URI = f"mongodb://localhost:27017/{PROJECT_NAME}"
     SECRET_KEY = "2934948fn394fnqp4ifqp394fSRHF8EFH9WEFn9"
     JWT_ALGORITHM="RS256"
     JWT_PRIVATE_KEY='''-----BEGIN PRIVATE KEY-----
@@ -49,14 +49,14 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     JWT_REGISTRATION_TOKEN_EXPIRES = timedelta(seconds=2)
     JWT_PASSWORD_TOKEN_EXPIRES = timedelta(seconds=2)
+    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
     FRONT_END_URL = 'http://localhost:3000'
-
-
 
 class DevConfig:
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    project_name = os.getenv("PROJECT_NAME")
-    MONGO_URI = f"mongodb://localhost:27017/{project_name}_dev"
+    PROJECT_NAME = os.getenv("PROJECT_NAME")
+    MONGO_URI = f"mongodb://localhost:27017/{PROJECT_NAME}_dev"
     SECRET_KEY = "293"
     JWT_ALGORITHM="RS256"
     JWT_PRIVATE_KEY='''-----BEGIN PRIVATE KEY-----
@@ -99,12 +99,14 @@ iAh4PUTw+HZmT86NvNZlr/Y7NEINJpfyiQIDAQAB
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     JWT_REGISTRATION_TOKEN_EXPIRES = timedelta(days=1)
     JWT_PASSWORD_TOKEN_EXPIRES = timedelta(minutes=15)
+    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
     FRONT_END_URL = 'http://localhost:3000'
 
 class ProdConfig:
     load_dotenv()
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
-    project_name = os.getenv("PROJECT_NAME")
+    PROJECT_NAME = os.getenv("PROJECT_NAME")
     MONGO_URI = os.getenv('MONGO_URI')
     SECRET_KEY = os.getenv('SECRET_KEY')
     JWT_ALGORITHM="RS256"
@@ -112,5 +114,7 @@ class ProdConfig:
     JWT_PUBLIC_KEY=os.getenv('JWT_PUBLIC_KEY')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
     SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
     

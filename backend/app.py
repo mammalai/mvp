@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 import sys
 from backend.blueprints.auth import auth_bp
@@ -14,6 +15,12 @@ from backend.config import TestConfig, DevConfig, ProdConfig
 def create_app():
     app = Flask(__name__)
 
+    # Disable strict slashes
+    app.url_map.strict_slashes = False
+
+    # Enable CORS for all routes and origins
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+
     # if no environment variable, it will default to test
     if os.environ.get("FLASK_ENV") == "TEST" or os.environ.get("FLASK_ENV") == None:
         app.config.from_object(TestConfig)
@@ -27,6 +34,21 @@ def create_app():
     # initialize exts
     db.init_app(app)
     jwt.init_app(app)
+
+    if app.config.get("PAYPAL_CLIENT_ID") and app.config.get("PAYPAL_SECRET"):
+        from backend.blueprints.order import create_order_blueprint
+        from backend.payment.services.payment_service import PaymentService
+        from backend.payment.services.order_service import OrderService
+        from backend.payment.gateways.paypal_gateway import PayPalGateway
+        # I got them from here: https://developer.paypal.com/dashboard/accounts/edit/5325186290147400380?accountName=sb-phbab33627723@business.example.com
+        client_id = app.config.get("PAYPAL_CLIENT_ID")
+        client_secret = app.config.get("PAYPAL_SECRET")
+
+        order_service = OrderService(PaymentService(PayPalGateway(client_id, client_secret)))
+
+        order_bp = create_order_blueprint(order_service)
+
+        app.register_blueprint(order_bp, url_prefix="/api/orders")
 
 
     # register bluepints

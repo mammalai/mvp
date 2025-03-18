@@ -1,0 +1,14 @@
+**/.env
+**/*.env
+
+**/.DS_Store
+**/.pytest_cache/
+**/__pycache__/
+
+backend/.env
+.env
+
+node_modules
+build
+dist
+npm-debug.log

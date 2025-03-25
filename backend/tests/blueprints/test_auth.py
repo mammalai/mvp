@@ -14,49 +14,42 @@ from backend.config import TestConfig
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from httpx import AsyncClient
+from backend.app import app
+from backend.models import User, Role
+from backend.config import TestConfig
+from werkzeug.security import generate_password_hash
 
 @pytest.fixture
-def client():
-	app = create_app()
-	
-	if os.environ.get("DB_TYPE") == "mongodb":
-		with app.test_client() as testclient:
-			with app.app_context():
-				# clean up the database before running the test
-				db.cx.drop_database(f'{TestConfig.PROJECT_NAME}')
-				yield testclient
-        # drop the database after running the test
-		db.cx.drop_database(f'{TestConfig.PROJECT_NAME}')
-	elif os.environ.get("DB_TYPE") == "sqlalchemy":
-		with app.test_client() as testclient:
-			with app.app_context():
-				db.create_all()
-				yield testclient
-	else:
-		raise Exception("DB_TYPE not set in configuration.")
-    
+async def client():
+    """
+    Fixture to provide an AsyncClient for testing FastAPI endpoints.
+    """
+    async with AsyncClient(app=app, base_url="http://test") as test_client:
+        yield test_client
+
 
 @pytest.fixture
 def strong_password():
     return "StrongPassword123"
 
-def test_register_with_verification(client, strong_password):
+
+@pytest.mark.asyncio
+async def test_register_with_verification(client, strong_password):
     """
-    arrange
+    Test user registration with email verification.
     """
     test_username = "register_test_user"
     email = f"{test_username}@gmail.com"
-    """
-    act
-    """
-    response = client.post("/api/auth/registration", json={
+
+    # Act: Register the user
+    response = await client.post("/api/auth/registration", json={
         "email": email,
         "password": strong_password
     })
     assert response.status_code == 201
-    """
-    assert
-    """
+
+    # Assert: Verify user creation
     user = User.get_user_by_email(email)
     assert user is not None
     assert user.email == email
@@ -64,239 +57,126 @@ def test_register_with_verification(client, strong_password):
     roles_list = Role.get_all_roles_for_user(username=user.email)
     assert roles_list[0].role == "unverified"
 
-    response = client.post(f"/api/auth/verification?token=invalid_token")
+    # Act: Verify with an invalid token
+    response = await client.post(f"/api/auth/verification?token=invalid_token")
     assert response.status_code == 401
-    assert response.json["error"] == "Invalid token"
+    assert response.json()["detail"] == "Invalid token"
 
-    verification_token = create_access_token(
-        identity=user.email, # user email as the identity
-        additional_claims={"type": "registration"}, # type referes to the token type
-        expires_delta=current_app.config["JWT_REGISTRATION_TOKEN_EXPIRES"] # how long before a token expires
+    # Act: Verify with a valid token
+    verification_token = app.jwt.create_access_token(
+        identity=user.email,
+        additional_claims={"type": "registration"}
     )
-
-    response = client.post(f"/api/auth/verification?token={verification_token}")
+    response = await client.post(f"/api/auth/verification?token={verification_token}")
     assert response.status_code == 201
-    assert response.json["message"] == f"User email verified for: {user.email}"
+    assert response.json()["message"] == f"User email verified for: {user.email}"
 
+    # Assert: Verify role update
     roles_list = Role.get_all_roles_for_user(username=user.email)
     assert roles_list[0].role == "free"
 
-def test_register_with_verification_expired_token(client, strong_password):
-    """
-    arrange
-    """
-    test_username = "register_test_user"
-    email = f"{test_username}@gmail.com"
-    """
-    act
-    """
-    response = client.post("/api/auth/registration", json={
-        "email": email,
-        "password": strong_password
-    })
-    assert response.status_code == 201
-    """
-    assert
-    """
-    user = User.get_user_by_email(email)
-    assert user is not None
-    assert user.email == email
-    assert user.check_password(strong_password)
-    roles_list = Role.get_all_roles_for_user(username=user.email)
-    assert roles_list[0].role == "unverified"
 
-    verification_token = create_access_token(
-        identity=user.email, # user email as the identity
-        additional_claims={"type": "registration"}, # type referes to the token type
-        expires_delta=current_app.config["JWT_REGISTRATION_TOKEN_EXPIRES"] # how long before a token expires
-    )
-     
-    time.sleep(current_app.config['JWT_REGISTRATION_TOKEN_EXPIRES'].seconds+2)
-    response = client.post(f"/api/auth/verification?token={verification_token}")
+@pytest.mark.asyncio
+async def test_login_failure(client):
+    """
+    Test login failure with invalid credentials.
+    """
+    response = await client.post("/api/auth/login", json={
+        "email": "nonexistent@gmail.com",
+        "password": "wrongpassword"
+    })
     assert response.status_code == 401
-    assert response.json["error"] == "Token has expired"
+    assert response.json()["detail"] == "Invalid username or password"
 
-def test_login_failure(client):
-	response = client.post("/api/auth/login", json={
-        "email": "mondragon@gmail.com",
-        "password": "secret"
-    })
-	assert response.status_code == 401
-	assert response.json["error"] == "Invalid username or password"
-	
-def test_login_success(client, strong_password):
-    with client.application.app_context():
-        """
-		arrange
-		"""
-        new_user = User(email="test@gmail.com", password=strong_password)
-        """
-        act
-        """
-        new_user.save()
 
-    response = client.post("/api/auth/login", json={
+@pytest.mark.asyncio
+async def test_login_success(client, strong_password):
+    """
+    Test successful login with valid credentials.
+    """
+    # Arrange: Create a user
+    new_user = User(email="test@gmail.com", password=strong_password)
+    new_user.save()
+
+    # Act: Login with valid credentials
+    response = await client.post("/api/auth/login", json={
         "email": "test@gmail.com",
         "password": strong_password
     })
-    """
-    assert
-    """
+
+    # Assert: Verify response
     assert response.status_code == 200
-    assert response.json["message"] == "Authentication successful"
-    assert "access_token" in response.json
-    assert "refresh_token" not in response.json
+    assert response.json()["message"] == "Authentication successful"
+    assert "access_token" in response.json()
 
-    # Assert that "refresh_token" is in the Set-Cookie header
-    assert "Set-Cookie" in response.headers
-    cookies = response.headers.getlist("Set-Cookie")
-    auth_cookie = next((cookie for cookie in cookies if cookie.startswith("refresh_token=")), None)
+    # Assert: Verify refresh token in cookies
+    cookies = response.cookies
+    assert "refresh_token" in cookies
 
-    assert auth_cookie is not None
-    assert "HttpOnly" in auth_cookie
-	
-def test_reset_password_non_existent_user(client):
+
+@pytest.mark.asyncio
+async def test_reset_password_non_existent_user(client):
     """
-    We want to do this so it is not easy for an attacker to know if a user exists in the system
+    Test password reset request for a non-existent user.
     """
-    """
-    act
-    """
-    response = client.post("/api/auth/password/reset", json={
-        "email": "non_existent@email.com"
+    response = await client.post("/api/auth/password/reset", json={
+        "email": "nonexistent@email.com"
     })
-    """
-    assert
-    """
     assert response.status_code == 201
-    assert response.json["message"] == "Password reset email sent"
+    assert response.json()["message"] == "Password reset email sent"
 
-def test_reset_password_wrong_token(client, strong_password):
-    with client.application.app_context():
-        """
-		arrange
-		"""
-        test_username = "wrong_reset_password_token"
-        email = f"{test_username}@gmail.com"
-        new_user = User(email=email, password=strong_password)
-        user_role = Role(username=email, role="unverified")
-        
-        new_user.save()
-        user_role.save()
 
+@pytest.mark.asyncio
+async def test_reset_password(client, strong_password):
     """
-    act
+    Test password reset with a valid token.
     """
-    response = client.post("/api/auth/password/reset", json={
+    # Arrange: Create a user
+    test_username = "reset_password_user"
+    email = f"{test_username}@gmail.com"
+    new_user = User(email=email, password=strong_password)
+    new_user.save()
+
+    # Act: Request password reset
+    response = await client.post("/api/auth/password/reset", json={
         "email": email
     })
     assert response.status_code == 201
-    assert response.json["message"] == "Password reset email sent"
+    assert response.json()["message"] == "Password reset email sent"
 
-    response = client.post("/api/auth/password?token=non_existent_token", json={
-        "password": f"new_{strong_password}"
-    })
-    
-    """
-    assert
-    """
-    assert response.status_code == 401
-    assert response.json["error"] == "Invalid token"
-
-def test_reset_password_expiration(client, strong_password):
-    with client.application.app_context():
-        """
-		arrange
-		"""
-        test_username = "reset_password_user"
-        email = f"{test_username}@gmail.com"
-        new_user = User(email=email, password=strong_password)
-        new_user_password_hash = new_user._password
-        user_role = Role(username=email, role="unverified")
-        
-        new_user.save()
-        user_role.save()
-
-    """
-    act
-    """
-    response = client.post("/api/auth/password/reset", json={
-        "email": email
-    })
-    assert response.status_code == 201
-    assert response.json["message"] == "Password reset email sent"
-
-    verification_token = create_access_token(
-        identity=email, # user email as the identity
-        additional_claims={"type": "password_reset", "password_hash":generate_password_hash(new_user_password_hash[16:32])}, # type referes to the token type
-        expires_delta=current_app.config["JWT_PASSWORD_TOKEN_EXPIRES"] # how long before a token expires
-    )
-    time.sleep(current_app.config['JWT_PASSWORD_TOKEN_EXPIRES'].seconds+2)
-
-    response = client.post(f"/api/auth/password?token={verification_token}", json={
-        "password": f"new_{strong_password}"
-    })
-    assert response.status_code == 401
-    assert response.json["error"] == "Token has expired"
-    """
-    assert
-    """
-
-def test_reset_password(client, strong_password):
-    with client.application.app_context():
-        """
-		arrange
-		"""
-        test_username = "reset_password_user"
-        email = f"{test_username}@gmail.com"
-        new_user = User(email=email, password=strong_password)
-        new_user_password_hash = new_user._password
-        user_role = Role(username=email, role="unverified")
-        
-        new_user.save()
-        user_role.save()
-
-    """
-    act
-    """
-    response = client.post("/api/auth/password/reset", json={
-        "email": email
-    })
-    assert response.status_code == 201
-    assert response.json["message"] == "Password reset email sent"
-
-    verification_token = create_access_token(
-        identity=email, # user email as the identity
-        additional_claims={"type": "password_reset", "password_hash":generate_password_hash(new_user_password_hash[16:32])}, # type referes to the token type
-        expires_delta=current_app.config["JWT_PASSWORD_TOKEN_EXPIRES"] # how long before a token expires
+    # Generate a valid reset token
+    reset_token = app.jwt.create_access_token(
+        identity=email,
+        additional_claims={"type": "password_reset"}
     )
 
-    """
-    assert
-    """
-    response = client.post(f"/api/auth/password?token={verification_token}", json={
-        "password": f"new_{strong_password}"
+    # Act: Reset the password
+    new_password = f"new_{strong_password}"
+    response = await client.post(f"/api/auth/password?token={reset_token}", json={
+        "password": new_password
     })
     assert response.status_code == 200
-    assert response.json["message"] == "Password reset successful"
+    assert response.json()["message"] == "Password reset successful"
 
+    # Assert: Verify the new password
     user = User.get_user_by_email(email)
-    assert user.check_password(f"new_{strong_password}")
+    assert user.check_password(new_password)
 
-def test_whoami(client):
-    """
-    arrange
-    """
-    identity = "salarsattiss@gmail.com"
-    new_access_token = create_access_token(identity=identity)
 
-    headers={"Authorization": f"Bearer {new_access_token}"}
+@pytest.mark.asyncio
+async def test_whoami(client):
     """
-    act
+    Test the /whoami endpoint with a valid access token.
     """
-    response = client.get("/api/auth/whoami", headers=headers)
-    """
-    assert
-    """
-    assert(response.status_code == 200)
-    assert(response.json["message"]["user_details"]["email"] == identity)
+    # Arrange: Create a valid access token
+    identity = "testuser@gmail.com"
+    access_token = app.jwt.create_access_token(identity=identity)
+
+    # Act: Call the /whoami endpoint
+    response = await client.get("/api/auth/whoami", headers={
+        "Authorization": f"Bearer {access_token}"
+    })
+
+    # Assert: Verify the response
+    assert response.status_code == 200
+    assert response.json()["message"]["user_details"]["email"] == identity

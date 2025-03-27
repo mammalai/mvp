@@ -1,12 +1,9 @@
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-import pytest
 import pytest_asyncio
-import asyncio
 from httpx import AsyncClient, ASGITransport
 from motor.motor_asyncio import AsyncIOMotorClient
-from backend.extensions import db
 from backend.app import create_app
 
 @pytest_asyncio.fixture(loop_scope="session")

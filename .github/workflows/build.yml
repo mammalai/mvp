@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.13]
+        python-version: [3.11, 3.12, 3.13]
         db-type: [mongodb]
         mongodb-version: [7.0]
 
@@ -51,6 +51,7 @@ jobs:
         timeout-minutes: 10
         run: |
           cd mvp/backend
+          cp .env.github .env
           poetry run pip list
           poetry run pytest
   run-frontend-tests:

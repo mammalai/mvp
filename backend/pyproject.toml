@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "mvp"
+version = "0.1.0"
+description = "A FastAPI-based MVP project"
+authors = ["Your Name <your.email@example.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.12"
+httpx = "^0.28.1"
+pytest = "^8.2.1"
+pytest-asyncio = "^0.26.0"
+passlib = "^1.7.4"
+python-jose = "^3.4.0"
+sendgrid = "^6.11.0"
+motor = "^3.7.0"
+pydantic = "^1.10.0"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+pytest-asyncio = "^0.26.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "asyncio: mark a test as an asyncio test."
+]

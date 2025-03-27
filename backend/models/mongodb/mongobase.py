@@ -7,20 +7,29 @@ class Query:
         self.owner = owner  # Keep a reference to the child class instance
         self.owner_class = owner_class
 
-    def filter_by(self, **kwargs):
+    async def filter_by(self, **kwargs):
         """kwargs will be a dictionary and the mongodb find expects a query dictionary"""
-        self.pymongo_cursor = db.db[self.owner_class.__collectionname__].find(kwargs, {"_id": False})
+        self.cursor = db[self.owner_class.__collectionname__].find(kwargs, {"_id": False})
         return self
 
-    def first(self):
-        record = next(self.pymongo_cursor, None)
-        if record is None:
+    async def first(self):
+        """Get the first record asynchronously"""
+        if not hasattr(self, 'cursor'):
             return None
-        else:
-            return self.owner_class(**record)
+            
+        # For AsyncIOMotorCursor
+        doc = await self.cursor.to_list(length=1)
+        if doc:
+            return self.owner_class(**doc[0])
+        return None
 
-    def all(self):
-        return [self.owner_class(**r) for r in self.pymongo_cursor]
+    async def all(self):
+        """Get all records asynchronously"""
+        if not hasattr(self, 'cursor'):
+            return []
+            
+        docs = await self.cursor.to_list(length=None)  # Get all documents
+        return [self.owner_class(**doc) for doc in docs]
 
 
 class MongoMeta(type):
@@ -46,9 +55,9 @@ class MongoBaseClass(metaclass=MongoMeta):
         return {k: v for k, v in asdict(self).items()}
 
     @abstractmethod
-    def save(self):
+    async def save(self):
         NotImplementedError("Subclasses must implement save() method")
 
     @abstractmethod
-    def delete(self):
+    async def delete(self):
         NotImplementedError("Subclasses must implement delete() method")

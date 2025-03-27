@@ -1,154 +1,165 @@
 import os
 import pytest
-from httpx import AsyncClient
 from backend.models import Role
 from backend.app import app
 from backend.config import TestConfig
 
-@pytest.fixture
-async def client():
-    """
-    Fixture to provide an AsyncClient for testing FastAPI endpoints.
-    """
-    async with AsyncClient(app=app, base_url="http://test") as test_client:
-        if os.environ.get("DB_TYPE") == "mongodb":
-            # Clean up the database before running the test
-            db.cx.drop_database(f'{TestConfig.PROJECT_NAME}')
-            yield test_client
-            # Drop the database after running the test
-            db.cx.drop_database(f'{TestConfig.PROJECT_NAME}')
-        elif os.environ.get("DB_TYPE") == "sqlalchemy":
-            with app.app_context():
-                db.create_all()
-                yield test_client
-                db.drop_all()
-        else:
-            raise Exception("DB_TYPE not set in configuration.")
-
-
-@pytest.mark.asyncio
-async def test_create_role(client):
+@pytest.mark.asyncio(loop_scope="session")
+async def test_create_role():
     """
     Test creating a role for a user.
     """
-    # Arrange
-    new_role = {"username": "ssatti", "role": "free"}
 
-    # Act
-    response = await client.post("/api/roles", json=new_role)
+    new_role = Role(username="ssatti", role="free")
 
-    # Assert
-    assert response.status_code == 201
-    role = Role.query.filter_by(username="ssatti").first()
+    """
+    act
+    """
+    await new_role.save()
+    # Add assertions to verify that the user was created successfully
+    roles = await Role.query.filter_by(username="ssatti")
+    role = await roles.first()
+    """
+    assert
+    """
     assert role is not None
     assert role.username == "ssatti"
     assert role.role == "free"
 
 
-@pytest.mark.asyncio
-async def test_delete_role(client):
+@pytest.mark.asyncio(loop_scope="session")
+async def test_delete_role():
     """
     Test deleting a role for a user.
     """
-    # Arrange
+    """
+    arrange
+    """
+    # set the new user, password, and save the user
     new_role = Role(username="ssatti", role="free")
-    new_role.save()
-
-    # Act
-    response = await client.delete(f"/api/roles/{new_role.id}")
-
-    # Assert
-    assert response.status_code == 204
-    role = Role.query.filter_by(username="ssatti", role="free").first()
+    await new_role.save()
+    """
+    act
+    """
+    roles = await Role.query.filter_by(username="ssatti", role="free")
+    role = await roles.first()
+    await new_role.delete()
+    """
+    assert
+    """
+    roles = await Role.query.filter_by(username="ssatti", role="free")
+    role = await roles.first()
     assert role is None
 
 
-@pytest.mark.asyncio
-async def test_get_all_roles_for_user(client):
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_all_roles_for_user():
     """
     Test retrieving all roles for a user.
     """
-    # Arrange
-    role1 = Role(username="ssatti", role="paid")
-    role2 = Role(username="ssatti", role="staff")
-    role1.save()
-    role2.save()
-
-    # Act
-    response = await client.get("/api/roles?username=ssatti")
-
-    # Assert
-    assert response.status_code == 200
-    roles = response.json()
+    """
+    arrange
+    """
+    role1 = "paid"
+    role2 = "staff"
+    new_role1 = Role(username="ssatti", role=role1)
+    await new_role1.save()
+    new_role2 = Role(username="ssatti", role=role2)
+    await new_role2.save()
+    """
+    act
+    """
+    roles = await Role.get_all_roles_for_user("ssatti")
+    """
+    assert
+    """
     assert len(roles) == 2
-    roles_str = [r["role"] for r in roles]
-    assert set(roles_str) == {"paid", "staff"}
+    roles_str = [r.role for r in roles]
+    assert set(roles_str) == set([role1, role2])
 
 
-@pytest.mark.asyncio
-async def test_role_exists_for_user_true(client):
+@pytest.mark.asyncio(loop_scope="session")
+async def test_role_exists_for_user_true():
     """
     Test checking if a role exists for a user (true case).
     """
-    # Arrange
-    new_role = Role(username="ssatti", role="paid")
-    new_role.save()
+    """
+    arrange
+    """
+    role = "paid"
+    new_role = Role(username="ssatti", role=role)
+    await new_role.save()
+    """
+    act
+    """
+    role_exists = await Role.role_exists_for_user("ssatti", role)
+    """
+    assert
+    """
+    assert role_exists == True
 
-    # Act
-    response = await client.get("/api/roles/exists", params={"username": "ssatti", "role": "paid"})
 
-    # Assert
-    assert response.status_code == 200
-    assert response.json()["exists"] is True
-
-
-@pytest.mark.asyncio
-async def test_role_exists_for_user_false(client):
+@pytest.mark.asyncio(loop_scope="session")
+async def test_role_exists_for_user_false():
     """
     Test checking if a role exists for a user (false case).
     """
-    # Act
-    response = await client.get("/api/roles/exists", params={"username": "ssatti", "role": "paid"})
+    """
+    arrange
+    """
+    role = "paid"
+    """
+    act
+    """
+    role_exists = await Role.role_exists_for_user("ssatti", role)
+    """
+    assert
+    """
+    assert role_exists == False
 
-    # Assert
-    assert response.status_code == 200
-    assert response.json()["exists"] is False
 
-
-@pytest.mark.asyncio
-async def test_add_role_for_user(client):
+@pytest.mark.asyncio(loop_scope="session")
+async def test_add_role_for_user():
     """
     Test adding a role for a user.
     """
-    # Arrange
+    """
+    arrange
+    """
     username = "ssatti"
     role = "paid"
-
-    # Act
-    response = await client.post("/api/roles", json={"username": username, "role": role})
-
-    # Assert
-    assert response.status_code == 201
-    r = Role.query.filter_by(username=username, role=role).first()
+    """
+    act
+    """
+    await Role.add_role_for_user(username=username, role=role)
+    """
+    assert
+    """
+    roles = await Role.query.filter_by(username=username, role=role)
+    r = await roles.first()
     assert r.username == username
     assert r.role == role
 
 
-@pytest.mark.asyncio
-async def test_remove_role_for_user(client):
+@pytest.mark.asyncio(loop_scope="session")
+async def test_remove_role_for_user():
     """
     Test removing a role for a user.
     """
-    # Arrange
+    """
+    arrange
+    """
     username = "ssatti"
     role = "paid"
     new_role = Role(username=username, role=role)
-    new_role.save()
-
-    # Act
-    response = await client.delete(f"/api/roles/{new_role.id}")
-
-    # Assert
-    assert response.status_code == 204
-    r = Role.query.filter_by(username=username, role=role).first()
+    await new_role.save()
+    """
+    act
+    """
+    await Role.remove_role_for_user(username=username, role=role)
+    """
+    assert
+    """
+    roles = await Role.query.filter_by(username=username, role=role)
+    r = await roles.first()
     assert r is None

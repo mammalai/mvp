@@ -4,10 +4,10 @@ from dataclasses import dataclass, field
 from backend.extensions import db
 from .mongobase import MongoBaseClass
 
-# @dataclass
+@dataclass
 class Order(MongoBaseClass):
     """
-    This is a class that manages the orders and the data and the interaction with the database (currently only supports paypa;)
+    This is a class that manages the orders and the data and the interaction with the database (currently only supports paypal)
     """
     __collectionname__ = "orders"
     STATUS_CREATED = "CREATED"
@@ -16,15 +16,14 @@ class Order(MongoBaseClass):
     STATUS_VOIDED = "VOIDED"
     STATUS_COMPLETED = "COMPLETED"
     STATUS_PAYER_ACTION_REQUIRED = "PAYER_ACTION_REQUIRED"
-    id: str
-    user_id: str  # Foreign reference to User
-    amount: float
-    currency: str
-    status: str
-    description: str
+    id: str = None
     status: str = field(default=STATUS_CREATED)
-    create_time: str
-    update_time: str
+    payment_source: dict = None
+    purchase_units: list = None
+    payer: dict = None
+    links: list = None
+    create_time: str = None
+    update_time: str = None
 
     def __init__(self, order_details):
         """
@@ -40,8 +39,8 @@ class Order(MongoBaseClass):
         self.update_time = order_details.get("update_time", str(datetime.datetime.now(datetime.timezone.utc)))
 
     @classmethod
-    def get_by_id(cls, order_id):
-        order = db.db[cls.__collectionname__].find_one({"id": order_id}, {"_id": False})
+    async def get_by_id(cls, order_id):
+        order = await db[cls.__collectionname__].find_one({"id": order_id}, {"_id": False})
         if order is None:
             return None
         return cls(order)
@@ -61,7 +60,7 @@ class Order(MongoBaseClass):
             "update_time": self.update_time,
         }
     
-    def update(self, order_details):
+    async def update(self, order_details):
         print('Updating order:', order_details)
         self.id = order_details.get("id")
         self.status = order_details.get("status", 'UNKNOWN')
@@ -71,10 +70,10 @@ class Order(MongoBaseClass):
         self.links = order_details.get("links")
         self.create_time = order_details.get("create_time", str(datetime.datetime.now(datetime.timezone.utc)))
         self.update_time = order_details.get("update_time", str(datetime.datetime.now(datetime.timezone.utc)))
-        self.save()
+        await self.save()
 
-    def save(self):
-        db.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
+    async def save(self):
+        await db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
 
-    def delete(self):
-        db.db[self.__collectionname__].delete_one({"id": self.id})
+    async def delete(self):
+        await db[self.__collectionname__].delete_one({"id": self.id})

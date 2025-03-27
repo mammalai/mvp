@@ -42,7 +42,7 @@ jobs:
         run: |
           cd mvp/backend
           pip install poetry
-          poetry install
+          poetry install --with dev
       - name: Run tests
         env:
           DB_TYPE: ${{ matrix.db-type }}

@@ -51,9 +51,8 @@ jobs:
         timeout-minutes: 10
         run: |
           cd mvp/backend
-          pip list
-          poetry show pytest pytest-asyncio
-          pytest
+          poetry run pip list
+          poetry run pytest
   run-frontend-tests:
     runs-on: ubuntu-latest
 

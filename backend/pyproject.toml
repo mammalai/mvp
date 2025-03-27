@@ -9,8 +9,8 @@ package-mode = false
 python = "^3.10"
 fastapi = "^0.115.12"
 httpx = "^0.28.1"
-passlib = "^1.7.4"
-python-jose = "^3.4.0"
+passlib = {version = "^1.7.4", extras = ["bcrypt"]}
+python-jose = {version = "^3.4.0", extras = ["cryptography"]}
 sendgrid = "^6.11.0"
 motor = "^3.7.0"
 pydantic = "^1.10.0"

@@ -1,8 +1,6 @@
 import os
 import pytest
 from backend.models import Role
-from backend.app import app
-from backend.config import TestConfig
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_create_role():

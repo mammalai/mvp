@@ -3,12 +3,10 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
 
 import pytest
-import pytest_asyncio
 from backend.models import User, Role
 from datetime import timedelta
-from backend.config import TestConfig
-from backend.extensions import create_token, decode_token
-from backend.blueprints.auth import generate_password_hash, check_password_hash
+from backend.extensions import create_token
+from backend.blueprints.auth import generate_password_hash
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_register_with_verification(client, strong_password):

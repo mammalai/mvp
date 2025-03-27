@@ -1,15 +1,12 @@
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from datetime import timedelta
 import os
 
 from dotenv import load_dotenv
 
 from backend.blueprints.auth import auth_router
 from backend.blueprints.order import create_order_router
-from backend.extensions import db, jwt
-from backend.config import TestConfig, DevConfig, ProdConfig
 
 load_dotenv()
 
@@ -26,20 +23,6 @@ def create_app():
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    # Load configuration based on environment
-    # if os.environ.get("FLASK_ENV") == "TEST" or os.environ.get("FLASK_ENV") is None:
-    #     config = TestConfig
-    # elif os.environ.get("FLASK_ENV") == "DEV":
-    #     config = DevConfig
-    # elif os.environ.get("FLASK_ENV") == "PROD":
-    #     config = ProdConfig
-    # else:
-    #     raise Exception("At least one config has not been set")
-
-    # Initialize extensions
-    # db.init_app(app)
-    # jwt.init_app(app)
 
     # Register order routes if PayPal credentials are available
     if os.environ.get("PAYPAL_CLIENT_ID") and os.environ.get("PAYPAL_SECRET"):

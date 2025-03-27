@@ -3,10 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
 
 import pytest
-from httpx import AsyncClient
-from backend.app import create_app, db
 from backend.models import User
-from backend.config import TestConfig
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_create_user(strong_password):

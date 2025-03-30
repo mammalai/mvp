@@ -7,15 +7,15 @@ class PaymentService:
         """Initialize with a specific payment gateway instance."""
         self.gateway = gateway
     
-    def create_payment(self, purchase_units, payment_source=None):
+    async def create_payment(self, purchase_units, payment_source=None):
         """Create a payment."""
-        return self.gateway.initialize_payment(purchase_units, payment_source=payment_source)
+        return await self.gateway.initialize_payment(purchase_units, payment_source=payment_source)
     
-    def execute_payment(self, order_id):
+    async def execute_payment(self, order_id):
         """Execute an approved payment."""
-        return self.gateway.execute_payment(order_id)
+        return await self.gateway.execute_payment(order_id)
     
-    def check_payment_status(self, order_id):
+    async def check_payment_status(self, order_id):
         """Check the current status of a payment."""
-        status = self.gateway.get_payment_status(order_id)
+        status = await self.gateway.get_payment_status(order_id)
         return status

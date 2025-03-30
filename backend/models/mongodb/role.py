@@ -35,25 +35,35 @@ class Role(MongoBaseClass):
     def __repr__(self):
         return f'<Role {self.username}={self.role}>'
 
-    def save(self):
-        db.db[self.__collectionname__].replace_one({"id": self.id}, self.dict(), upsert=True)
+    async def save(self):
+        """Save the role to the database asynchronously"""
+        await db[self.__collectionname__].replace_one(
+            {"id": self.id}, 
+            self.dict(), 
+            upsert=True
+        )
 
-    def delete(self):
-        db.db[self.__collectionname__].delete_one({"id": self.id})
+    async def delete(self):
+        """Delete the role from the database asynchronously"""
+        await db[self.__collectionname__].delete_one({"id": self.id})
 
     @classmethod
-    def get_all_roles_for_user(cls, username):
-        roles_list = cls.query.filter_by(username=username).all()
-        return [r_db for r_db in roles_list]
+    async def get_all_roles_for_user(cls, username):
+        """Get all roles for a user asynchronously"""
+        query = await cls.query.filter_by(username=username)
+        return await query.all()
     
     @classmethod
-    def role_exists_for_user(cls, username, role):
-
+    async def role_exists_for_user(cls, username, role):
+        """Check if a role exists for a user asynchronously"""
         if role not in ROLES:
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return False
 
-        if cls.query.filter_by(username=username, role=role).first() is not None:
+        query = await cls.query.filter_by(username=username, role=role)
+        role_obj = await query.first()
+        
+        if role_obj is not None:
             print(f'Role "{role}" exists for user "{username}".')
             return True
         else:
@@ -61,30 +71,31 @@ class Role(MongoBaseClass):
             return False
     
     @classmethod
-    def add_role_for_user(cls, username, role):
-        
+    async def add_role_for_user(cls, username, role):
+        """Add a role for a user asynchronously"""
         if role not in ROLES:
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return
         
-        if cls.role_exists_for_user(username, role):
+        if await cls.role_exists_for_user(username, role):
             pass
         else:
             new_role = cls(username=username, role=role)
-            new_role.save()
+            await new_role.save()
             print(f'Role "{role}" added for user "{username}".')
 
             
     @classmethod
-    def remove_role_for_user(cls, username, role):
-
+    async def remove_role_for_user(cls, username, role):
+        """Remove a role from a user asynchronously"""
         if role not in ROLES:
             print(f'Role "{role}" does not exist in master dictionary. Please check the role or update the master dictionary.')
             return
         
-        if cls.role_exists_for_user(username, role):
-            db_role = cls.query.filter_by(username=username, role=role).first()
-            db_role.delete()
+        if await cls.role_exists_for_user(username, role):
+            query = await cls.query.filter_by(username=username, role=role)
+            db_role = await query.first()
+            await db_role.delete()
             print(f'Role "{role}" removed for user "{username}".')
         else:
             print(f'Role "{role}" does not exist for user "{username}".')

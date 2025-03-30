@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.11]
+        python-version: [3.11, 3.12, 3.13]
         db-type: [mongodb]
         mongodb-version: [7.0]
 
@@ -40,8 +40,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install requirements
         run: |
-          cd mvp
-          pip install -r requirements.txt
+          cd mvp/backend
+          pip install poetry
+          poetry install --with dev
       - name: Run tests
         env:
           DB_TYPE: ${{ matrix.db-type }}
@@ -49,8 +50,10 @@ jobs:
           PAYPAL_SECRET: ${{ secrets.PAYPAL_SECRET }}
         timeout-minutes: 10
         run: |
-          cd mvp
-          pytest
+          cd mvp/backend
+          cp .env.github .env
+          poetry run pip list
+          poetry run pytest
   run-frontend-tests:
     runs-on: ubuntu-latest
 

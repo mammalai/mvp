@@ -1,13 +1,19 @@
-Flask==3.0.3
-Flask-SQLAlchemy==3.1.1
-Flask-RESTful==0.3.10
-Flask-JWT-Extended==4.6.0
-Flask-PyMongo==2.3.0
-Flask-Cors==5.0.0
+# Flask==3.0.3
+# Flask-SQLAlchemy==3.1.1
+# Flask-RESTful==0.3.10
+# Flask-JWT-Extended==4.6.0
+# Flask-PyMongo==2.3.0
+# Flask-Cors==5.0.0
 python-dotenv==1.0.1
 marshmallow==3.21.1
 sendgrid==6.11.0
 cryptography==42.0.8
 requests==2.*  # Allow any version of requests 2.x
+fastapi==0.115.12
+motor==3.7.0
+python-jose[cryptography]==3.4.0
+passlib[bcrypt]==1.7.4
+httpx==0.28.1
 # tests
 pytest==8.2.1
+pytest-asyncio==0.26.0

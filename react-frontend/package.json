@@ -37,6 +37,7 @@
     "@mui/lab": "^5.0.0-alpha.167",
     "@mui/material": "^5.15.12",
     "@mui/system": "^5.15.12",
+    "@paypal/react-paypal-js": "^8.8.1",
     "@svgr/webpack": "^8.1.0",
     "@vitejs/plugin-react": "^4.2.1",
     "@xstate/react": "^4.1.1",

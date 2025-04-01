@@ -62,7 +62,7 @@ const registerMachine = setup({
         },
       };
     }),
-    assignLoadinErrorMessage: assign(({ event }) => {
+    assignLoadingErrorMessage: assign(({ event }) => {
       const axiosError = event.error;
       if (axiosError.message === 'Request failed with status code 500') {
         return {
@@ -108,7 +108,7 @@ const registerMachine = setup({
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadinErrorMessage'],
+          actions: ['assignLoadingErrorMessage'],
         },
       },
     },

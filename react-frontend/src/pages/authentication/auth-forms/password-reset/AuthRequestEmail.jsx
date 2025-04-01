@@ -56,7 +56,7 @@ const loginMachine = setup({
         },
       };
     }),
-    assignLoadinErrorMessage: assign(({ event }) => {
+    assignLoadingErrorMessage: assign(({ event }) => {
       const axiosError = event.error;
       if (
         'response' in axiosError &&
@@ -102,7 +102,7 @@ const loginMachine = setup({
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadinErrorMessage'],
+          actions: ['assignLoadingErrorMessage'],
         },
       },
     },

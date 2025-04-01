@@ -1,26 +1,24 @@
 import { useRef, useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-// project import
+// project imports
 import MainCard from 'components/MainCard';
+import IconButton from 'components/@extended/IconButton';
 import Transitions from 'components/@extended/Transitions';
 
 // assets
@@ -30,11 +28,13 @@ import GiftOutlined from '@ant-design/icons/GiftOutlined';
 import MessageOutlined from '@ant-design/icons/MessageOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 
+import { useTheme } from '@mui/material/styles';
+
 // sx styles
 const avatarSX = {
   width: 36,
   height: 36,
-  fontSize: '1rem',
+  fontSize: '1rem'
 };
 
 const actionSX = {
@@ -44,14 +44,16 @@ const actionSX = {
   right: 'auto',
   alignSelf: 'flex-start',
 
-  transform: 'none',
+  transform: 'none'
 };
 
 // ==============================|| HEADER CONTENT - NOTIFICATION ||============================== //
 
 export default function Notification() {
+
   const theme = useTheme();
-  const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
+
+  const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   const anchorRef = useRef(null);
   const [read, setRead] = useState(2);
@@ -67,36 +69,43 @@ export default function Notification() {
     setOpen(false);
   };
 
-  const iconBackColorOpen = 'grey.100';
-
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
       <IconButton
         color="secondary"
         variant="light"
-        sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : 'transparent' }}
+        sx={(theme) => ({
+          color: 'text.primary',
+          bgcolor: open ? 'grey.100' : 'transparent',
+          ...theme.applyStyles('dark', { bgcolor: open ? 'background.default' : 'transparent' })
+        })}
         aria-label="open profile"
         ref={anchorRef}
         aria-controls={open ? 'profile-grow' : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
       >
-        <Badge badgeContent={read} color="primary">
+        <Badge badgeContent={read} color="error" sx={{ 
+          '& .MuiBadge-badge': { 
+            bgcolor: theme.palette.m3?.main || theme.palette.error.main,
+            color: '#fff'
+          } 
+        }}>
           <BellOutlined />
         </Badge>
       </IconButton>
       <Popper
-        placement={matchesXs ? 'bottom' : 'bottom-end'}
+        placement={downMD ? 'bottom' : 'bottom-end'}
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
         transition
         disablePortal
-        popperOptions={{ modifiers: [{ name: 'offset', options: { offset: [matchesXs ? -5 : 0, 9] } }] }}
+        popperOptions={{ modifiers: [{ name: 'offset', options: { offset: [downMD ? -5 : 0, 9] } }] }}
       >
         {({ TransitionProps }) => (
-          <Transitions type="grow" position={matchesXs ? 'top' : 'top-right'} in={open} {...TransitionProps}>
-            <Paper sx={{ boxShadow: theme.customShadows.z1, width: '100%', minWidth: 285, maxWidth: { xs: 285, md: 420 } }}>
+          <Transitions type="grow" position={downMD ? 'top' : 'top-right'} in={open} {...TransitionProps}>
+            <Paper sx={(theme) => ({ boxShadow: theme.customShadows.z1, width: '100%', minWidth: 285, maxWidth: { xs: 285, md: 420 } })}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MainCard
                   title="Notification"
@@ -121,13 +130,23 @@ export default function Notification() {
                       p: 0,
                       '& .MuiListItemButton-root': {
                         py: 0.5,
+                        px: 2,
                         '&.Mui-selected': { bgcolor: 'grey.50', color: 'text.primary' },
                         '& .MuiAvatar-root': avatarSX,
-                        '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' },
-                      },
+                        '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' }
+                      }
                     }}
                   >
-                    <ListItemButton selected={read > 0}>
+                    <ListItem
+                      component={ListItemButton}
+                      divider
+                      selected={read > 0}
+                      secondaryAction={
+                        <Typography variant="caption" noWrap>
+                          3:00 AM
+                        </Typography>
+                      }
+                    >
                       <ListItemAvatar>
                         <Avatar sx={{ color: 'success.main', bgcolor: 'success.lighter' }}>
                           <GiftOutlined />
@@ -145,14 +164,16 @@ export default function Notification() {
                         }
                         secondary="2 min ago"
                       />
-                      <ListItemSecondaryAction>
+                    </ListItem>
+                    <ListItem
+                      component={ListItemButton}
+                      divider
+                      secondaryAction={
                         <Typography variant="caption" noWrap>
-                          3:00 AM
+                          6:00 AM
                         </Typography>
-                      </ListItemSecondaryAction>
-                    </ListItemButton>
-                    <Divider />
-                    <ListItemButton>
+                      }
+                    >
                       <ListItemAvatar>
                         <Avatar sx={{ color: 'primary.main', bgcolor: 'primary.lighter' }}>
                           <MessageOutlined />
@@ -169,14 +190,17 @@ export default function Notification() {
                         }
                         secondary="5 August"
                       />
-                      <ListItemSecondaryAction>
+                    </ListItem>
+                    <ListItem
+                      component={ListItemButton}
+                      divider
+                      selected={read > 0}
+                      secondaryAction={
                         <Typography variant="caption" noWrap>
-                          6:00 PM
+                          2:45 PM
                         </Typography>
-                      </ListItemSecondaryAction>
-                    </ListItemButton>
-                    <Divider />
-                    <ListItemButton selected={read > 0}>
+                      }
+                    >
                       <ListItemAvatar>
                         <Avatar sx={{ color: 'error.main', bgcolor: 'error.lighter' }}>
                           <SettingOutlined />
@@ -193,14 +217,16 @@ export default function Notification() {
                         }
                         secondary="7 hours ago"
                       />
-                      <ListItemSecondaryAction>
+                    </ListItem>
+                    <ListItem
+                      component={ListItemButton}
+                      divider
+                      secondaryAction={
                         <Typography variant="caption" noWrap>
-                          2:45 PM
+                          9:10 PM
                         </Typography>
-                      </ListItemSecondaryAction>
-                    </ListItemButton>
-                    <Divider />
-                    <ListItemButton>
+                      }
+                    >
                       <ListItemAvatar>
                         <Avatar sx={{ color: 'primary.main', bgcolor: 'primary.lighter' }}>C</Avatar>
                       </ListItemAvatar>
@@ -218,13 +244,7 @@ export default function Notification() {
                         }
                         secondary="Daily scrum meeting time"
                       />
-                      <ListItemSecondaryAction>
-                        <Typography variant="caption" noWrap>
-                          9:10 PM
-                        </Typography>
-                      </ListItemSecondaryAction>
-                    </ListItemButton>
-                    <Divider />
+                    </ListItem>
                     <ListItemButton sx={{ textAlign: 'center', py: `${12}px !important` }}>
                       <ListItemText
                         primary={

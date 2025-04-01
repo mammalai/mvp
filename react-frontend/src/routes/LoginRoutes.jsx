@@ -2,7 +2,8 @@ import { lazy } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
-import MinimalLayout from 'layout/MinimalLayout';
+import AuthLayout from 'layout/Auth';
+
 
 // render - login
 const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
@@ -14,7 +15,7 @@ const AuthNewPassword = Loadable(lazy(() => import('pages/authentication/passwor
 
 const LoginRoutes = {
   path: '/',
-  element: <MinimalLayout />,
+  element: <AuthLayout />,
   children: [
     {
       path: '/login',

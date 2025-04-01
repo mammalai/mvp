@@ -15,6 +15,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import Alert from '@mui/material/Alert';
+import { useTheme } from '@mui/material/styles';
 
 // ant design icons
 import CheckOutlined from '@ant-design/icons/CheckOutlined';
@@ -36,7 +37,7 @@ import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
 const loginMachine = setup({
   actors: {
-    loginRequest: fromPromise(async (args) => {
+    passwordResetRequest: fromPromise(async (args) => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           axios
@@ -72,7 +73,7 @@ const loginMachine = setup({
         },
       };
     }),
-    assignLoadinErrorMessage: assign(({ event }) => {
+    assignLoadingErrorMessage: assign(({ event }) => {
       const axiosError = event.error;
       if (
         'response' in axiosError &&
@@ -111,7 +112,7 @@ const loginMachine = setup({
     },
     loadingState: {
       invoke: {
-        src: 'loginRequest',
+        src: 'passwordResetRequest',
         input: ({ context }) => ({ context }),
         onDone: {
           target: 'successState',
@@ -119,7 +120,7 @@ const loginMachine = setup({
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadinErrorMessage'],
+          actions: ['assignLoadingErrorMessage'],
         },
       },
     },
@@ -141,6 +142,8 @@ export default function AuthNewPassword() {
   const [state, send] = useMachine(loginMachine);
 
   const [searchParams] = useSearchParams();
+
+  const theme = useTheme();
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {

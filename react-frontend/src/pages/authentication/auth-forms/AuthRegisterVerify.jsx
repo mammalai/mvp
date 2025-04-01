@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import Alert from '@mui/material/Alert';
-
+import { useTheme } from '@mui/material/styles';
 // ant design icons
 import CheckOutlined from '@ant-design/icons/CheckOutlined';
 
@@ -51,7 +51,7 @@ const loginMachine = setup({
         },
       };
     }),
-    assignLoadinErrorMessage: assign(({ event }) => {
+    assignLoadingErrorMessage: assign(({ event }) => {
       const axiosError = event.error;
       if (
         'response' in axiosError &&
@@ -97,7 +97,7 @@ const loginMachine = setup({
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadinErrorMessage'],
+          actions: ['assignLoadingErrorMessage'],
         },
       },
     },
@@ -115,10 +115,12 @@ const loginMachine = setup({
 
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthRegisterVerify() {
+export default function AuthRegisterVerify() {  
   const [state, send] = useMachine(loginMachine);
 
   const [searchParams] = useSearchParams();
+
+  const theme = useTheme();
 
   useEffect(() => {
     const values = { token: searchParams.get('token') };

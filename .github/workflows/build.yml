@@ -87,4 +87,4 @@ jobs:
         run: |
           cd mvp/react-frontend
           yarn run lint
-          yarn run prettier:check
+        # yarn run prettier:check

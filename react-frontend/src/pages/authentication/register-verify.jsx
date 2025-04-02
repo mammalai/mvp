@@ -13,7 +13,6 @@ import AuthRegisterVerify from './auth-forms/AuthRegisterVerify';
 // ================================|| REGISTER ||================================ //
 
 export default function Register() {
-
   const theme = useTheme();
 
   return (

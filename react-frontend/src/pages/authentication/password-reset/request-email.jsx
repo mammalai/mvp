@@ -13,7 +13,6 @@ import AuthRequestEmail from '../auth-forms/password-reset/AuthRequestEmail';
 // ================================|| LOGIN ||================================ //
 
 export default function Login() {
-
   const theme = useTheme();
 
   return (

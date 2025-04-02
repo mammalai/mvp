@@ -13,7 +13,6 @@ import OverviewView from 'pages/component-overview/overview.jsx';
 import TabsView from 'pages/component-overview/tabs.jsx';
 import NavigationDrawerView from 'pages/component-overview/navigation-drawer.jsx';
 
-
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -26,11 +25,7 @@ function TabPanel(props) {
       {...other}
       sx={{ width: '100%', height: '100%' }}
     >
-      {value === index && (
-        <Box>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box>{children}</Box>}
     </Box>
   );
 }
@@ -38,13 +33,13 @@ function TabPanel(props) {
 TabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired
 };
 
 function a11yProps(index) {
   return {
     id: `vertical-tab-${index}`,
-    'aria-controls': `vertical-tabpanel-${index}`,
+    'aria-controls': `vertical-tabpanel-${index}`
   };
 }
 
@@ -56,17 +51,14 @@ export default function VerticalTabs() {
   };
 
   return (
-    <Box
-      sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex' }}
-    >
+    <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex' }}>
       <Tabs
         orientation="vertical"
         variant="scrollable"
         value={value}
         onChange={handleChange}
         aria-label="Vertical tabs example"
-        sx={{  borderColor: 'divider', minWidth: 180, borderRadius: 0 }}
-
+        sx={{ borderColor: 'divider', minWidth: 180, borderRadius: 0 }}
       >
         <Tab label="Overview" {...a11yProps(0)} />
         <Tab label="Button" {...a11yProps(1)} />
@@ -94,7 +86,7 @@ export default function VerticalTabs() {
       <TabPanel value={value} index={5}>
         <NavigationDrawerView />
       </TabPanel>
-      { /*<TabPanel value={value} index={6}>
+      {/*<TabPanel value={value} index={6}>
         Item Seven
       </TabPanel> */}
     </Box>

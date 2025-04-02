@@ -2,9 +2,7 @@
 import { alpha } from '@mui/material/styles';
 import { blend } from '@mui/system';
 
-
 import Typography from '../typography';
-
 
 // ==============================|| OVERRIDES - TAB ||============================== //
 
@@ -17,18 +15,17 @@ export default function Tab(theme) {
           color: theme.palette.m3.onSurface, // font color
           ...Typography().labelLarge,
           fontWeight: 400,
-          
-          '&.Mui-selected': { // done
+          '&.Mui-selected': {
             color: theme.palette.m3.onSecondaryContainer,
             backgroundColor: theme.palette.m3.secondaryContainer,
             fontWeight: 500,
             outline: 'none',
             borderBottom: 'none'
           },
-          '&.Mui-selected:hover': { 
+          '&.Mui-selected:hover': {
             backgroundColor: blend(theme.palette.m3.secondaryContainer, theme.palette.m3.onSurface, 0.08),
             color: theme.palette.m3.onSecondaryContainer,
-            fontWeight: 500,
+            fontWeight: 500
           },
           '&:hover': {
             backgroundColor: blend(theme.palette.m3.surface, theme.palette.m3.onSurface, 0.08),

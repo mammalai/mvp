@@ -2,7 +2,6 @@
 
 export default function typography(theme) {
   return {
-
     // display - large
     displayLarge: {
       fontWeight: 400,
@@ -121,14 +120,7 @@ export default function typography(theme) {
       fontSize: '12px',
       lineHeight: '16px',
       letterSpacing: '0.4px'
-    },
-
-
-
-
-
-
-
+    }
 
     // // heading - large
     // h1: {

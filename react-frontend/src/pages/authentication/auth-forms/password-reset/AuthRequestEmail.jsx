@@ -34,7 +34,7 @@ const loginMachine = setup({
         setTimeout(() => {
           axios
             .post('/api/auth/password/reset', {
-              email: args.input.context.userIdentity.email,
+              email: args.input.context.userIdentity.email
             })
             .then((response) => {
               resolve(response);
@@ -44,7 +44,7 @@ const loginMachine = setup({
             });
         }, 2000);
       });
-    }),
+    })
   },
   actions: {
     assignFromFetchToContext: assign(({ event }) => {
@@ -52,8 +52,8 @@ const loginMachine = setup({
       // return a partial dictionary of the context will update the context
       return {
         userIdentity: {
-          email: event.data.email,
-        },
+          email: event.data.email
+        }
       };
     }),
     assignLoadingErrorMessage: assign(({ event }) => {
@@ -65,22 +65,22 @@ const loginMachine = setup({
         'error' in axiosError.response.data
       ) {
         return {
-          errorMessage: axiosError.response.data.error,
+          errorMessage: axiosError.response.data.error
         };
       } else {
         return {
-          errorMessage: 'An unknown error occured. Please try again later',
+          errorMessage: 'An unknown error occured. Please try again later'
         };
       }
-    }),
-  },
+    })
+  }
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QBGAKyaSATiH79AJiPqhAZiFGANCACeiI0IAseoQDYjm55t0AOdXU-XU0AX1DbNCw8QlIKKXQIAig6BmYIRTAyfG4pAGssqJwCYhJ4xOTUxgQCXMwGBXxhEWblaVl5RWU1BE8ddWc-Z10Adm0RkZN1WwcEU10Scz8jPwNNcwGhIZHwyIxi2LKEpPwU+kYmMAAnK6krkgkKBhY71BIimNLyk7O0mpypPVOk1RK0kCB2nJGt1EO51AtzLo4YiRuY0atpvZEBsjCQXEZRpNUepUUjdiAPiVSNdblcqsw2BxsDw+IJRG0ZFCuuCes4rCQ4ZNEashC5NDNEINXMsQrp1EtPEJ4TtyfgpBA4MpKbEOR1oTzEABaIyuILrEYBIyI7S6CUIQIjEh8vqWTSTQXk7WlchUem6rlKA1zcwkALOTxBEbuFzOTGzE1+EjeTTwoQTELONHuT37T5xY6Vc5gf3AmEIWMh9wjeGmEa6QZDIZ22uh3xLczuYLrExGHPRKkkGl3P3gyGloN+Mah6PmcbuTQWTR+O0d9QkKOaaP18zOTNu7MRCm5gewACumEwcFgI8knPHoB6AUTs90iPcaLdpnczdjizbFuCeUhE3PxwnCIA */
   context: {
     userIdentity: {
-      email: '',
+      email: ''
     },
-    errorMessage: '',
+    errorMessage: ''
   },
   initial: 'idleState',
   states: {
@@ -88,9 +88,9 @@ const loginMachine = setup({
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignFromFetchToContext'],
-        },
-      },
+          actions: ['assignFromFetchToContext']
+        }
+      }
     },
     loadingState: {
       invoke: {
@@ -98,24 +98,24 @@ const loginMachine = setup({
         input: ({ context }) => ({ context }),
         onDone: {
           target: 'successState',
-          actions: [],
+          actions: []
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadingErrorMessage'],
-        },
-      },
+          actions: ['assignLoadingErrorMessage']
+        }
+      }
     },
     errorState: {
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignFromFetchToContext'],
-        },
-      },
+          actions: ['assignFromFetchToContext']
+        }
+      }
     },
-    successState: {},
-  },
+    successState: {}
+  }
 });
 
 // ============================|| JWT - LOGIN ||============================ //
@@ -132,10 +132,10 @@ export default function AuthLogin() {
       <Formik
         initialValues={{
           email: '',
-          submit: null,
+          submit: null
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+          email: Yup.string().email('Must be a valid email').max(255).required('Email is required')
         })}
         onSubmit={handleSubmit}
       >

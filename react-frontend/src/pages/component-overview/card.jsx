@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 
-
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -16,7 +15,6 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { red } from '@mui/material/colors';
 
-
 import ButtonBase from '@mui/material/ButtonBase';
 
 import { alpha } from '@mui/material/styles';
@@ -24,26 +22,19 @@ import { blend } from '@mui/system';
 
 import { useTheme } from '@mui/material/styles';
 
-
-
-
 export default function ButtonDemo() {
-
   const theme = useTheme();
 
-  useEffect(() => {
+  useEffect(() => {}, []);
 
-  }, []);
-
-  
   return (
-    <Box bgcolor="#FFFFFF" width="100%" height="100%" sx={{p:5}}>
+    <Box bgcolor="#FFFFFF" width="100%" height="100%" sx={{ p: 5 }}>
       <Stack spacing={6} direction="column">
         <Stack spacing={2} direction="column">
           <Box>
             <Typography variant="titleMedium">Filled Card</Typography>
           </Box>
-          <Grid container >
+          <Grid container>
             <Grid item xs={12} md={6}>
               <Card variant="filled">
                 <CardHeader
@@ -67,10 +58,9 @@ export default function ButtonDemo() {
                   alt="Paella dish"
                 />
                 <CardContent>
-                  <Typography variant="body2" >
-                    This impressive paella is a perfect party dish and a fun meal to cook
-                    together with your guests. Add 1 cup of frozen peas along with the mussels,
-                    if you like.
+                  <Typography variant="body2">
+                    This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen
+                    peas along with the mussels, if you like.
                   </Typography>
                 </CardContent>
               </Card>
@@ -78,12 +68,11 @@ export default function ButtonDemo() {
           </Grid>
         </Stack>
 
-
         <Stack spacing={2} direction="column">
           <Box>
             <Typography variant="titleMedium">Outlined Card</Typography>
           </Box>
-          <Grid container >
+          <Grid container>
             <Grid item xs={12} md={6}>
               <Card variant="outlined">
                 <CardHeader
@@ -107,10 +96,9 @@ export default function ButtonDemo() {
                   alt="Paella dish"
                 />
                 <CardContent>
-                  <Typography variant="body2" >
-                    This impressive paella is a perfect party dish and a fun meal to cook
-                    together with your guests. Add 1 cup of frozen peas along with the mussels,
-                    if you like.
+                  <Typography variant="body2">
+                    This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen
+                    peas along with the mussels, if you like.
                   </Typography>
                 </CardContent>
               </Card>
@@ -118,10 +106,6 @@ export default function ButtonDemo() {
           </Grid>
         </Stack>
       </Stack>
-      
-      
-      
     </Box>
-    
   );
 }

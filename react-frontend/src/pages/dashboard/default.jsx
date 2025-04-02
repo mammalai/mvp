@@ -55,7 +55,9 @@ export default function DashboardDefault() {
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       {/* row 1 */}
       <Grid sx={{ mb: -2.25 }} size={12}>
-        <Typography variant="h5" size="medium">Dashboard</Typography>
+        <Typography variant="h5" size="medium">
+          Dashboard
+        </Typography>
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>

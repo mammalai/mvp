@@ -15,11 +15,8 @@ const NotFound = Loadable(lazy(() => import('pages/404/default')));
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
 // ==============================|| MAIN ROUTING ||============================== //
 
-
 const DefaultHome = () => {
-
   return <Navigate to="dashboard/default/" replace />;
-  
 };
 
 const OpenRoutes = {
@@ -28,42 +25,42 @@ const OpenRoutes = {
   children: [
     {
       path: '/',
-      element: <DefaultHome />,
+      element: <DefaultHome />
     },
     {
       path: 'component-overview',
-      element: <ComponentOverview />,
+      element: <ComponentOverview />
     },
     {
       path: '404',
-      element: <NotFound />,
+      element: <NotFound />
     },
     {
       path: 'color',
-      element: <Color />,
+      element: <Color />
     },
     {
       path: 'dashboard',
       children: [
         {
           path: 'default',
-          element: <DashboardDefault />,
-        },
-      ],
+          element: <DashboardDefault />
+        }
+      ]
     },
     {
       path: 'sample-page',
-      element: <SamplePage />,
+      element: <SamplePage />
     },
     {
       path: 'shadow',
-      element: <Shadow />,
+      element: <Shadow />
     },
     {
       path: 'typography',
-      element: <Typography />,
-    },
-  ],
+      element: <Typography />
+    }
+  ]
 };
 
 export default OpenRoutes;

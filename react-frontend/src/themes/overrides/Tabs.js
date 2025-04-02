@@ -9,16 +9,14 @@ export default function Tabs(theme) {
           borderColor: 'none',
           backgroundColor: theme.palette.m3.surface,
           // these two together remove the default height of the tabs and remove the indicator space
-          '& .MuiTabs-indicator': { 
-            display: 'none' 
+          '& .MuiTabs-indicator': {
+            display: 'none'
           },
-          minHeight: 'auto',           
-
+          minHeight: 'auto',
           '& .MuiTab-root': {
             padding: 28,
             borderRadius: 38
           }
-          
         },
         vertical: {
           overflow: 'visible',
@@ -26,7 +24,7 @@ export default function Tabs(theme) {
             padding: 18,
             borderRadius: 35
           }
-        },
+        }
       }
     }
   };

@@ -4,7 +4,6 @@ import { lazy } from 'react';
 import Loadable from 'components/Loadable';
 import AuthLayout from 'layout/Auth';
 
-
 // render - login
 const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
 const AuthRegister = Loadable(lazy(() => import('pages/authentication/register')));
@@ -19,25 +18,25 @@ const LoginRoutes = {
   children: [
     {
       path: '/login',
-      element: <AuthLogin />,
+      element: <AuthLogin />
     },
     {
       path: '/register',
-      element: <AuthRegister />,
+      element: <AuthRegister />
     },
     {
       path: '/register-verify',
-      element: <AuthRegisterVerify />,
+      element: <AuthRegisterVerify />
     },
     {
       path: '/password-reset/request',
-      element: <AuthRequestEmail />,
+      element: <AuthRequestEmail />
     },
     {
       path: '/password-reset/password',
-      element: <AuthNewPassword />,
-    },
-  ],
+      element: <AuthNewPassword />
+    }
+  ]
 };
 
 export default LoginRoutes;

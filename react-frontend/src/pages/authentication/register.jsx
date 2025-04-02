@@ -13,9 +13,8 @@ import AuthRegister from './auth-forms/AuthRegister';
 // ================================|| REGISTER ||================================ //
 
 export default function Register() {
-
   const theme = useTheme();
-  
+
   return (
     <AuthWrapper>
       <Grid container spacing={3}>

@@ -33,7 +33,7 @@ const ProtectedRoutesSet = {
     //   path: '/typography',
     //   element: <Typography />,
     // },
-  ],
+  ]
 };
 
 export default ProtectedRoutesSet;

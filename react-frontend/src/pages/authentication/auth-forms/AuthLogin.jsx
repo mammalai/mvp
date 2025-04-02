@@ -40,25 +40,20 @@ const loginMachine = setup({
     loginRequest: fromPromise(async ({ input: loginCredentials }) => {
       return new Promise((resolve, reject) => {
         setTimeout(async () => {
-
           axios
-            .post(
-              '/api/auth/login',
-              {
-                email: loginCredentials.email,
-                password: loginCredentials.password,
-              }
-            )
+            .post('/api/auth/login', {
+              email: loginCredentials.email,
+              password: loginCredentials.password
+            })
             .then((response) => {
               resolve(response);
             })
             .catch((error) => {
               reject(error);
             });
-
         }, 2000);
       });
-    }),
+    })
   },
   actions: {
     assignLoginCredentials: assign(({ event }) => {
@@ -67,8 +62,8 @@ const loginMachine = setup({
       return {
         loginCredentials: {
           email: event.data.email,
-          password: event.data.password,
-        },
+          password: event.data.password
+        }
       };
     }),
     assignLoadingErrorMessage: assign(({ event }) => {
@@ -80,29 +75,29 @@ const loginMachine = setup({
         'error' in axiosError.response.data
       ) {
         return {
-          errorMessage: axiosError.response.data.error,
+          errorMessage: axiosError.response.data.error
         };
       } else {
         return {
-          errorMessage: 'An unknown error occured. Please try again later',
+          errorMessage: 'An unknown error occured. Please try again later'
         };
       }
     }),
     assignResponseData: assign(({ event }) => {
       return {
-        fetchResponseBody: event.output.data,
+        fetchResponseBody: event.output.data
       };
-    }),
-  },
+    })
+  }
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QAmdQHYSADi3qhAZgCMugJwA2Y+aMBWADQgAnoiPmALCUuX1J9ebaWh52Rh4AvuFOaFh4hKQUUugQBFB0DMwQimBk+NxSANY5MTgExCSJyanpjAgE+ZgMCvjCIq3K0rLyispqCJa66npCJp7qHupGlh5a5k6uCAC0Jl5aunYG-kK6ppaeRpHRGKXxFUkp+Gn0jExgAE53UnckEhQMLE+oJCVx5ZUXVwydTyUka3RaonaSBAnTkzV6biE5hIo2MRmMIxWjhciEWRh0Wl8YV0ug8RimfnUhxAPzKpHujzuNWYbA42B4fEEog6MjhPWhfRMWjsJHMJPshNMoSmRnmiH8QxJA22dg2wo2kSiIHwUggcGUtPiPK68IFiDsJj0Rl0lncKpWxjlSz8yMpJh8FnGJjs+mphvK5CozONfKUZoQJiEXgtO1VGxJxnWToCQhIQjs5mFSIzQqElj9x1+CXO1WuYBD4IRCA8ulT6jsI3UuhM+O95jmOIQVhI2gChjJQnTHiFBdidJIDKewehsMr4fbVptdvWDtlneW7pIqvx5jsljsZPcK1HJ3KsAArphMHBYNPJLy56A+ntUwYtFp0fWJh-LE7lqY9E9dxxmHXxNXCIA */
   context: {
     loginCredentials: {
       email: '',
-      password: '',
+      password: ''
     },
     errorMessage: '',
-    fetchResponseBody: {},
+    fetchResponseBody: {}
   },
   initial: 'idleState',
   states: {
@@ -110,9 +105,9 @@ const loginMachine = setup({
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignLoginCredentials'],
-        },
-      },
+          actions: ['assignLoginCredentials']
+        }
+      }
     },
     loadingState: {
       invoke: {
@@ -120,24 +115,24 @@ const loginMachine = setup({
         input: ({ context }) => context.loginCredentials,
         onDone: {
           target: 'successState',
-          actions: ['assignResponseData'],
+          actions: ['assignResponseData']
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadingErrorMessage'],
-        },
-      },
+          actions: ['assignLoadingErrorMessage']
+        }
+      }
     },
     errorState: {
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignLoginCredentials'],
-        },
-      },
+          actions: ['assignLoginCredentials']
+        }
+      }
     },
-    successState: {},
-  },
+    successState: {}
+  }
 });
 
 // ============================|| JWT - LOGIN ||============================ //
@@ -172,8 +167,7 @@ export default function AuthLogin() {
       machineActor.send({ type: 'login', data: state.context.fetchResponseBody });
       navigate('/');
     }
-  }, [state]);
-
+  }, [state, navigate]);
 
   // Debug effect to print state value changes
   useEffect(() => {
@@ -187,11 +181,11 @@ export default function AuthLogin() {
         initialValues={{
           email: '',
           password: '',
-          submit: null,
+          submit: null
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          password: Yup.string().max(255).required('Password is required'),
+          password: Yup.string().max(255).required('Password is required')
         })}
         onSubmit={handleSubmit}
       >

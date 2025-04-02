@@ -8,7 +8,7 @@ export default function TableHead(theme) {
           backgroundColor: theme.palette.grey[50],
           borderTop: '1px solid',
           borderTopColor: theme.palette.divider,
-          borderBottom: '1px solid',
+          borderBottom: '1px solid'
         }
       }
     }

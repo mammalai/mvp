@@ -13,12 +13,12 @@ export default function DrawerContent() {
 
   return (
     <>
-      <SimpleBar 
+      <SimpleBar
         sx={{
           '& .simplebar-content': { display: 'flex', flexDirection: 'column' },
           backgroundColor: theme.palette.m3.surfaceContainerLow,
           borderTopRightRadius: 16,
-          borderBottomRightRadius: 16,
+          borderBottomRightRadius: 16
         }}
       >
         <Navigation />

@@ -7,19 +7,7 @@ import Typography from '../typography';
 
 /***************************  OVERRIDES - BUTTON  ***************************/
 
-export const generateFocusVisibleStyles = (color) => ({
-  outline: `2px solid ${color}`,
-  outlineOffset: 2
-});
-
-
 export default function Card(theme) {
-
-  useEffect(() => {
-    console.log(Typography().titleMedium);
-  }, []);
-
-
   return {
     MuiCard: {
       styleOverrides: {
@@ -40,17 +28,15 @@ export default function Card(theme) {
             '& .MuiCardHeader-title': {
               ...Typography().titleMedium,
               color: theme.palette.m3.onSurface
-            },
-            
+            }
           }
         },
         {
           props: { variant: 'filled' },
           style: {
-            backgroundColor: theme.palette.m3.surfaceContainerHighest,
+            backgroundColor: theme.palette.m3.surfaceContainerHighest
           }
         }
-
       ]
     }
   };

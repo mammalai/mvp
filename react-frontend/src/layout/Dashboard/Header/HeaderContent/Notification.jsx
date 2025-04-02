@@ -50,7 +50,6 @@ const actionSX = {
 // ==============================|| HEADER CONTENT - NOTIFICATION ||============================== //
 
 export default function Notification() {
-
   const theme = useTheme();
 
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -85,12 +84,16 @@ export default function Notification() {
         aria-haspopup="true"
         onClick={handleToggle}
       >
-        <Badge badgeContent={read} color="error" sx={{ 
-          '& .MuiBadge-badge': { 
-            bgcolor: theme.palette.m3?.main || theme.palette.error.main,
-            color: '#fff'
-          } 
-        }}>
+        <Badge
+          badgeContent={read}
+          color="error"
+          sx={{
+            '& .MuiBadge-badge': {
+              bgcolor: theme.palette.m3?.main || theme.palette.error.main,
+              color: '#fff'
+            }
+          }}
+        >
           <BellOutlined />
         </Badge>
       </IconButton>

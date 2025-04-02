@@ -12,31 +12,31 @@ export const contextMachine = setup({
           }
         }, 2000);
       });
-    }),
+    })
   },
   actions: {
     logoutAction: assign(() => {
       // on logout we will simply remove the access token
       return {
-        accessToken: null,
+        accessToken: null
       };
     }),
     assignAccessToken: assign(({ event }) => {
       return {
-        accessToken: event.data.access_token,
+        accessToken: event.data.access_token
       };
     }),
     assignResponseData: assign(({ event }) => {
       return {
-        fetchResponseBody: event.output.data,
+        fetchResponseBody: event.output.data
       };
-    }),
-  },
+    })
+  }
 }).createMachine({
   id: 'context',
   context: {
     user: null,
-    accessToken: null,
+    accessToken: null
   },
   initial: 'UnAuthState',
   states: {
@@ -44,26 +44,25 @@ export const contextMachine = setup({
       on: {
         logout: {
           target: 'UnAuthState',
-          actions: [{ type: 'logoutAction' }],
-        },
-      },
+          actions: [{ type: 'logoutAction' }]
+        }
+      }
     },
     UnAuthState: {
       on: {
         login: {
           target: 'AuthState',
-          actions: ['assignAccessToken'],
-        },
-      },
-    },
-  },
+          actions: ['assignAccessToken']
+        }
+      }
+    }
+  }
 });
 
 const restoredState = JSON.parse(localStorage.getItem('contextMachine'));
 
 export const machineActor = createActor(contextMachine, { snapshot: restoredState });
 
-// eslint-disable-next-line
 machineActor.subscribe((snapshot) => {
   const persistedState = machineActor.getPersistedSnapshot();
   localStorage.setItem('contextMachine', JSON.stringify(persistedState));

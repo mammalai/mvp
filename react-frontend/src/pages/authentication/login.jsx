@@ -10,12 +10,9 @@ import { useTheme } from '@mui/material/styles';
 import AuthWrapper from './AuthWrapper';
 import AuthLogin from './auth-forms/AuthLogin';
 
-
-
 // ================================|| LOGIN ||================================ //
 
 export default function Login() {
-
   const theme = useTheme();
 
   return (

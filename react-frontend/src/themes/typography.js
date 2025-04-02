@@ -9,7 +9,6 @@ export default function Typography(fontFamily) {
     fontWeightMedium: 500,
     fontWeightBold: 600,
 
-
     // display - large
     displayLarge: {
       fontWeight: 400,
@@ -129,8 +128,6 @@ export default function Typography(fontFamily) {
       lineHeight: '16px',
       letterSpacing: '0.4px'
     },
-
-
 
     h1: {
       fontWeight: 600,

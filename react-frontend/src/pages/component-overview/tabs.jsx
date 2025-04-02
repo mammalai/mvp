@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -19,8 +18,6 @@ import { red } from '@mui/material/colors';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
-
-
 import ButtonBase from '@mui/material/ButtonBase';
 
 import { alpha } from '@mui/material/styles';
@@ -28,33 +25,25 @@ import { blend } from '@mui/system';
 
 import { useTheme } from '@mui/material/styles';
 
-
-
-
 export default function ButtonDemo() {
-
   const [value, setValue] = useState('one');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-
   const theme = useTheme();
 
-  useEffect(() => {
+  useEffect(() => {}, []);
 
-  }, []);
-
-  
   return (
-    <Box bgcolor="#FFFFFF" width="100%" height="100%" sx={{p:5}}>
+    <Box bgcolor="#FFFFFF" width="100%" height="100%" sx={{ p: 5 }}>
       <Stack spacing={6} direction="column">
         <Stack spacing={2} direction="column">
           <Box>
             <Typography variant="titleMedium">Horizontal Tabs</Typography>
           </Box>
-          <Grid container >
+          <Grid container>
             <Tabs
               value={value}
               onChange={handleChange}
@@ -84,7 +73,7 @@ export default function ButtonDemo() {
           <Box>
             <Typography variant="titleMedium">Vertical Tabs</Typography>
           </Box>
-          <Grid container >
+          <Grid container>
             <Tabs
               value={value}
               onChange={handleChange}
@@ -110,12 +99,7 @@ export default function ButtonDemo() {
             </Tabs>
           </Grid>
         </Stack>
-
       </Stack>
-      
-      
-      
     </Box>
-    
   );
 }

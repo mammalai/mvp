@@ -3,14 +3,12 @@
 import { alpha } from '@mui/material/styles';
 import { blend } from '@mui/system';
 
-
 /***************************  OVERRIDES - BUTTON  ***************************/
 
 export const generateFocusVisibleStyles = (color) => ({
   outline: `2px solid ${color}`,
   outlineOffset: 2
 });
-
 
 export default function Button(theme) {
   return {
@@ -26,7 +24,7 @@ export default function Button(theme) {
           borderRadius: 100,
           borderWidth: 1.5,
           borderColor: theme.palette.m3.primary,
-          boxShadow: 'none',
+          boxShadow: 'none'
 
           // '&:focus-visible': generateFocusVisibleStyles(theme.palette.primary.main)
         },
@@ -71,29 +69,30 @@ export default function Button(theme) {
               backgroundColor: blend(theme.palette.m3.primary, theme.palette.m3.onPrimary, 0.08),
               color: theme.palette.m3.onPrimary,
               // TO DO: check the MUI spec to implement this properly
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)'
             },
             // '&:focus': {
             //   backgroundColor: blend(theme.palette.m3.primary, theme.palette.m3.onPrimary, 0.12),
             //   color: theme.palette.m3.onPrimary
             // },
             '&:active': {
-              boxShadow: 'none',
+              boxShadow: 'none'
             },
             // TO DO: the colors are not mapping perfectly here
             '&:disabled': {
               backgroundColor: alpha(theme.palette.m3.onSurface, 0.12),
               color: alpha(theme.palette.m3.onSurface, 0.38)
             },
-            '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate': {
-              color: blend(theme.palette.m3.surfaceContainerLow, theme.palette.m3.primary, 0.48),
-            },
+            '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate':
+              {
+                color: blend(theme.palette.m3.surfaceContainerLow, theme.palette.m3.primary, 0.48)
+              }
           }
         },
         {
           props: { variant: 'outlined' },
           style: {
-            backgroundColor: alpha(theme.palette.m3.main, 0.00), //transparent
+            backgroundColor: alpha(theme.palette.m3.main, 0.0), //transparent
             color: theme.palette.m3.primary,
             border: `2px solid ${theme.palette.m3.primary}`,
             '&:hover': {
@@ -109,10 +108,11 @@ export default function Button(theme) {
               border: `2px solid ${alpha(theme.palette.m3.onSurface, 0.12)}`
             },
             '& .MuiTouchRipple-root': {
-              '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate': {
-                color: alpha(theme.palette.m3.primary, 0.24),
-              },
-            },
+              '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate':
+                {
+                  color: alpha(theme.palette.m3.primary, 0.24)
+                }
+            }
           }
         },
         {
@@ -132,13 +132,14 @@ export default function Button(theme) {
             // },
             '&:disabled': {
               backgroundColor: 'none',
-              color: alpha(theme.palette.m3.onSurface, 0.38),
+              color: alpha(theme.palette.m3.onSurface, 0.38)
             },
             '& .MuiTouchRipple-root': {
-              '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate': {
-                color: alpha(theme.palette.m3.primary, 0.48),
-              },
-            },
+              '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate':
+                {
+                  color: alpha(theme.palette.m3.primary, 0.48)
+                }
+            }
           }
         },
         {
@@ -153,7 +154,7 @@ export default function Button(theme) {
               color: theme.palette.m3.primary,
               // TO DO: check the MUI spec to implement this properly
               // increase the box shadow on hover
-              boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.3), 0px 2px 4px 2px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.3), 0px 2px 4px 2px rgba(0, 0, 0, 0.15)'
             },
             // '&:focus': {
             //   backgroundColor: blend(theme.palette.m3.surfaceContainerLow, theme.palette.m3.primary, 0.12),
@@ -163,16 +164,16 @@ export default function Button(theme) {
               // TO DO: check the MUI spec to implement this properly
               // reduce the box shadow on active
               boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)'
-              
             },
             '&:disabled': {
               backgroundColor: alpha(theme.palette.m3.onSurface, 0.12),
               color: alpha(theme.palette.m3.onSurface, 0.38),
               boxShadow: 'none'
             },
-            '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate': {
-              color: blend(theme.palette.m3.surfaceContainerLow, theme.palette.m3.primary, 0.48),
-            },
+            '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate':
+              {
+                color: blend(theme.palette.m3.surfaceContainerLow, theme.palette.m3.primary, 0.48)
+              }
           }
         },
         {
@@ -184,7 +185,7 @@ export default function Button(theme) {
               backgroundColor: blend(theme.palette.m3.secondaryContainer, theme.palette.m3.onSecondaryContainer, 0.08),
               color: theme.palette.m3.onSecondaryContainer,
               // TO DO: check the MUI spec to implement this properly
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)'
             },
             // '&:focus': {
             //   backgroundColor: blend(theme.palette.m3.secondaryContainer, theme.palette.m3.onSecondaryContainer, 0.12),
@@ -192,13 +193,14 @@ export default function Button(theme) {
             // },
             '&:disabled': {
               backgroundColor: alpha(theme.palette.m3.onSurface, 0.12),
-              color: alpha(theme.palette.m3.onSurface, 0.38),
+              color: alpha(theme.palette.m3.onSurface, 0.38)
             },
-            '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate': {
-              color: blend(theme.palette.m3.secondaryContainer, theme.palette.m3.onSecondaryContainer, 0.48),
-            },
+            '& .MuiTouchRipple-ripple, & .MuiTouchRipple-rippleVisible, & .MuiTouchRipple-child, & .MuiTouchRipple-childLeaving, & .MuiTouchRipple-childPulsate':
+              {
+                color: blend(theme.palette.m3.secondaryContainer, theme.palette.m3.onSecondaryContainer, 0.48)
+              }
           }
-        },
+        }
       ]
     }
   };

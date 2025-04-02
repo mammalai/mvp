@@ -19,50 +19,37 @@ const NotFound = () => {
         py: 5
       }}
     >
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <ErrorOutlineIcon 
-          sx={{ 
-            fontSize: '8rem', 
+      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
+        <ErrorOutlineIcon
+          sx={{
+            fontSize: '8rem',
             color: theme.palette.error.main,
             mb: 2
-          }} 
+          }}
         />
       </motion.div>
 
-      <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.8 }}
-      >
+      <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.8 }}>
         <Typography variant="h1" component="h1" gutterBottom>
           404
         </Typography>
       </motion.div>
 
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-      >
+      <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5, duration: 0.8 }}>
         <Typography variant="h4" gutterBottom>
           Page Not Found
         </Typography>
-        
+
         <Typography variant="body1" color="textSecondary" paragraph sx={{ maxWidth: 480, mx: 'auto', mb: 4 }}>
-          The page you're looking for doesn't exist or has been moved.
-          We suggest you go back to the homepage.
+          The page you're looking for doesn't exist or has been moved. We suggest you go back to the homepage.
         </Typography>
 
         <Box>
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             size="large"
             onClick={() => navigate('/')}
-            sx={{ 
+            sx={{
               px: 5,
               boxShadow: theme.customShadows?.primary,
               '&:hover': {

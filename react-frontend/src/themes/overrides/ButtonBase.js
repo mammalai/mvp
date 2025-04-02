@@ -3,13 +3,12 @@
 import { alpha } from '@mui/material/styles';
 import { blend } from '@mui/system';
 
-
 export default function ButtonBase(theme) {
   return {
     MuiButtonBase: {
       defaultProps: {
         disableRipple: false
-      },
-    },
+      }
+    }
   };
 }

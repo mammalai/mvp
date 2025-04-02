@@ -22,40 +22,41 @@ const rows = [
   createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
   createData('Eclair', 262, 16.0, 24, 6.0),
   createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
+  createData('Gingerbread', 356, 16.0, 49, 3.9)
 ];
 
 export default function BasicTable() {
-  
   const theme = useTheme();
-  
+
   return (
-    <Box bgcolor="" width="100%" height="100%" sx={{p:5}}>
+    <Box bgcolor="" width="100%" height="100%" sx={{ p: 5 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
-          <Card 
+          <Card
             variant="outlined"
             sx={{
               borderRadius: '28px',
               border: `1px solid ${theme.palette.m3.outlineVariant}`,
               backgroundColor: 'transparent',
-              minWidth: 700,
+              minWidth: 700
             }}
           >
-            <TableContainer >
-              <Table 
+            <TableContainer>
+              <Table
                 aria-label="simple table"
-                sx={{ 
-                minWidth: 650,
-                "& .MuiTableRow-root:hover": {
-                  backgroundColor: "transparent"
-                }
+                sx={{
+                  minWidth: 650,
+                  '& .MuiTableRow-root:hover': {
+                    backgroundColor: 'transparent'
+                  }
                 }}
               >
-                <TableHead sx={{
-                  bgcolor: theme.palette.m3.surface,
-                  borderBottom: `1px solid ${theme.palette.m3.outlineVariant}`,
-                }}>
+                <TableHead
+                  sx={{
+                    bgcolor: theme.palette.m3.surface,
+                    borderBottom: `1px solid ${theme.palette.m3.outlineVariant}`
+                  }}
+                >
                   <TableRow>
                     <TableCell>
                       <Typography variant="bodyLarge">
@@ -83,27 +84,26 @@ export default function BasicTable() {
                       </Typography>
                     </TableCell>
                   </TableRow>
-                </TableHead >
+                </TableHead>
                 <TableBody>
                   {rows.map((row) => (
                     <TableRow
                       key={row.name}
                       hover
-                      sx={{ 
+                      sx={{
                         // '&:last-child td, &:last-child th': { border: 0 },
                         backgroundColor: 'none',
-                        '&:hover': {backgroundColor: 'none'},
+                        '&:hover': { backgroundColor: 'none' },
                         '& td, & th': {
                           borderBottom: `1px solid ${theme.palette.m3.outlineVariant}`
                         }
                       }}
-
                     >
-                      <TableCell 
-                        // component="th"
-                        // scope="row"
-                        // sx={{borderRight: `1px solid #000`, }}
-                        >
+                      <TableCell
+                      // component="th"
+                      // scope="row"
+                      // sx={{borderRight: `1px solid #000`, }}
+                      >
                         {row.name}
                       </TableCell>
                       <TableCell align="right">{row.calories}</TableCell>

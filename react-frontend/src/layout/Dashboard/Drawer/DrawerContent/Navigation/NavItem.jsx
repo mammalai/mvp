@@ -23,9 +23,8 @@ import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 // ==============================|| NAVIGATION - LIST ITEM ||============================== //
 
 export default function NavItem({ item, level, isParents = false, setSelectedID }) {
-
   const theme = useTheme();
-  
+
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
 
@@ -63,7 +62,6 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
   ) : (
     false
   );
-  
 
   return (
     <>
@@ -101,7 +99,7 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
               sx={(theme) => ({
                 minWidth: 28,
                 ...(drawerOpen && {
-                  color: isSelected ? theme.palette.m3.onSecondaryContainer : theme.palette.m3.onSurfaceVariant,
+                  color: isSelected ? theme.palette.m3.onSecondaryContainer : theme.palette.m3.onSurfaceVariant
                   // backgroundColor: isSelected ? theme.palette.m3.secondaryContainer : 'transparent',
                 }),
                 ...(!drawerOpen && {
@@ -110,8 +108,8 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
                   height: 36,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: isSelected ? theme.palette.m3.onSecondaryContainer : theme.palette.m3.onSurfaceVariant,
-                }),
+                  color: isSelected ? theme.palette.m3.onSecondaryContainer : theme.palette.m3.onSurfaceVariant
+                })
                 // ...(!drawerOpen &&
                 //   isSelected && {
                 //     // bgcolor: 'primary.lighter',
@@ -127,7 +125,13 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
           {(drawerOpen || (!drawerOpen && level !== 1)) && (
             <ListItemText
               primary={
-                <Typography variant="h6" sx={{ color: isSelected ? theme.palette.m3.onSecondaryContainer : theme.palette.m3.onSurfaceVariant, fontWeight: isSelected && 500 }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: isSelected ? theme.palette.m3.onSecondaryContainer : theme.palette.m3.onSurfaceVariant,
+                    fontWeight: isSelected && 500
+                  }}
+                >
                   {item.title}
                 </Typography>
               }

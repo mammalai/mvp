@@ -21,7 +21,7 @@ const pages = {
       type: 'item',
       url: '/login',
       icon: icons.LoginIcon,
-      target: true,
+      target: true
     },
     {
       id: 'register1',
@@ -29,7 +29,7 @@ const pages = {
       type: 'item',
       url: '/register',
       icon: icons.LoginIcon,
-      target: true,
+      target: true
     },
     {
       id: 'register-verify-1',
@@ -37,7 +37,7 @@ const pages = {
       type: 'item',
       url: '/register-verify',
       icon: icons.LoginIcon,
-      target: true,
+      target: true
     },
     {
       id: 'passwordreset-request-1',
@@ -45,7 +45,7 @@ const pages = {
       type: 'item',
       url: '/password-reset/request',
       icon: icons.PasswordIcon,
-      target: true,
+      target: true
     },
     {
       id: 'passwordreset-password-1',
@@ -53,9 +53,9 @@ const pages = {
       type: 'item',
       url: '/password-reset/password',
       icon: icons.PasswordIcon,
-      target: true,
-    },
-  ],
+      target: true
+    }
+  ]
 };
 
 export default pages;

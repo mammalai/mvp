@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import * as React from 'react';
 import Box from '@mui/material/Box';
@@ -27,40 +27,33 @@ import { blend } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
 import { fontWeight } from '@mui/system';
 
-
-
-
 export default function NavigationDrawerView() {
-
   const [selectedItem, setSelectedItem] = useState(1);
 
   const theme = useTheme();
 
-  useEffect(() => {
+  useEffect(() => {}, []);
 
-  }, []);
-
-  
   return (
-    <Box bgcolor="#FFFFFF" width="100%" height="100%" sx={{p:5}}>
-      <Box sx={{ 
+    <Box bgcolor="#FFFFFF" width="100%" height="100%" sx={{ p: 5 }}>
+      <Box
+        sx={{
           overflow: 'auto',
           width: drawerWidth,
-          backgroundColor:
-          theme.palette.m3.surfaceContainerLow,
+          backgroundColor: theme.palette.m3.surfaceContainerLow,
           borderTopRightRadius: 16,
-          borderBottomRightRadius: 16,
+          borderBottomRightRadius: 16
         }}
       >
         <List>
           {[
-            { id:0, type: 'category', title: 'Overview', icon: <InboxIcon /> },
-            { id:1, type: 'item', title: 'Inbox', icon: <InboxIcon /> },
-            { id:2, type: 'item', title: 'Starred', icon: <StarIcon /> },
-            { id:3, type: 'item', title: 'Send email', icon: <MailIcon /> },
-            { id:4, type: 'divider', title: 'none', icon: <DraftsIcon /> },
-            { id:5, type: 'category', title: 'Drafts', icon: <DraftsIcon /> },
-            { id:6, type: 'item', title: 'Trash', icon: <DeleteIcon /> }
+            { id: 0, type: 'category', title: 'Overview', icon: <InboxIcon /> },
+            { id: 1, type: 'item', title: 'Inbox', icon: <InboxIcon /> },
+            { id: 2, type: 'item', title: 'Starred', icon: <StarIcon /> },
+            { id: 3, type: 'item', title: 'Send email', icon: <MailIcon /> },
+            { id: 4, type: 'divider', title: 'none', icon: <DraftsIcon /> },
+            { id: 5, type: 'category', title: 'Drafts', icon: <DraftsIcon /> },
+            { id: 6, type: 'item', title: 'Trash', icon: <DeleteIcon /> }
           ].map(({ id, type, title, icon }, index) => (
             <>
               {type == 'category' ? (
@@ -68,32 +61,35 @@ export default function NavigationDrawerView() {
                 <ListItem key={title} disablePadding>
                   <ListItemButton
                     sx={{
-                      pointerEvents: "none", // Prevents interaction & cursor change
+                      pointerEvents: 'none', // Prevents interaction & cursor change
                       marginLeft: 1,
-                      marginRight: 1,
+                      marginRight: 1
                     }}
                   >
-                    <ListItemText primary={
-                      <Typography 
-                        variant="labelLarge"
-                        sx={{
-                          color: theme.palette.m3.onSurfaceVariant,
-                        }}
-                      >
-                        {title}
-                      </Typography>
-                    } />
+                    <ListItemText
+                      primary={
+                        <Typography
+                          variant="labelLarge"
+                          sx={{
+                            color: theme.palette.m3.onSurfaceVariant
+                          }}
+                        >
+                          {title}
+                        </Typography>
+                      }
+                    />
                   </ListItemButton>
                 </ListItem>
-              ) : (type == 'divider') ? (
+              ) : type == 'divider' ? (
                 <>
-                  <Divider 
-                    sx={{ 
+                  <Divider
+                    sx={{
                       my: '8px',
                       mx: '2px',
                       backgroundColor: theme.palette.m3.outlineVariant,
-                      height:'2px' 
-                    }} />
+                      height: '2px'
+                    }}
+                  />
                 </>
               ) : (
                 // for the selectable buttons
@@ -101,17 +97,17 @@ export default function NavigationDrawerView() {
                   <ListItemButton
                     onClick={() => setSelectedItem(id)}
                     sx={{
-                      ...(id === selectedItem 
+                      ...(id === selectedItem
                         ? {
                             backgroundColor: theme.palette.m3.secondaryContainer,
                             '&:hover': {
-                              backgroundColor: blend(theme.palette.m3.secondaryContainer, theme.palette.m3.onSecondaryContainer, 0.08),
+                              backgroundColor: blend(theme.palette.m3.secondaryContainer, theme.palette.m3.onSecondaryContainer, 0.08)
                             }
                           }
                         : {
                             backgroundColor: 'transparent',
                             '&:hover': {
-                              backgroundColor: alpha(theme.palette.m3.onSurface, 0.08),
+                              backgroundColor: alpha(theme.palette.m3.onSurface, 0.08)
                             }
                           }),
                       marginLeft: 1,
@@ -119,40 +115,44 @@ export default function NavigationDrawerView() {
                       borderRadius: 28
                     }}
                   >
-                    <ListItemIcon sx={{marginRight: 2}}>
+                    <ListItemIcon sx={{ marginRight: 2 }}>
                       {icon && (
-                        <Box sx={{ 
-                          color: id === selectedItem 
-                            ? theme.palette.m3.onSecondaryContainer 
-                            : theme.palette.m3.onSurfaceVariant,
-                          marginBottom: -0.6
-                        }}>
+                        <Box
+                          sx={{
+                            color: id === selectedItem ? theme.palette.m3.onSecondaryContainer : theme.palette.m3.onSurfaceVariant,
+                            marginBottom: -0.6
+                          }}
+                        >
                           {React.cloneElement(icon, { fontSize: 'small' })}
                         </Box>
                       )}
                     </ListItemIcon>
-                    <ListItemText primary={
-                      <Typography 
-                        variant="labelLarge"
-                        sx={ (id == selectedItem) ? {
-                          color: theme.palette.m3.onSecondaryContainer,
-                          fontWeight: 500
-                        } : {
-                          color: theme.palette.m3.onSurfaceVariant
-                        }}
-                      >
-                        {title}
-                      </Typography>
-                    } />
+                    <ListItemText
+                      primary={
+                        <Typography
+                          variant="labelLarge"
+                          sx={
+                            id == selectedItem
+                              ? {
+                                  color: theme.palette.m3.onSecondaryContainer,
+                                  fontWeight: 500
+                                }
+                              : {
+                                  color: theme.palette.m3.onSurfaceVariant
+                                }
+                          }
+                        >
+                          {title}
+                        </Typography>
+                      }
+                    />
                   </ListItemButton>
                 </ListItem>
               )}
             </>
           ))}
         </List>
-
       </Box>
     </Box>
-    
   );
 }

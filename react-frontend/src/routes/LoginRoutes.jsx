@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
-import MinimalLayout from 'layout/MinimalLayout';
+import AuthLayout from 'layout/Auth';
 
 // render - login
 const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
@@ -14,29 +14,29 @@ const AuthNewPassword = Loadable(lazy(() => import('pages/authentication/passwor
 
 const LoginRoutes = {
   path: '/',
-  element: <MinimalLayout />,
+  element: <AuthLayout />,
   children: [
     {
       path: '/login',
-      element: <AuthLogin />,
+      element: <AuthLogin />
     },
     {
       path: '/register',
-      element: <AuthRegister />,
+      element: <AuthRegister />
     },
     {
       path: '/register-verify',
-      element: <AuthRegisterVerify />,
+      element: <AuthRegisterVerify />
     },
     {
       path: '/password-reset/request',
-      element: <AuthRequestEmail />,
+      element: <AuthRequestEmail />
     },
     {
       path: '/password-reset/password',
-      element: <AuthNewPassword />,
-    },
-  ],
+      element: <AuthNewPassword />
+    }
+  ]
 };
 
 export default LoginRoutes;

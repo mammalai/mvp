@@ -15,6 +15,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 
 // third party
 import * as Yup from 'yup';
@@ -39,18 +40,20 @@ const loginMachine = setup({
     loginRequest: fromPromise(async ({ input: loginCredentials }) => {
       return new Promise((resolve, reject) => {
         setTimeout(async () => {
-          try {
-            const response = await axios.post('/api/auth/login', {
+          axios
+            .post('/api/auth/login', {
               email: loginCredentials.email,
-              password: loginCredentials.password,
+              password: loginCredentials.password
+            })
+            .then((response) => {
+              resolve(response);
+            })
+            .catch((error) => {
+              reject(error);
             });
-            resolve(response);
-          } catch (error) {
-            reject(error);
-          }
         }, 2000);
       });
-    }),
+    })
   },
   actions: {
     assignLoginCredentials: assign(({ event }) => {
@@ -59,37 +62,42 @@ const loginMachine = setup({
       return {
         loginCredentials: {
           email: event.data.email,
-          password: event.data.password,
-        },
+          password: event.data.password
+        }
       };
     }),
-    assignLoadinErrorMessage: assign(({ event }) => {
+    assignLoadingErrorMessage: assign(({ event }) => {
       const axiosError = event.error;
-      if ('response' in axiosError && 'data' in axiosError.response && 'error' in axiosError.response.data) {
+      if (
+        'response' in axiosError &&
+        'data' in axiosError.response &&
+        typeof axiosError.response.data === 'object' && // check if data is an object
+        'error' in axiosError.response.data
+      ) {
         return {
-          errorMessage: axiosError.response.data.error,
+          errorMessage: axiosError.response.data.error
         };
       } else {
         return {
-          errorMessage: 'An unknown error occured. Please try again later',
+          errorMessage: 'An unknown error occured. Please try again later'
         };
       }
     }),
     assignResponseData: assign(({ event }) => {
       return {
-        fetchResponseBody: event.output.data,
+        fetchResponseBody: event.output.data
       };
-    }),
-  },
+    })
+  }
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QAmdQHYSADi3qhAZgCMugJwA2Y+aMBWADQgAnoiPmALCUuX1J9ebaWh52Rh4AvuFOaFh4hKQUUugQBFB0DMwQimBk+NxSANY5MTgExCSJyanpjAgE+ZgMCvjCIq3K0rLyispqCJa66npCJp7qHupGlh5a5k6uCAC0Jl5aunYG-kK6ppaeRpHRGKXxFUkp+Gn0jExgAE53UnckEhQMLE+oJCVx5ZUXVwydTyUka3RaonaSBAnTkzV6biE5hIo2MRmMIxWjhciEWRh0Wl8YV0ug8RimfnUhxAPzKpHujzuNWYbA42B4fEEog6MjhPWhfRMWjsJHMJPshNMoSmRnmiH8QxJA22dg2wo2kSiIHwUggcGUtPiPK68IFiDsJj0Rl0lncKpWxjlSz8yOtgQ8I3U1kGQks1MN5XIVGZxr5SjNCBMQi8Fp2qo2JOM6ydASEJCEdnMwqRmaFvv9x1+CXO1WuYFD4IRCA8ujTCq0JiMkxMJmmcxxCCsJC0BiE6nWQgbpmFBdidJIDKeIehsMrEfMyJ2Nrt6wdso7y1bJFV+PMdksdjJ7hWo5O5VgAFdMJg4LBp5JeXPQH09mmDD30epD9opk7lqY9AsSZ3Q8VsqU1IA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QAmdQHYSADi3qhAZgCMugJwA2Y+aMBWADQgAnoiPmALCUuX1J9ebaWh52Rh4AvuFOaFh4hKQUUugQBFB0DMwQimBk+NxSANY5MTgExCSJyanpjAgE+ZgMCvjCIq3K0rLyispqCJa66npCJp7qHupGlh5a5k6uCAC0Jl5aunYG-kK6ppaeRpHRGKXxFUkp+Gn0jExgAE53UnckEhQMLE+oJCVx5ZUXVwydTyUka3RaonaSBAnTkzV6biE5hIo2MRmMIxWjhciEWRh0Wl8YV0ug8RimfnUhxAPzKpHujzuNWYbA42B4fEEog6MjhPWhfRMWjsJHMJPshNMoSmRnmiH8QxJA22dg2wo2kSiIHwUggcGUtPiPK68IFiDsJj0Rl0lncKpWxjlSz8yMpJh8FnGJjs+mphvK5CozONfKUZoQJiEXgtO1VGxJxnWToCQhIQjs5mFSIzQqElj9x1+CXO1WuYBD4IRCA8ulT6jsI3UuhM+O95jmOIQVhI2gChjJQnTHiFBdidJIDKewehsMr4fbVptdvWDtlneW7pIqvx5jsljsZPcK1HJ3KsAArphMHBYNPJLy56A+ntUwYtFp0fWJh-LE7lqY9E9dxxmHXxNXCIA */
   context: {
     loginCredentials: {
       email: '',
-      password: '',
+      password: ''
     },
     errorMessage: '',
-    fetchResponseBody: {},
+    fetchResponseBody: {}
   },
   initial: 'idleState',
   states: {
@@ -97,9 +105,9 @@ const loginMachine = setup({
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignLoginCredentials'],
-        },
-      },
+          actions: ['assignLoginCredentials']
+        }
+      }
     },
     loadingState: {
       invoke: {
@@ -107,30 +115,32 @@ const loginMachine = setup({
         input: ({ context }) => context.loginCredentials,
         onDone: {
           target: 'successState',
-          actions: ['assignResponseData'],
+          actions: ['assignResponseData']
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadinErrorMessage'],
-        },
-      },
+          actions: ['assignLoadingErrorMessage']
+        }
+      }
     },
     errorState: {
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignLoginCredentials'],
-        },
-      },
+          actions: ['assignLoginCredentials']
+        }
+      }
     },
-    successState: {},
-  },
+    successState: {}
+  }
 });
 
 // ============================|| JWT - LOGIN ||============================ //
 
 export default function AuthLogin() {
   const [state, send] = useMachine(loginMachine);
+
+  const theme = useTheme();
 
   // form validation hooks
   const [showInvalidError] = React.useState(false);
@@ -157,6 +167,12 @@ export default function AuthLogin() {
       machineActor.send({ type: 'login', data: state.context.fetchResponseBody });
       navigate('/');
     }
+  }, [state, navigate]);
+
+  // Debug effect to print state value changes
+  useEffect(() => {
+    console.log('Current state:', state.value);
+    console.log('State context:', state.context);
   }, [state]);
 
   return (
@@ -165,11 +181,11 @@ export default function AuthLogin() {
         initialValues={{
           email: '',
           password: '',
-          submit: null,
+          submit: null
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          password: Yup.string().max(255).required('Password is required'),
+          password: Yup.string().max(255).required('Password is required')
         })}
         onSubmit={handleSubmit}
       >
@@ -251,7 +267,7 @@ export default function AuthLogin() {
                     to="/forgot-password/request"
                     variant="body1"
                     sx={{ textDecoration: 'none' }}
-                    color="primary"
+                    color={theme.palette.m3.primary}
                   >
                     Forgot password?
                   </Typography>

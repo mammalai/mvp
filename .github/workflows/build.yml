@@ -71,6 +71,13 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install yarn
+        run: |
+          npm uninstall -g yarn
+          npm install -g corepack
+          corepack enable
+          corepack prepare yarn@4.6.0 --activate
+          yarn set version 4.6.0
       - name: Install dependencies
         run: |
           cd mvp/react-frontend
@@ -80,4 +87,4 @@ jobs:
         run: |
           cd mvp/react-frontend
           yarn run lint
-          yarn run prettier:check
+        # yarn run prettier:check

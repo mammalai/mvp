@@ -1,21 +1,12 @@
-// assets
-import {
-  AppstoreAddOutlined,
-  AntDesignOutlined,
-  BarcodeOutlined,
-  BgColorsOutlined,
-  FontSizeOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
+import TonalityIcon from '@mui/icons-material/Tonality';
 
 // icons
 const icons = {
-  FontSizeOutlined,
-  BgColorsOutlined,
-  BarcodeOutlined,
-  AntDesignOutlined,
-  LoadingOutlined,
-  AppstoreAddOutlined,
+  FormatColorTextIcon,
+  ColorLensIcon,
+  TonalityIcon
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -30,23 +21,23 @@ const utilities = {
       title: 'Typography',
       type: 'item',
       url: '/typography',
-      icon: icons.FontSizeOutlined,
+      icon: icons.FormatColorTextIcon
     },
     {
       id: 'util-color',
       title: 'Color',
       type: 'item',
       url: '/color',
-      icon: icons.BgColorsOutlined,
+      icon: icons.ColorLensIcon
     },
     {
       id: 'util-shadow',
       title: 'Shadow',
       type: 'item',
       url: '/shadow',
-      icon: icons.BarcodeOutlined,
-    },
-  ],
+      icon: icons.TonalityIcon
+    }
+  ]
 };
 
 export default utilities;

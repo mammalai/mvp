@@ -39,7 +39,7 @@ const registerMachine = setup({
           axios
             .post('/api/auth/registration', {
               email: args.input.context.loginCredentials.email,
-              password: args.input.context.loginCredentials.password,
+              password: args.input.context.loginCredentials.password
             })
             .then((response) => {
               resolve(response);
@@ -49,7 +49,7 @@ const registerMachine = setup({
             });
         }, 1000);
       });
-    }),
+    })
   },
   actions: {
     assignFromFetchToContext: assign(({ event }) => {
@@ -58,35 +58,35 @@ const registerMachine = setup({
       return {
         loginCredentials: {
           email: event.data.email,
-          password: event.data.password,
-        },
+          password: event.data.password
+        }
       };
     }),
-    assignLoadinErrorMessage: assign(({ event }) => {
+    assignLoadingErrorMessage: assign(({ event }) => {
       const axiosError = event.error;
       if (axiosError.message === 'Request failed with status code 500') {
         return {
-          errorMessage: 'An unknown error occured. Please try again later.',
+          errorMessage: 'An unknown error occured. Please try again later.'
         };
       } else if (axiosError?.response?.data?.error) {
         return {
-          errorMessage: axiosError.response.data.error,
+          errorMessage: axiosError.response.data.error
         };
       } else {
         return {
-          errorMessage: 'An unknown error occured. Please try again later',
+          errorMessage: 'An unknown error occured. Please try again later'
         };
       }
-    }),
-  },
+    })
+  }
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOlwgBswBlAF3VrAGIAzMWnAUQDcx9aA2gAYAuolAAHAPaxctXFPziQAD0QBGAKyaSATiH79AJiPqhAZiFGANCACeiI0IAseoQDYjm55t0AOdXU-XU0AX1DbNCw8QlIKKXQIAig6BmYIRTAyfG4pAGssqJwCYhJ4xOTUxgQCXMwGBXxhEWblaVl5RWU1BE8ddWc-Z10Adm0RkZN1WwcEU10Scz8jPwNNcwGhIZHwyIxi2LKEpPwU+kYmMAAnK6krkgkKBhY71BIimNLyk7O0mpypPVOk1RK0kCB2nJGt1EO51AtzLo4YiRuY0atpvZEBsjCQXEZRpNUepUUjdiAPiVSNdblcqsw2BxsDw+IJRG0ZFCuuCes4rCQ4ZNEashC5NDNEINXMsQrp1EtPEJ4TtyfgpBA4MpKbEOR1oTzEABaIyuILrEYBIyI7S6CUIQIjEh8vqWTSTQXk7WlchUem6rlKA1zcwkALOTxBEbuFzOTGzE1+EjeTTwoQTELONHuT37T5xY6Vc5gf3AmEIWMh9wjeGmEa6QZDIZ22uh3xLczuYLrExGHPRKkkGl3P3gyGloN+Mah6PmcbuTQWTR+O0d9QkKOaaP18zOTNu7MRCm5gewACumEwcFgI8knPHoB6AUTs90iPcaLdpnczdjizbFuCeUhE3PxwnCIA */
   context: {
     loginCredentials: {
       email: '',
-      password: '',
+      password: ''
     },
-    errorMessage: '',
+    errorMessage: ''
   },
   initial: 'idleState',
   states: {
@@ -94,9 +94,9 @@ const registerMachine = setup({
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignFromFetchToContext'],
-        },
-      },
+          actions: ['assignFromFetchToContext']
+        }
+      }
     },
     loadingState: {
       invoke: {
@@ -104,24 +104,24 @@ const registerMachine = setup({
         input: ({ context }) => ({ context }),
         onDone: {
           target: 'successState',
-          actions: [],
+          actions: []
         },
         onError: {
           target: 'errorState',
-          actions: ['assignLoadinErrorMessage'],
-        },
-      },
+          actions: ['assignLoadingErrorMessage']
+        }
+      }
     },
     errorState: {
       on: {
         fetchEvent: {
           target: 'loadingState',
-          actions: ['assignFromFetchToContext'],
-        },
-      },
+          actions: ['assignFromFetchToContext']
+        }
+      }
     },
-    successState: {},
-  },
+    successState: {}
+  }
 });
 
 // ============================|| JWT - REGISTER ||============================ //
@@ -169,14 +169,14 @@ export default function AuthRegister() {
             email: '',
             // company: '',
             password: '',
-            submit: null,
+            submit: null
           }}
           validationSchema={Yup.object().shape({
             // firstname: Yup.string().max(255).required('First Name is required'),
             // lastname: Yup.string().max(255).required('Last Name is required'),
             // email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
             email: Yup.string().matches(``),
-            password: Yup.string().max(255).required('Password is required'),
+            password: Yup.string().max(255).required('Password is required')
           })}
           onSubmit={handleSubmit}
         >

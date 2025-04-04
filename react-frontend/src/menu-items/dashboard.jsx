@@ -1,9 +1,11 @@
 // assets
-import { DashboardOutlined } from '@ant-design/icons';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import GridViewIcon from '@mui/icons-material/GridView';
 
 // icons
 const icons = {
-  DashboardOutlined,
+  DashboardIcon,
+  GridViewIcon
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -18,10 +20,18 @@ const dashboard = {
       title: 'Dashboard',
       type: 'item',
       url: '/dashboard/default',
-      icon: icons.DashboardOutlined,
-      breadcrumbs: false,
+      icon: icons.DashboardIcon,
+      breadcrumbs: false
     },
-  ],
+    {
+      id: 'component-overview',
+      title: 'Components Overview',
+      type: 'item',
+      url: '/component-overview',
+      icon: icons.GridViewIcon,
+      breadcrumbs: false
+    }
+  ]
 };
 
 export default dashboard;

@@ -33,6 +33,7 @@ FROM nginx:alpine
 # move the build folder to the default location nginx expects it to be
 COPY --from=nodebuild /run/react-frontend/dist /usr/share/nginx/html
 
+# copy the nginx config file to the container
 COPY ./react-frontend/tools/docker/nginx.conf /etc/nginx/nginx.conf
 
 # expose the port that nginx will listen on

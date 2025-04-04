@@ -4,9 +4,11 @@ A flask backend to satisfy an MVP
 
 ## Run the backend
 ### Install the environment
-- cd into `./backend` and run `pip install -r requirements.txt`
+- cd into `./backend` and run `poetry install`
+### Copy the .env file
+- cd into `./backend` and run `cp .env.github .env` (this will copy the default environment variables for the test environment)
 ### Run backend development server
-- cd into `./backend` and run `flask run --debug`
+- cd into `./backend` and run `uvicorn backend.app:app --host 0.0.0.0 --port 8080`
 
 
 ## Run the frontend

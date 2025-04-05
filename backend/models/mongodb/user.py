@@ -17,7 +17,7 @@ def check_password_hash(hashed_password, password):
 class User():
     def __init__(self, email: str, id: str = None, password: str = None, _password: str = None):
         if id is None:
-            self.id = str(generate_id())
+            self.id = generate_id()
         else:
             self.id = id
         self.email = email

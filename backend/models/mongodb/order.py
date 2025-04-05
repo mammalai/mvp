@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Order():
-    __collectionname__ = "orders"
     STATUS_CREATED = "CREATED"
     STATUS_SAVED = "SAVED"
     STATUS_APPROVED = "APPROVED"

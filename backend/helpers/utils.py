@@ -8,4 +8,4 @@ def multi_urljoin(*parts):
     return posixpath_join(*formatted_parts)
 
 def generate_id():
-    return uuid4()
+    return str(uuid4())

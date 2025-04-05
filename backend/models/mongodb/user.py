@@ -1,15 +1,8 @@
 import re
-from backend.extensions import db
 from uuid import uuid4
-from datetime import datetime
-
-from dataclasses import dataclass, asdict
-
-from .mongobase import MongoBaseClass
+from dataclasses import dataclass
 from passlib.context import CryptContext
-
-def generate_uuid():
-    return uuid4()
+from backend.helpers.utils import generate_id
 
 # Create a password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -21,15 +14,10 @@ def check_password_hash(hashed_password, password):
     return pwd_context.verify(password, hashed_password)
 
 @dataclass
-class User(MongoBaseClass):
-    __collectionname__ = "users"
-    email: str
-    _password: str
-    id: str
-
+class User():
     def __init__(self, email: str, id: str = None, password: str = None, _password: str = None):
         if id is None:
-            self.id = str(generate_uuid())
+            self.id = str(generate_id())
         else:
             self.id = id
         self.email = email
@@ -43,6 +31,13 @@ class User(MongoBaseClass):
 
     def __repr__(self):
         return f"<User {self.email}>"
+
+    def dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "_password": self._password,  # Store the hashed password
+        }
 
     @property
     def password(self):
@@ -65,23 +60,4 @@ class User(MongoBaseClass):
 
     def check_password(self, password):
         return check_password_hash(self._password, password)
-
-    @classmethod
-    async def get_user_by_email(cls, email):
-        """return the first user with this email asynchronously"""
-        query = await cls.query.filter_by(email=email)
-        return await query.first()
-
-    async def save(self):
-        """Save the user to the database asynchronously"""
-        # Using upsert here which means update if exists and insert if not
-        await db[self.__collectionname__].replace_one(
-            {"id": self.id}, 
-            self.dict(), 
-            upsert=True
-        )
-
-    async def delete(self):
-        """Delete the user from the database asynchronously"""
-        await db[self.__collectionname__].delete_one({"id": self.id})
 

@@ -1,6 +1,5 @@
 
 from backend.extensions import db
-from uuid import uuid4
 from datetime import datetime
 
 class TokenBlocklist(db.Model):

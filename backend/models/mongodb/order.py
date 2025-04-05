@@ -1,10 +1,8 @@
-import uuid
 import datetime
 from dataclasses import dataclass, field
-from .mongobase import MongoBaseClass
 
 @dataclass
-class Order(MongoBaseClass):
+class Order():
     __collectionname__ = "orders"
     STATUS_CREATED = "CREATED"
     STATUS_SAVED = "SAVED"

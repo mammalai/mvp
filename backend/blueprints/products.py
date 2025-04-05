@@ -8,7 +8,6 @@ def create_product_router(product_service: ProductService):
     async def insert_product(request: Request):
         data = await request.json()
         # TODO: Add a layer of validation
-        # TODO: Add a layer that converts the incoming data to the expected format
         product = await product_service.upsert(data)
         return product.dict() # TODO: Ensure that the returned product is in the correct format
 
@@ -17,7 +16,6 @@ def create_product_router(product_service: ProductService):
         data = await request.json()
         data["id"] = request.path_params.get("product_id")
         # TODO: Add a layer of validation
-        # TODO: Add a layer that converts the incoming data to the expected format
         product = await product_service.upsert(data)
         return product.dict() # TODO: Ensure that the returned product is in the correct format
 

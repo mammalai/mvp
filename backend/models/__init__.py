@@ -7,6 +7,7 @@ if os.environ.get("DB_TYPE") == "mongodb":
     print("Using MongoDB")
     from .mongodb.user import User
     from .mongodb.role import Role
+    from .mongodb.product import Product
 elif os.environ.get("DB_TYPE") == "sqlalchemy":
     print("Using SQLAlchemy")
     from .sqlalchemy.user import User

@@ -7,6 +7,13 @@ from dotenv import load_dotenv
 
 from backend.blueprints.auth import auth_router
 from backend.blueprints.order import create_order_router
+from backend.blueprints.products import create_product_router
+
+from backend.services.product import ProductService
+
+from backend.repositories.product import ProductsRepository
+
+from backend.extensions import db
 
 load_dotenv()
 
@@ -44,6 +51,10 @@ def create_app():
 
     # Register auth routes
     app.include_router(auth_router, prefix="/api/auth")
+
+    products_repository = ProductsRepository(db)
+    product_service = ProductService(products_repository)
+    app.include_router(create_product_router(product_service), prefix="/api/products")
 
     # Echo endpoint
     @app.post("/api/echo")

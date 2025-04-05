@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
 
 import pytest
-from backend.payment.gateways.paypal_gateway import PayPalGateway
+from backend.payment.paypal_gateway import PayPalGateway
 import os
 
 @pytest.mark.asyncio

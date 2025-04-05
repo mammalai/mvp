@@ -1,9 +1,8 @@
-# TODO: May need to update to use Motor (Look at other respositories for reference or rather in models...)
 from backend.models.mongodb.product import Product
 
 class ProductsRepository():
     def __init__(self, db):
-        self.collection = db.products  # TODO: Ensure the collection name matches your MongoDB setup
+        self.collection = db.products
 
     async def upsert(self, product: Product) -> None:
         await self.collection.update_one(

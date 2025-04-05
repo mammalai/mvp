@@ -33,17 +33,15 @@ def create_app():
 
     # Register order routes if PayPal credentials are available
     if os.environ.get("PAYPAL_CLIENT_ID") and os.environ.get("PAYPAL_SECRET"):
-        from backend.payment.services.payment_service import PaymentService
-        from backend.payment.services.order_service import OrderService
-        from backend.payment.gateways.paypal_gateway import PayPalGateway
+        from backend.services.order import OrderService
+        from backend.payment.paypal_gateway import PayPalGateway
 
         client_id = os.environ.get("PAYPAL_CLIENT_ID")
         client_secret = os.environ.get("PAYPAL_SECRET")
 
         # Create instances
         gateway = PayPalGateway(client_id, client_secret)
-        payment_service = PaymentService(gateway)
-        order_service = OrderService(payment_service)
+        order_service = OrderService(gateway)
         
         # Create and include router
         order_router = create_order_router(order_service)

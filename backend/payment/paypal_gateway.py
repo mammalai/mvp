@@ -1,11 +1,10 @@
 import os
 from urllib.parse import urljoin
 import httpx
-from backend.payment.gateways.base import PaymentGateway
 from backend.helpers.utils import multi_urljoin
 from backend.helpers.errors import PaypalError, MVPError
 
-class PayPalGateway(PaymentGateway):
+class PayPalGateway:
     def __init__(self, client_id, client_secret):
         self.base_url = "https://api-m.sandbox.paypal.com" # TODO: Move to paypal config
         self.auth_url = multi_urljoin(self.base_url, "/v1/oauth2/token") # TODO: Move to paypal config

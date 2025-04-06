@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 import pytest
 from backend.models import User
 from backend.repositories.user import UsersRepository
+from backend.helpers.utils import check_password_hash
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_create_user(strong_password):
@@ -27,7 +28,7 @@ async def test_create_user(strong_password):
     """
     assert user is not None
     assert user.email == test_email
-    assert user.check_password(strong_password)
+    assert check_password_hash(user._password, strong_password)
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_delete_user(strong_password):
@@ -106,4 +107,4 @@ async def test_update_user_password(strong_password):
     """
     user = await UsersRepository.get_user_by_email(test_email)
     assert(user is not None)
-    assert user.check_password(f"new_{strong_password}")
+    assert check_password_hash(user._password, f"new_{strong_password}")

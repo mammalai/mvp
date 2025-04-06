@@ -1,7 +1,7 @@
 # order/order_service.py
 
 from backend.models.mongodb.order import Order
-from backend.payment.paypal_gateway import PayPalGateway
+from backend.helpers.paypal_gateway import PayPalGateway
 from backend.repositories.order import OrdersRepository
 
 class OrderService:

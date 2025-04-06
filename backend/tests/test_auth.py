@@ -4,9 +4,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 
 import pytest
 from backend.models import User, Role
+from backend.repositories.user import UsersRepository
+from backend.repositories.role import RolesRepository
 from datetime import timedelta
-from backend.extensions import create_token
-from backend.blueprints.auth import generate_password_hash
+from backend.services.auth import AuthService
+from backend.helpers.utils import generate_password_hash, check_password_hash
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_register_with_verification(client, strong_password):
@@ -24,29 +26,29 @@ async def test_register_with_verification(client, strong_password):
     assert response.status_code == 201
 
     # Assert: Verify user creation
-    user = await User.get_user_by_email(email)
+    user = await UsersRepository.get_user_by_email(email)
     assert user is not None
     assert user.email == email
-    assert user.check_password(strong_password)
-    roles_list = await Role.get_all_roles_for_user(username=user.email)
+    assert check_password_hash(user._password, strong_password)
+    roles_list = await RolesRepository.get_all_roles_for_user(username=user.email)
     assert roles_list[0].role == "unverified"
 
     # Act: Verify with an invalid token
     response = await client.post(f"/api/auth/verification?token=invalid_token")
-    assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid token"
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Email verification failed"
 
     # Act: Verify with a valid token
-    verification_token = create_token(
+    verification_token = AuthService.create_token(
         data={"sub": user.email, "type": "registration"},
         expires_delta=timedelta(seconds=10)
     )
     response = await client.post(f"/api/auth/verification?token={verification_token}")
     assert response.status_code == 201
-    assert response.json()["message"] == f"User email verified for: {user.email}"
+    assert response.json()["message"] == "Email verification successful"
 
     # Assert: Verify role update
-    roles_list = await Role.get_all_roles_for_user(username=user.email)
+    roles_list = await RolesRepository.get_all_roles_for_user(username=user.email)
     assert roles_list[0].role == "free"
 
 
@@ -70,7 +72,7 @@ async def test_login_success(client, strong_password):
     """
     # Arrange: Create a user
     new_user = User(email="test@gmail.com", password=strong_password)
-    await new_user.save()
+    await UsersRepository.save(new_user)
 
     # Act: Login with valid credentials
     response = await client.post("/api/auth/login", json={
@@ -110,7 +112,7 @@ async def test_reset_password(client, strong_password):
     email = f"{test_username}@gmail.com"
     new_user = User(email=email, password=strong_password)
     new_user_password_hash = new_user._password
-    await new_user.save()
+    await UsersRepository.save(new_user)
 
     # Act: Request password reset
     response = await client.post("/api/auth/password/reset", json={
@@ -120,7 +122,7 @@ async def test_reset_password(client, strong_password):
     assert response.json()["message"] == "Password reset email sent"
 
     # Generate a valid reset token
-    reset_token = create_token(
+    reset_token = AuthService.create_token(
         data={"sub": email, "type": "password_reset", "password_hash": generate_password_hash(new_user_password_hash[16:32])},
         expires_delta=timedelta(seconds=100)
     )
@@ -134,8 +136,8 @@ async def test_reset_password(client, strong_password):
     assert response.json()["message"] == "Password reset successful"
 
     # Assert: Verify the new password
-    user = await User.get_user_by_email(email)
-    assert user.check_password(new_password)
+    user = await UsersRepository.get_user_by_email(email)
+    assert check_password_hash(user._password, new_password)
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -145,7 +147,7 @@ async def test_whoami(client):
     """
     # Arrange: Create a valid access token with roles
     identity = "testuser@gmail.com"
-    access_token = create_token(
+    access_token = AuthService.create_token(
         data={"sub": identity, "roles": ["free"]},  # Add roles like in the login endpoint
         expires_delta=timedelta(seconds=10)
     )

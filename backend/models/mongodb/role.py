@@ -18,7 +18,7 @@ ROLES = {
 
 @dataclass
 class Role():
-    def __init__(self, username, role: str = 'free', id: str = None):
+    def __init__(self, username, role: str = 'unverified', id: str = None):
         if not Role.is_role_valid(role):
             raise ValueError(f"Invalid role '{role}'. Valid roles are: {', '.join(ROLES.keys())}")
         self.id = id if id is not None else generate_id()

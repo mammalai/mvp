@@ -1,17 +1,7 @@
 import re
 from uuid import uuid4
 from dataclasses import dataclass
-from passlib.context import CryptContext
-from backend.helpers.utils import generate_id
-
-# Create a password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-def generate_password_hash(password):
-    return pwd_context.hash(password)
-
-def check_password_hash(hashed_password, password):
-    return pwd_context.verify(password, hashed_password)
+from backend.helpers.utils import generate_id, generate_password_hash
 
 @dataclass
 class User():
@@ -57,7 +47,4 @@ class User():
             raise ValueError("Password must contain at least one lowercase letter")
         if not re.search(r'[0-9]', password):
             raise ValueError("Password must contain at least one number")
-
-    def check_password(self, password):
-        return check_password_hash(self._password, password)
 

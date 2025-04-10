@@ -1,22 +1,22 @@
-import os
 import pytest
 from backend.models import Role
+from backend.repositories.role import RolesRepository
+from backend.services.role import RoleService
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_create_role():
     """
     Test creating a role for a user.
     """
-
     new_role = Role(username="ssatti", role="free")
 
     """
     act
     """
-    await new_role.save()
+    await RolesRepository.save(new_role)
     # Add assertions to verify that the user was created successfully
-    roles = await Role.query.filter_by(username="ssatti")
-    role = await roles.first()
+    roles = await RolesRepository.get_all_roles_for_user(username="ssatti")
+    role = roles[0]
     """
     assert
     """
@@ -35,18 +35,16 @@ async def test_delete_role():
     """
     # set the new user, password, and save the user
     new_role = Role(username="ssatti", role="free")
-    await new_role.save()
+    await RolesRepository.save(new_role)
     """
     act
     """
-    roles = await Role.query.filter_by(username="ssatti", role="free")
-    role = await roles.first()
-    await new_role.delete()
+    role = await RolesRepository.get_by_id(new_role.id)
+    await RolesRepository.delete(role.id)
     """
     assert
     """
-    roles = await Role.query.filter_by(username="ssatti", role="free")
-    role = await roles.first()
+    role = await RolesRepository.get_by_id(new_role.id)
     assert role is None
 
 
@@ -61,13 +59,13 @@ async def test_get_all_roles_for_user():
     role1 = "paid"
     role2 = "staff"
     new_role1 = Role(username="ssatti", role=role1)
-    await new_role1.save()
+    await RolesRepository.save(new_role1)
     new_role2 = Role(username="ssatti", role=role2)
-    await new_role2.save()
+    await RolesRepository.save(new_role2)
     """
     act
     """
-    roles = await Role.get_all_roles_for_user("ssatti")
+    roles = await RolesRepository.get_all_roles_for_user("ssatti")
     """
     assert
     """
@@ -86,11 +84,11 @@ async def test_role_exists_for_user_true():
     """
     role = "paid"
     new_role = Role(username="ssatti", role=role)
-    await new_role.save()
+    await RolesRepository.save(new_role)
     """
     act
     """
-    role_exists = await Role.role_exists_for_user("ssatti", role)
+    role_exists = await RoleService.role_exists_for_user("ssatti", role)
     """
     assert
     """
@@ -109,7 +107,7 @@ async def test_role_exists_for_user_false():
     """
     act
     """
-    role_exists = await Role.role_exists_for_user("ssatti", role)
+    role_exists = await RoleService.role_exists_for_user("ssatti", role)
     """
     assert
     """
@@ -129,14 +127,12 @@ async def test_add_role_for_user():
     """
     act
     """
-    await Role.add_role_for_user(username=username, role=role)
+    await RoleService.add_role_for_user(username=username, role=role)
     """
     assert
     """
-    roles = await Role.query.filter_by(username=username, role=role)
-    r = await roles.first()
-    assert r.username == username
-    assert r.role == role
+    role_exists = await RoleService.role_exists_for_user("ssatti", role)
+    assert role_exists == True
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -150,14 +146,13 @@ async def test_remove_role_for_user():
     username = "ssatti"
     role = "paid"
     new_role = Role(username=username, role=role)
-    await new_role.save()
+    await RolesRepository.save(new_role)
     """
     act
     """
-    await Role.remove_role_for_user(username=username, role=role)
+    await RoleService.remove_role_for_user(username=username, role=role)
     """
     assert
     """
-    roles = await Role.query.filter_by(username=username, role=role)
-    r = await roles.first()
-    assert r is None
+    role_exists = await RoleService.role_exists_for_user("ssatti", role)
+    assert role_exists == False

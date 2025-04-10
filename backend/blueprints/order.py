@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
-from backend.payment.services.order_service import OrderService
+from backend.services.order import OrderService
 
 def create_order_router(order_service: OrderService):
     order_router = APIRouter()

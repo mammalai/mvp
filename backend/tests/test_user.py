@@ -4,6 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 
 import pytest
 from backend.models import User
+from backend.repositories.user import UsersRepository
+from backend.helpers.utils import check_password_hash
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_create_user(strong_password):
@@ -18,15 +20,15 @@ async def test_create_user(strong_password):
     """
     act
     """
-    await new_user.save()
+    await UsersRepository.save(new_user)
     # Add assertions to verify that the user was created successfully
-    user = await User.get_user_by_email(test_email)
+    user = await UsersRepository.get_user_by_email(test_email)
     """
     assert
     """
     assert user is not None
     assert user.email == test_email
-    assert user.check_password(strong_password)
+    assert check_password_hash(user._password, strong_password)
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_delete_user(strong_password):
@@ -39,16 +41,16 @@ async def test_delete_user(strong_password):
     test_email = "s@gmail.com"
     # set the new user, password, and save the user
     new_user = User(email="s@gmail.com", password=strong_password)
-    await new_user.save()
+    await UsersRepository.save(new_user)
     """
     act
     """
-    user = await User.get_user_by_email(test_email)
-    await new_user.delete()
+    user = await UsersRepository.get_user_by_email(test_email)
+    await UsersRepository.delete(user.id)
     """
     assert
     """
-    user = await User.get_user_by_email(test_email)
+    user = await UsersRepository.get_user_by_email(test_email)
     assert user is None
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -93,16 +95,16 @@ async def test_update_user_password(strong_password):
     test_email = "s@gmai.com"
     # set the new user
     new_user = User(email=test_email, password=f"old_{strong_password}")
-    await new_user.save()
+    await UsersRepository.save(new_user)
     """
     act
     """
-    user = await User.get_user_by_email(test_email)
+    user = await UsersRepository.get_user_by_email(test_email)
     user.password = f"new_{strong_password}"
-    await user.save()
+    await UsersRepository.save(user)
     """
     assert
     """
-    user = await User.get_user_by_email(test_email)
+    user = await UsersRepository.get_user_by_email(test_email)
     assert(user is not None)
-    assert user.check_password(f"new_{strong_password}")
+    assert check_password_hash(user._password, f"new_{strong_password}")

@@ -8,10 +8,13 @@ from dotenv import load_dotenv
 from backend.blueprints.auth import auth_router
 from backend.blueprints.order import create_order_router
 from backend.blueprints.products import create_product_router
+from backend.blueprints.product_details import create_product_details_router
 
 from backend.services.product import ProductService
+from backend.services.product_details import ProductDetailsService
 
 from backend.repositories.product import ProductsRepository
+from backend.repositories.product_details import ProductsDetailsRepository
 
 from backend.extensions import db
 
@@ -53,6 +56,10 @@ def create_app():
     products_repository = ProductsRepository(db)
     product_service = ProductService(products_repository)
     app.include_router(create_product_router(product_service), prefix="/api/products")
+
+    product_details_repository = ProductsDetailsRepository(db)
+    product_details_service = ProductDetailsService(product_details_repository)
+    app.include_router(create_product_details_router(product_details_service), prefix="/api/product-details")
 
     # Echo endpoint
     @app.post("/api/echo")

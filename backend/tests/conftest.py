@@ -2,9 +2,14 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 import pytest_asyncio
+from datetime import timedelta
 from httpx import AsyncClient, ASGITransport
 from motor.motor_asyncio import AsyncIOMotorClient
 from backend.app import create_app
+from backend.services.auth import AuthService
+from backend.models.mongodb.user import User
+from backend.models.mongodb.role import Role, RoleName
+from backend.repositories.user import UsersRepository
 
 @pytest_asyncio.fixture(loop_scope="session")
 async def client():
@@ -22,6 +27,19 @@ async def client():
 @pytest_asyncio.fixture(loop_scope="session")
 def strong_password():
     return "StrongPassword123"
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def admin(strong_password):
+    identity = "admin@gmail.com"
+    access_token = AuthService.create_token(
+        data={"sub": identity, "roles": ["admin"]},  # Add roles like in the login endpoint
+        expires_delta=timedelta(seconds=1000)
+    )
+
+    new_user = User(email=identity, password=strong_password, roles=[Role(RoleName.ADMIN)])
+    await UsersRepository.save(new_user)
+
+    return new_user, access_token
 
 @pytest_asyncio.fixture(autouse=True, loop_scope="session")
 async def test_database():

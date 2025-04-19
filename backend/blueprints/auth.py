@@ -1,34 +1,8 @@
-from fastapi import APIRouter, HTTPException, Request, Depends, Response, status
+from fastapi import APIRouter, HTTPException, Request, Depends, Response
 from backend.services.auth import AuthService
+from backend.middleware.auth import decode_access_token
 
 auth_router = APIRouter()
-
-def decode_access_token(request: Request) -> str:
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing or invalid Authorization header",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    token = auth_header[len("Bearer "):]
-
-    try:
-        payload = AuthService.decode_token(token)
-        user_email = payload.get("sub")  # commonly "sub" is used for user identity
-        if user_email is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token: missing user information",
-            )
-        return user_email
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate token",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from e
 
 @auth_router.post("/password")
 async def password_reset_new_password(request: Request):
@@ -99,7 +73,7 @@ async def login_user(request: Request, response: Response):
 
 @auth_router.get("/whoami")
 async def whoami(current_user: str = Depends(decode_access_token)):
-    return {"message": {"user_details": {"email": current_user}}}
+    return current_user.safe_dict()
 
 
 @auth_router.post("/register")

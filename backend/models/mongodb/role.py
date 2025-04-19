@@ -1,41 +1,32 @@
 from dataclasses import dataclass
-from backend.helpers.utils import generate_id
+from enum import Enum
 
-ROLES = {
-    'unverified': {
-        'description': 'Unverified User'
-    },
-    'free': {
-        'description': 'Free User'
-    },
-    'paid': {
-        'description': 'Paid User',
-    },
-    'staff': {
-        'description': 'Staff User - can have access to cross users',
-    },
-}
+class RoleName(Enum):
+    ADMIN = "admin"
+    UNVERIFIED = "unverified"
+    FREE = "free"
+    PAID = "paid"
+    STAFF = "staff"
 
 @dataclass
 class Role():
-    def __init__(self, username, role: str = 'unverified', id: str = None):
-        if not Role.is_role_valid(role):
-            raise ValueError(f"Invalid role '{role}'. Valid roles are: {', '.join(ROLES.keys())}")
-        self.id = id if id is not None else generate_id()
-        self.username = username
-        self.role = role
+    def __init__(self, name: RoleName = RoleName.UNVERIFIED):
+        if not Role.is_valid(name):
+            raise ValueError(f"Invalid role '{name}'. Valid roles are: {', '.join([r.value for r in RoleName])}")
+        self.name = name
 
     def __repr__(self):
-        return f'<Role {self.username}={self.role}>'
+        return f'<Role {self.name}>'
     
-    def dict(self):
-        return {
-            "id": self.id,
-            "username": self.username,
-            "role": self.role
-        }
+    def __eq__(self, other):
+        return isinstance(other, Role) and self.name == other.name
+    
+    def __hash__(self):
+        return hash(self.name)
+    
+    def __str__(self):
+        return self.name.value
     
     @classmethod
-    def is_role_valid(cls, role):
-        """Check if a role is valid based on the master dictionary"""
-        return role in ROLES
+    def is_valid(cls, role: RoleName):
+        return isinstance(role, RoleName)

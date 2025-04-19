@@ -10,7 +10,7 @@ class UsersRepository:
         user = await cls.collection.find_one({"email": email}, {"_id": False})
         if user is None:
             return None
-        return User(**user)
+        return User.from_dict(user)
 
     @classmethod
     async def save(cls, user: User) -> None:

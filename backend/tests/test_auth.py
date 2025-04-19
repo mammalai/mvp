@@ -3,9 +3,9 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
 
 import pytest
-from backend.models import User, Role
+from backend.models import User
+from backend.models.mongodb.role import Role, RoleName
 from backend.repositories.user import UsersRepository
-from backend.repositories.role import RolesRepository
 from datetime import timedelta
 from backend.services.auth import AuthService
 from backend.helpers.utils import generate_password_hash, check_password_hash
@@ -30,8 +30,7 @@ async def test_register_with_verification(client, strong_password):
     assert user is not None
     assert user.email == email
     assert check_password_hash(user._password, strong_password)
-    roles_list = await RolesRepository.get_all_roles_for_user(username=user.email)
-    assert roles_list[0].role == "unverified"
+    assert user.has_role(Role(RoleName.UNVERIFIED))
 
     # Act: Verify with an invalid token
     response = await client.post(f"/api/auth/verification?token=invalid_token")
@@ -48,9 +47,8 @@ async def test_register_with_verification(client, strong_password):
     assert response.json()["message"] == "Email verification successful"
 
     # Assert: Verify role update
-    roles_list = await RolesRepository.get_all_roles_for_user(username=user.email)
-    assert roles_list[0].role == "free"
-
+    user = await UsersRepository.get_user_by_email(email)
+    assert user.has_role(Role(RoleName.FREE))
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_login_failure(client):

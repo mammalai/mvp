@@ -3,10 +3,8 @@ from dotenv import load_dotenv
 from jose import jwt
 from datetime import datetime, timezone, timedelta
 from backend.models.mongodb.user import User
-from backend.models.mongodb.role import Role
+from backend.models.mongodb.role import Role, RoleName
 from backend.repositories.user import UsersRepository
-from backend.repositories.role import RolesRepository
-from backend.services.role import RoleService
 from backend.helpers.mail_gateway import MailGateway
 from backend.helpers.utils import generate_password_hash, check_password_hash
 
@@ -106,13 +104,15 @@ class AuthService:
             raise Exception("Not a registration token")
 
         user_email = decoded_token.get("sub")
-        user_roles = await RolesRepository.get_all_roles_for_user(username=user_email)
 
-        if len(user_roles) == 1 and user_roles[0].role == "unverified":
-            await RolesRepository.delete(user_roles[0].id)
-            await RoleService.add_role_for_user(username=user_email, role="free")
-        else:
+        user = await UsersRepository.get_user_by_email(email=user_email)
+
+        if not user.has_role(Role(RoleName.UNVERIFIED)):
             raise Exception("User already verified")
+        
+        user.remove_role(Role(RoleName.UNVERIFIED))
+        user.add_role(Role(RoleName.FREE))
+        await UsersRepository.save(user)
 
     @classmethod
     async def register_email(cls, email: str, password: str):
@@ -120,26 +120,23 @@ class AuthService:
 
         if not user:
             new_user = User(email=email, password=password)
-            role = Role(username=new_user.email, role="unverified")
             verification_token = cls.create_token(
                 data={"sub": new_user.email, "type": "registration"},
                 expires_delta=timedelta(hours=24)
             )
-            await RolesRepository.save(role)
             await UsersRepository.save(new_user)
             cls.send_password_reset_email(new_user.email, verification_token)
             return {"message": "User created"}
         else:
-            user_roles = await RolesRepository.get_all_roles_for_user(username=user.email)
-            if len(user_roles) == 1 and user_roles[0].role == "unverified":
-                verification_token = cls.create_token(
-                    data={"sub": user.email, "type": "registration"},
-                    expires_delta=timedelta(hours=24)
-                )
-                cls.send_password_reset_email(user.email, verification_token)
-                return {"message": "User exists, resending verification email"}
-            else:
+            if not user.has_role(Role(RoleName.UNVERIFIED)):
                 raise Exception("User already verified")
+
+            verification_token = cls.create_token(
+                data={"sub": user.email, "type": "registration"},
+                expires_delta=timedelta(hours=24)
+            )
+            cls.send_password_reset_email(user.email, verification_token)
+            return {"message": "User exists, resending verification email"}
             
     @classmethod
     async def login_user(cls, email: str, password: str):
@@ -151,9 +148,8 @@ class AuthService:
         if not check_password_hash(hashed_password=user._password, password=password):
             raise Exception("Invalid password")
 
-        roles_list = await RolesRepository.get_all_roles_for_user(username=user.email)
-        roles_list_str = [r.role for r in roles_list]
-
+        roles_list_str = [str(role) for role in user.get_roles()]
+        
         access_token_expiration = timedelta(seconds=cls.JWT_ACCESS_TOKEN_EXPIRES)
         refresh_token_expiration = timedelta(seconds=cls.JWT_REFRESH_TOKEN_EXPIRES)
         access_token = cls.create_token(data={"sub": user.email, "roles": roles_list_str}, expires_delta=access_token_expiration)
@@ -175,5 +171,5 @@ class AuthService:
         new_user = User(email=email, password=password)
         
         # Add the user as a free user
-        await RoleService.add_role_for_user(username=new_user.email, role="free")
+        new_user.add_role(Role(RoleName.FREE))
         await UsersRepository.save(new_user)

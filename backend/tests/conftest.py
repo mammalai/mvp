@@ -2,9 +2,14 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 import pytest_asyncio
+from datetime import timedelta
 from httpx import AsyncClient, ASGITransport
 from motor.motor_asyncio import AsyncIOMotorClient
 from backend.app import create_app
+from backend.services.auth import AuthService
+from backend.models.mongodb.user import User
+from backend.models.mongodb.role import Role, RoleName
+from backend.repositories.user import UsersRepository
 
 @pytest_asyncio.fixture(loop_scope="session")
 async def client():
@@ -23,6 +28,19 @@ async def client():
 def strong_password():
     return "StrongPassword123"
 
+@pytest_asyncio.fixture(loop_scope="session")
+async def admin(strong_password):
+    identity = "admin@gmail.com"
+    access_token = AuthService.create_token(
+        data={"sub": identity, "roles": ["admin"]},  # Add roles like in the login endpoint
+        expires_delta=timedelta(seconds=1000)
+    )
+
+    new_user = User(email=identity, password=strong_password, roles=[Role(RoleName.ADMIN)])
+    await UsersRepository.save(new_user)
+
+    return new_user, access_token
+
 @pytest_asyncio.fixture(autouse=True, loop_scope="session")
 async def test_database():
     """Use a separate test database and clean it before each test function."""
@@ -34,7 +52,7 @@ async def test_database():
     os.environ["MONGO_DB_NAME"] = test_db_name
     
     # Create new connection using the current running loop
-    mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
+    mongo_uri = os.environ.get("MONGO_URI")
     test_client = AsyncIOMotorClient(mongo_uri)
     test_db = test_client[test_db_name]
     

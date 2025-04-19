@@ -139,7 +139,7 @@ async def test_reset_password(client, strong_password):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_whoami(client):
+async def test_whoami(client, strong_password):
     """
     Test the /whoami endpoint with a valid access token.
     """
@@ -147,8 +147,11 @@ async def test_whoami(client):
     identity = "testuser@gmail.com"
     access_token = AuthService.create_token(
         data={"sub": identity, "roles": ["free"]},  # Add roles like in the login endpoint
-        expires_delta=timedelta(seconds=10)
+        expires_delta=timedelta(seconds=100)
     )
+
+    new_user = User(email=identity, password=strong_password)
+    await UsersRepository.save(new_user)
     
     # Act: Call the /whoami endpoint
     response = await client.get(
@@ -158,4 +161,4 @@ async def test_whoami(client):
     
     # Assert: Verify the response
     assert response.status_code == 200
-    assert response.json()["message"]["user_details"]["email"] == identity
+    assert response.json()["email"] == identity

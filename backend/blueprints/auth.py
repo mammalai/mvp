@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, Request, Depends, Response, status
 from backend.services.auth import AuthService
+from backend.repositories.user import UsersRepository
 
 auth_router = APIRouter()
 
-def decode_access_token(request: Request) -> str:
+async def decode_access_token(request: Request) -> str:
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(
@@ -22,7 +23,14 @@ def decode_access_token(request: Request) -> str:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token: missing user information",
             )
-        return user_email
+        # Check if the user exists in the database
+        user = await UsersRepository.get_user_by_email(user_email)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+            )
+        return user
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -99,7 +107,7 @@ async def login_user(request: Request, response: Response):
 
 @auth_router.get("/whoami")
 async def whoami(current_user: str = Depends(decode_access_token)):
-    return {"message": {"user_details": {"email": current_user}}}
+    return current_user.safe_dict()
 
 
 @auth_router.post("/register")

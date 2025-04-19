@@ -24,6 +24,13 @@ class User():
 
     def __repr__(self):
         return f"<User {self.email}>"
+    
+    def safe_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "roles": [str(role) for role in self.roles]
+        }
 
     def dict(self):
         return {

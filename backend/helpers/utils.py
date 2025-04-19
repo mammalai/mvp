@@ -1,27 +1,26 @@
-from posixpath import join as posixpath_join
+import bcrypt
 from uuid import uuid4
-from passlib.context import CryptContext
-
-# Create a password context for hashing and verification
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def multi_urljoin(*parts):
     formatted_parts = []
     for part in parts:
         formatted_parts.append(part.rstrip('/').lstrip('/'))
-    return posixpath_join(*formatted_parts)
+    return '/'.join(formatted_parts)
 
 def generate_id():
     return str(uuid4())
 
+# Use bcrypt directly instead of passlib
 def generate_password_hash(password: str) -> str:
-    """
-    Hash a password using bcrypt.
-    """
-    return pwd_context.hash(password)
+    """Hash a password using bcrypt."""
+    if isinstance(password, str):
+        password = password.encode('utf-8')
+    return bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8')
 
 def check_password_hash(hashed_password: str, password: str) -> bool:
-    """
-    Verify a password against its hash using bcrypt.
-    """
-    return pwd_context.verify(password, hashed_password)
+    """Verify a password against its hash using bcrypt."""
+    if isinstance(password, str):
+        password = password.encode('utf-8')
+    if isinstance(hashed_password, str):
+        hashed_password = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(password, hashed_password)

@@ -1,4 +1,4 @@
-This PR follows this approach of file organization and division of tasks:
+This is the approach for file organization and division of tasks:
 
 ```
 Blueprints
@@ -18,4 +18,18 @@ Blueprints
 Some comments and possible TODOs:
 - Maybe we should separate the Helpers directory in Gateways and Helpers
 - TODO: Convert some Service methods to be static/class methods
-- It might be necessary to rethink the Role Model. I am not sure if this should just be a property of the User Model. I don't understand the advantage of having separate objects for this. @ssattids let's discuss this point.
+
+How to install the dependencies:
+```bash
+poetry install
+```
+
+How to run the tests:
+```bash
+pytest
+```
+
+How to start the service locally (run from the root directory):
+```bash
+uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
+```

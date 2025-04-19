@@ -52,7 +52,7 @@ async def test_database():
     os.environ["MONGO_DB_NAME"] = test_db_name
     
     # Create new connection using the current running loop
-    mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
+    mongo_uri = os.environ.get("MONGO_URI")
     test_client = AsyncIOMotorClient(mongo_uri)
     test_db = test_client[test_db_name]
     

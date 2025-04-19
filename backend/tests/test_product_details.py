@@ -7,7 +7,7 @@ import pytest_asyncio
 from httpx import AsyncClient
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_insert_product_details(client: AsyncClient):
+async def test_insert_product_details(client: AsyncClient, admin):
     # Payload based on the provided JSON; required fields added for model compliance.
     data = {
         "title": "Raised Toilet Seat",
@@ -51,13 +51,14 @@ async def test_insert_product_details(client: AsyncClient):
         },
         "more_to_consider": "<b>Finding Your Perfect Height</b>: Before buying, measure from the back of your knees to the floor while seated, then subtract your current toilet height. This gives you your ideal riser height. Your knees should be slightly higher than your hips when seated.\nInstallation Options:\nLong-Term Use: We recommend bolt-on risers for maximum stability. The Bemis Assurance (3-inch height) comes with or without handles. Consider the handle-free version paired with a wall-mounted grab bar for a cleaner look. For a budget-friendly option with handles, try the Vive Health riser (3.5-inch height).\nTemporary Use: Clamp-on risers offer easy installation and removal. For round toilets, we recommend the Vaunn (4.5-inch height). For elongated toilets, try the Carex (5-inch height).\n\nWith the right toilet riser installed correctly, you'll enjoy safer, more confident bathroom visits. A stable, well-fitted riser reduces strain on joints and muscles while supporting recovery and independence."
     }
-    response = await client.post("/api/product-details/", json=data)
+    user, access_token = admin
+    response = await client.post("/api/product-details/", json=data, headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
     result = response.json()
     assert result["title"] == data["title"]
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_update_product_details(client: AsyncClient):
+async def test_update_product_details(client: AsyncClient, admin):
     # Insert a product_details record to update
     data_create = {
         "title": "Initial Raised Toilet Seat",
@@ -75,7 +76,8 @@ async def test_update_product_details(client: AsyncClient):
         },
         "more_to_consider": "Initial considerations"
     }
-    response_create = await client.post("/api/product-details/", json=data_create)
+    user, access_token = admin
+    response_create = await client.post("/api/product-details/", json=data_create, headers={"Authorization": f"Bearer {access_token}"})
     assert response_create.status_code == 200
     product_details = response_create.json()
     product_details_id = product_details["id"]
@@ -83,13 +85,13 @@ async def test_update_product_details(client: AsyncClient):
     # Update the product_details record
     data_update = data_create.copy()
     data_update["title"] = "Updated Raised Toilet Seat"
-    response_update = await client.post(f"/api/product-details/{product_details_id}", json=data_update)
+    response_update = await client.post(f"/api/product-details/{product_details_id}", json=data_update, headers={"Authorization": f"Bearer {access_token}"})
     assert response_update.status_code == 200
     updated_details = response_update.json()
     assert updated_details["title"] == "Updated Raised Toilet Seat"
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_delete_product_details(client: AsyncClient):
+async def test_delete_product_details(client: AsyncClient, admin):
     # Insert a product_details record to delete
     data_create = {
         "title": "Delete Test Raised Toilet Seat",
@@ -107,12 +109,15 @@ async def test_delete_product_details(client: AsyncClient):
         },
         "more_to_consider": "Delete considerations"
     }
-    response_create = await client.post("/api/product-details/", json=data_create)
+
+    user, access_token = admin
+
+    response_create = await client.post("/api/product-details/", json=data_create, headers={"Authorization": f"Bearer {access_token}"})
     assert response_create.status_code == 200
     product_details = response_create.json()
     product_details_id = product_details["id"]
     
-    response_delete = await client.delete(f"/api/product-details/{product_details_id}")
+    response_delete = await client.delete(f"/api/product-details/{product_details_id}", headers={"Authorization": f"Bearer {access_token}"})
     assert response_delete.status_code == 200
     result = response_delete.json()
     assert "deleted" in result.get("message", "").lower()
